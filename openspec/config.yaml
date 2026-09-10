@@ -1,0 +1,50 @@
+schema: spec-driven
+
+context: |
+  Orbweaver Admin: an admin UI for user management, built as a take-home
+  exercise. Reference: Admin_User_Management_Take-Home.pdf.
+
+  Stack: Angular, styled with Tailwind CSS.
+
+  The API layer is client-side over an in-memory store, written like a real
+  HTTP client (request/response shapes, headers, status codes, error
+  handling). There is no real backend.
+
+  Designed for 500,000 users: the list must use server-side pagination
+  (skip/limit), never client-side slicing of a full dataset.
+
+  Accessibility target is WCAG 2.2.
+
+  Git commits use Conventional Commits, one sentence, with no AI or tooling
+  attribution.
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
