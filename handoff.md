@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-14, optional tasks and stray dev servers recorded (earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-14, dev server ports corrected after sync (earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -93,10 +93,10 @@ committed in `3901bcf`, archived 2026-09-13 with its delta merged into
   the heading. The failure was forced by wrapping `loadPage` from the
   browser console (`ng.getComponent`), with no source change.
 - Ports 4200 and 4300 were both held by other `ng serve` processes of this
-  app during the session, so the check ran on 4400. Both were still
-  listening on 2026-09-14 (PIDs 25844 and 3492). This work did not start
-  them and left them running; ask the user before killing them, or pick
-  another port.
+  app during the session, so the check ran on 4400. A later check on
+  2026-09-14 found 4200 free and only 4300 still listening (PID 3492).
+  This work did not start that server and left it running; ask the user
+  before killing it, or pick another port.
 
 The API layer lives in `src/app/core/api/` and was built through the OpenSpec
 change `openspec/changes/archive/2026-09-13-build-user-api-client/` (all 10
