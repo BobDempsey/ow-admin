@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13, API layer built (previously 2026-09-10)
+Last updated: 2026-09-13, top nav built (previously 2026-09-10)
 
 ## What this is
 
@@ -12,16 +12,52 @@ distilled from `Admin_User_Management_Take-Home.pdf`.
 ## State
 
 The Angular workspace is scaffolded at the repo root (2026-09-13). It holds
-the client-side API layer and the CLI's starter page, with no nav or user
-screens yet. It was generated with `@angular/cli@22.1.8`:
+the client-side API layer and the app shell with the top nav; `/users` shows
+only a heading so far. It was generated with `@angular/cli@22.1.8`:
 `ng new orbweaver-admin --directory . --style tailwind --skip-git
 --package-manager npm --ssr false --zoneless --ai-config none
 --test-runner vitest --defaults`. That gives Angular 22.1, TypeScript 6.0,
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (72 tests in 7 files), and
-`npx prettier --check src/app` is clean. AG Grid is not installed yet; add
+`ng build` and `ng test --watch=false` both pass (84 tests in 10 files), and
+`npx prettier --check src` is clean.
+
+The app shell and nav were built through the OpenSpec change
+`openspec/changes/add-top-navigation/` (all 12 tasks done, not yet archived).
+How it works:
+
+- `App` (`src/app/app.ts`, inline template; `app.html` and `app.css` are
+  gone) renders a skip link, `<header>` with `TopNav`, and
+  `<main id="main" tabindex="-1">` around the router outlet. The skip link
+  handles its own click, because a plain `#main` href resolves against
+  `<base href="/">` and would change the URL.
+- After every navigation except the first, `App` focuses the first
+  `h1[tabindex]` in `<main>`, falling back to `<main>`. **Every screen needs
+  an `<h1 tabindex="-1">`** or focus lands on `<main>`.
+- `TopNav` (`src/app/layout/top-nav.ts`): wordmark link to `/users`, Users
+  link with `routerLinkActive` and `aria-current="page"`, and Dashboard,
+  Reports and Settings as `aria-disabled` buttons with hidden
+  "(not available yet)" text. Those three labels are invented. The active
+  style is bold plus a sky-400 bottom border, driven by
+  `aria-[current=page]:` Tailwind variants.
+- Routes: `''` and `**` redirect to `users`; `users` lazy-loads
+  `src/app/users/users-page.ts` (default export, heading only).
+- `PageTitleStrategy` (`src/app/core/page-title-strategy.ts`) sets
+  `<route title> | Orbweaver Admin`.
+- `axe-core` 4.13.0 is a dev dependency. `src/testing/axe.ts` exports
+  `expectNoAxeViolations(element)`, which disables `color-contrast` because
+  jsdom has no layout; reuse it for later screens.
+- Browser check on 2026-09-13 (Playwright, dev server): at 320 px the page
+  does not scroll sideways, the nav wraps to three rows, every entry is 44 px
+  tall, the skip link shows on first Tab and moves focus to `<main>` without
+  changing the URL. At 1280 px the nav is one row and Tab reaches Users with
+  a visible 2 px outline. Contrast on the slate-900 header: white 17.8:1,
+  slate-300 placeholders 12:1, sky-400 focus ring 8.2:1.
+- `.playwright-mcp/` (Playwright MCP screenshots and logs) is now in
+  `.gitignore`.
+- Port 4200 was already in use during this session, so the check ran on
+  4300. AG Grid is not installed yet; add
 `ag-grid-angular` with the user list task.
 
 The API layer lives in `src/app/core/api/` and was built through the OpenSpec
@@ -191,11 +227,12 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- No UI beyond the CLI starter page in `src/app/app.html`, which the nav
-  task should replace. The `UsersService` from the state decision (signals,
+- The user list, create, view and edit screens are not built; `/users` is a
+  heading only. The `UsersService` from the state decision (signals,
   ETags beside records, `resource()` for pages) does not exist yet; build it
   over `UsersApi` with the user list and user management tasks.
-- The `build-user-api-client` change is complete but not archived.
+- The `build-user-api-client` and `add-top-navigation` changes are complete
+  but not archived.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
