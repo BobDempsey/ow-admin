@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-14, user management screens built through `build-user-management`, not yet committed or archived (earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-14, user management screens committed in `4ab6e59` (earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -101,7 +101,7 @@ committed in `3901bcf`, archived 2026-09-13 with its delta merged into
 
 The create, view and edit screens were built through the OpenSpec change
 `openspec/changes/build-user-management/` (all 17 tasks done on
-2026-09-14). The change and its code are **not yet committed or archived**.
+2026-09-14, committed in `4ab6e59`). The change is **not yet archived**.
 How it works:
 
 - Routes: `users/new` (title `New user`) is declared before `users/:id` so
@@ -204,8 +204,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`3901bcf` (user list); the user management screens and their OpenSpec
-change are uncommitted. Commit `handoff.md` and `tasks.md` edits after
+`4ab6e59` (user management screens and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -400,8 +399,8 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- The user management screens are built but uncommitted, and
-  `build-user-management` is not archived.
+- `build-user-management` is committed but not archived; run
+  `/opsx:archive` to merge its deltas into `openspec/specs/`.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
