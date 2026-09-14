@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13, commit reference corrected after sync (earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-13, API client and top nav changes archived (earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -24,7 +24,9 @@ and the 2025 file naming style (`app.ts`, not `app.component.ts`).
 `npx prettier --check src` is clean.
 
 The app shell and nav were built through the OpenSpec change
-`openspec/changes/add-top-navigation/` (all 12 tasks done, not yet archived).
+`openspec/changes/archive/2026-09-13-add-top-navigation/` (all 12 tasks
+done, archived 2026-09-13 with its delta merged into
+`openspec/specs/admin-navigation/`).
 How it works:
 
 - `App` (`src/app/app.ts`, inline template; `app.html` and `app.css` are
@@ -62,8 +64,8 @@ How it works:
 AG Grid is not installed yet; add `ag-grid-angular` with the user list task.
 
 The API layer lives in `src/app/core/api/` and was built through the OpenSpec
-change `openspec/changes/build-user-api-client/` (all 10 tasks done, not yet
-archived; run `/opsx:archive` to fold its delta into
+change `openspec/changes/archive/2026-09-13-build-user-api-client/` (all 10
+tasks done, archived 2026-09-13 with its delta merged into
 `openspec/specs/user-api-client/`). How it works:
 
 - `inMemoryApiInterceptor` (`in-memory/in-memory-api.interceptor.ts`) plays
@@ -120,8 +122,13 @@ workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code c
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
-`accessibility` (23 requirements total). The change that created them is at
-`openspec/changes/archive/2026-09-10-establish-user-management-specs/`.
+`accessibility` (33 requirements total). The change that created them is at
+`openspec/changes/archive/2026-09-10-establish-user-management-specs/`; the
+two 2026-09-13 archives added five requirements to `user-api-client` and
+five to `admin-navigation`, and widened "Placeholder nav entries". The
+merged text is hard-wrapped to match the existing main specs.
+`openspec validate --specs --strict` passes all six. No OpenSpec change is
+active; the next screen needs a new `/opsx:propose`.
 
 ## Decisions made
 
@@ -227,14 +234,17 @@ All pre-implementation decisions are made.
   landed (such as the VS Code chat that generated it) does not have them
   until it restarts; check with `/mcp`.
 
+- `git mv` of a directory under `openspec/changes/` failed with
+  "Permission denied" on 2026-09-13 (a Windows handle, likely the editor or
+  a watcher). PowerShell `Move-Item` moved the same directories; git then
+  sees the moves as deletes plus untracked files until they are staged.
+
 ## Not done
 
 - The user list, create, view and edit screens are not built; `/users` is a
   heading only. The `UsersService` from the state decision (signals,
   ETags beside records, `resource()` for pages) does not exist yet; build it
   over `UsersApi` with the user list and user management tasks.
-- The `build-user-api-client` and `add-top-navigation` changes are complete
-  but not archived.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.

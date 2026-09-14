@@ -1,6 +1,5 @@
 # Remaining tasks
 
-- [ ] Archive the completed OpenSpec changes
 - [ ] Build user list screen with AG Grid pagination
 - [ ] Build create/view/edit user screens with conflict handling
 - [ ] Implement and verify WCAG 2.2 accessibility
