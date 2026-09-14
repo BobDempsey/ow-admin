@@ -4,7 +4,7 @@
 - [x] Decide UI component library
 - [x] Decide pagination vs. infinite scroll
 - [x] Decide search/filter/sort scope
-- [ ] Scaffold Angular + Tailwind project
+- [x] Scaffold Angular + Tailwind project
 - [ ] Add Angular's official AI rules to CLAUDE.md (`ng generate ai-config`)
 - [ ] Build client-side API layer (pagination, ETag/If-Match, error handling)
 - [ ] Build top nav bar

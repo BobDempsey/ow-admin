@@ -11,10 +11,23 @@ distilled from `Admin_User_Management_Take-Home.pdf`.
 
 ## State
 
-No application code exists yet. The repo holds the PDF, this handoff,
-`tasks.md`, the OpenSpec workspace, and the `.claude/` OpenSpec commands.
-Git is initialized; the initial commit (`f7d6cdc`) tracks the OpenSpec
-workspace, the `.claude/` commands, and `.gitignore`.
+The Angular workspace is scaffolded at the repo root (2026-09-13) and holds
+only the CLI's starter app: no API layer, nav or user screens yet. It was
+generated with `@angular/cli@22.1.8`:
+`ng new orbweaver-admin --directory . --style tailwind --skip-git
+--package-manager npm --ssr false --zoneless --ai-config none
+--test-runner vitest --defaults`. That gives Angular 22.1, TypeScript 6.0,
+Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
+`src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
+and the 2025 file naming style (`app.ts`, not `app.component.ts`).
+`ng build` and `ng test --watch=false` both pass (2 of 2 starter tests). AG
+Grid is not installed yet; add `ag-grid-angular` with the user list task.
+
+The scaffold replaced `.gitignore` with Angular's version; the PDF ignore
+rule was re-added at the top.
+
+Git tracks the OpenSpec workspace, the `.claude/` commands, `handoff.md` and
+`tasks.md`.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
@@ -98,6 +111,12 @@ All pre-implementation decisions are made.
   features. `user-api-client` states role and status as closed sets. That is a
   deliberate narrowing, not an oversight; widen the spec first if the build
   needs more values.
+- Node is 24.19.0, managed by nvm-windows (`C:\Program Files\nodejs` is a
+  symlink to `%APPDATA%\nvm\v24.19.0`; switched 2026-09-13). Angular 22 needs
+  Node 22.22.3+, 24.15.0+ or 26+. The global `claude`, `openspec` and `pnpm`
+  CLIs were reinstalled under Node 24 and run. Change versions with
+  `nvm use` from an administrator terminal. Do not install Node through
+  winget or the MSI: it writes through the symlink into nvm's version folder.
 - AG Grid facts, checked against ag-grid.com docs on 2026-09-13 (current
   release 36.1.0):
   - The Infinite Row Model, pagination, sorting, column filters and ARIA
@@ -118,9 +137,9 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- No project scaffold, no API layer, no UI.
-- `CLAUDE.md` does not exist yet. Once the Angular workspace is scaffolded,
-  run `ng generate ai-config` to write Angular's own maintained best-practices
+- No API layer and no UI beyond the CLI starter page in `src/app/app.html`,
+  which the nav task should replace.
+- `CLAUDE.md` does not exist yet. Run `ng generate ai-config` to write Angular's own maintained best-practices
   rules into it. Angular's raw file is not fetchable from
   `angular.dev/context/...` (those URLs return the SPA shell), so use the CLI
   rather than curl.
