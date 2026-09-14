@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13 (previously 2026-09-10)
+Last updated: 2026-09-13, API layer built (previously 2026-09-10)
 
 ## What this is
 
@@ -11,17 +11,47 @@ distilled from `Admin_User_Management_Take-Home.pdf`.
 
 ## State
 
-The Angular workspace is scaffolded at the repo root (2026-09-13) and holds
-only the CLI's starter app: no API layer, nav or user screens yet. It was
-generated with `@angular/cli@22.1.8`:
+The Angular workspace is scaffolded at the repo root (2026-09-13). It holds
+the client-side API layer and the CLI's starter page, with no nav or user
+screens yet. It was generated with `@angular/cli@22.1.8`:
 `ng new orbweaver-admin --directory . --style tailwind --skip-git
 --package-manager npm --ssr false --zoneless --ai-config none
 --test-runner vitest --defaults`. That gives Angular 22.1, TypeScript 6.0,
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (2 of 2 starter tests). AG
-Grid is not installed yet; add `ag-grid-angular` with the user list task.
+`ng build` and `ng test --watch=false` both pass (72 tests in 7 files), and
+`npx prettier --check src/app` is clean. AG Grid is not installed yet; add
+`ag-grid-angular` with the user list task.
+
+The API layer lives in `src/app/core/api/` and was built through the OpenSpec
+change `openspec/changes/build-user-api-client/` (all 10 tasks done, not yet
+archived; run `/opsx:archive` to fold its delta into
+`openspec/specs/user-api-client/`). How it works:
+
+- `inMemoryApiInterceptor` (`in-memory/in-memory-api.interceptor.ts`) plays
+  the server. It answers every request under `API_BASE_URL` (`/api`) with a
+  real `HttpResponse` or `HttpErrorResponse` and passes everything else to the
+  network. `provideUsersApi()` registers it and is in `app.config.ts`.
+- `UserStore` generates the 500,000 seeded users on read from their index
+  (`seedUser`, ids `u-000000` to `u-499999`) and keeps only written users in a
+  map, so a page costs O(limit). Created users take the next index and land
+  on the last page. The store resets on reload.
+- ETags are `"<id>.<version>"`, version 1 until a successful `PUT`.
+- Status codes: 200 list/get/update, 201 create (with `ETag` and `Location`),
+  204 password reset, 400 validation (`fieldErrors` per field), 404, 405 with
+  `Allow`, 412 stale `If-Match`, 428 missing `If-Match`. `limit` above 100 is
+  capped, not rejected.
+- `UsersApi` is the typed client the UI should call: `list`, `get`,
+  `create`, `update(id, draft, etag)`, `resetPassword`. `get`, `create` and
+  `update` return `{ data, etag }`; every failure is an `ApiError` with
+  `status`, `message` and `fieldErrors`.
+- `API_LATENCY_MS` delays responses 250 ms by default so loading states show;
+  tests set it to 0.
+- `USER_ROLES` and `USER_STATUSES` in `user.model.ts` are the closed sets for
+  validation and for form selects later.
+- Email uniqueness is not enforced (recorded as a non-goal in the change's
+  `design.md`).
 
 `CLAUDE.md` and `.mcp.json` came from `ng generate ai-config --tool
 claude-code` (2026-09-13). `CLAUDE.md` is Angular's own best-practices file:
@@ -48,7 +78,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last commit is
-`32338b9`; commit `handoff.md` and `tasks.md` edits after each task.
+`ffafddb`; commit `handoff.md` and `tasks.md` edits after each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
@@ -161,8 +191,11 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- No API layer and no UI beyond the CLI starter page in `src/app/app.html`,
-  which the nav task should replace.
+- No UI beyond the CLI starter page in `src/app/app.html`, which the nav
+  task should replace. The `UsersService` from the state decision (signals,
+  ETags beside records, `resource()` for pages) does not exist yet; build it
+  over `UsersApi` with the user list and user management tasks.
+- The `build-user-api-client` change is complete but not archived.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.

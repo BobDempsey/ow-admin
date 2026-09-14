@@ -1,6 +1,6 @@
 # Remaining tasks
 
-- [ ] Build client-side API layer (pagination, ETag/If-Match, error handling)
+- [x] Build client-side API layer (pagination, ETag/If-Match, error handling)
 - [ ] Build top nav bar
 - [ ] Build user list screen with AG Grid pagination
 - [ ] Build create/view/edit user screens with conflict handling
