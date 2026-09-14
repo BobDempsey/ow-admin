@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13, user list built through `build-user-list` (earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-13, user list committed in `3901bcf` (earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -63,8 +63,9 @@ How it works:
   4300.
 
 The user list was built through the OpenSpec change
-`openspec/changes/build-user-list/` (all 13 tasks done, not yet archived or
-committed; its delta modifies `openspec/specs/user-list/`). How it works:
+`openspec/changes/build-user-list/` (all 13 tasks done, committed in
+`3901bcf`, not yet archived; its delta modifies `openspec/specs/user-list/`).
+How it works:
 
 - `ag-grid-angular` 36.1.0 is pinned exactly in `package.json`. The grid
   code registers only `InfiniteRowModelModule`, `PaginationModule` and, in
@@ -148,8 +149,8 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`288f748` (app shell and nav), followed by the docs commit `c45ebf0`; commit
-`handoff.md` and `tasks.md` edits after each task.
+`3901bcf` (user list); commit `handoff.md` and `tasks.md` edits after each
+task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
@@ -294,7 +295,7 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- The `build-user-list` change is implemented but not committed or
+- The `build-user-list` change is implemented and committed but not
   archived. Archiving merges its `user-list` delta into
   `openspec/specs/user-list/`.
 - The create, view and edit screens are not built; `/users/:id` is a
@@ -319,7 +320,8 @@ All pre-implementation decisions are made.
   "Go" means start the next task in `tasks.md`, and "Next task?" wants the
   single next unchecked item in one line. After each task, update the handoff
   and `tasks.md`, propose a commit message, and wait for "y" before
-  committing.
+  committing. After the commit, the handoff must not still describe the
+  work as uncommitted; the user checks for that.
 - The user asks for a quick web check of a library before relying on it (as
   with AG Grid) and wants the sources cited.
 - Tell the user about side effects a command had beyond the task, such as the
