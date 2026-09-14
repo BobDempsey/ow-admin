@@ -1,7 +1,5 @@
 # Remaining tasks
 
-- [x] Build client-side API layer (pagination, ETag/If-Match, error handling)
-- [x] Build top nav bar
 - [ ] Archive the completed OpenSpec changes
 - [ ] Build user list screen with AG Grid pagination
 - [ ] Build create/view/edit user screens with conflict handling

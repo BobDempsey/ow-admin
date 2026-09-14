@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13, top nav built (previously 2026-09-10)
+Last updated: 2026-09-13, commit reference corrected after sync (earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -114,8 +114,9 @@ The scaffold replaced `.gitignore` with Angular's version; the PDF ignore
 rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
-workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last commit is
-`288f748`; commit `handoff.md` and `tasks.md` edits after each task.
+workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
+`288f748` (app shell and nav), followed by the docs commit `c45ebf0`; commit
+`handoff.md` and `tasks.md` edits after each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
