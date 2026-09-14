@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-14, user management screens committed in `4ab6e59` (earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-14, `build-user-management` archived with its deltas synced (earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -100,8 +100,10 @@ committed in `3901bcf`, archived 2026-09-13 with its delta merged into
   before killing it, or pick another port.
 
 The create, view and edit screens were built through the OpenSpec change
-`openspec/changes/build-user-management/` (all 17 tasks done on
-2026-09-14, committed in `4ab6e59`). The change is **not yet archived**.
+`openspec/changes/archive/2026-09-14-build-user-management/` (all 17
+tasks done, committed in `4ab6e59`, archived 2026-09-14 with its deltas
+merged into `openspec/specs/user-management/` and
+`openspec/specs/user-list/`).
 How it works:
 
 - Routes: `users/new` (title `New user`) is declared before `users/:id` so
@@ -209,18 +211,18 @@ each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
-`accessibility` (37 requirements total). The change that created them is at
+`accessibility` (42 requirements total). The change that created them is at
 `openspec/changes/archive/2026-09-10-establish-user-management-specs/`; the
 two 2026-09-13 archives added five requirements to `user-api-client` and
 five to `admin-navigation`, and widened "Placeholder nav entries"; the
 `build-user-list` archive added four requirements to `user-list` and
 widened "Server-side paginated list" and "Navigate to user detail". The
 merged text is hard-wrapped to match the existing main specs.
-`openspec validate --specs --strict` passes all six. One OpenSpec change is
-active: `build-user-management`, with all tasks done and
-`openspec validate build-user-management --strict` passing. It modifies
-four `user-management` requirements, adds four more there, and adds one to
-`user-list`; archiving it merges those deltas.
+The `build-user-management` archive rewrote the four existing
+`user-management` requirements, added four more there, and added "New user
+entry point" to `user-list`. `openspec validate --specs --strict` passes
+all six. No OpenSpec change is active; the WCAG 2.2 task needs a new
+`/opsx:propose`.
 
 ## Decisions made
 
@@ -399,8 +401,6 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- `build-user-management` is committed but not archived; run
-  `/opsx:archive` to merge its deltas into `openspec/specs/`.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
