@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13
+Last updated: 2026-09-13 (previously 2026-09-10)
 
 ## What this is
 
@@ -32,13 +32,23 @@ editing it by hand; Angular's raw file is not fetchable from
 `angular.dev/context/...` (those URLs return the SPA shell). `.mcp.json`
 registers the Angular CLI MCP server through `npx -y @angular/cli mcp`, which
 is unpinned and pulls the latest CLI rather than the workspace's 22.1.8. Its
-AXE and "WCAG AA" lines are a floor; the project target is WCAG 2.2.
+AXE and "WCAG AA" lines are a floor; the project target is WCAG 2.2. The
+user approved the server and confirmed on 2026-09-13, from a terminal
+`claude` session, that `angular-cli` responds and sees the `orbweaver-admin`
+project.
+
+`angular.json` sets `cli.analytics` to `false`, which stops the Angular CLI
+sending usage data to Google and suppresses its first-run prompt.
+
+`npm start` serves the app at http://localhost:4200; the user has previewed
+the starter page there.
 
 The scaffold replaced `.gitignore` with Angular's version; the PDF ignore
 rule was re-added at the top.
 
-Git tracks the OpenSpec workspace, the `.claude/` commands, `handoff.md` and
-`tasks.md`.
+Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
+workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last commit is
+`32338b9`; commit `handoff.md` and `tasks.md` edits after each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
@@ -82,7 +92,6 @@ Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 - `tasks.md` is ordered in the sequence the work should be done. A review of
   the PDF against it on 2026-09-13 found every other task traces to the PDF,
   apart from the `ng generate ai-config` step, which is project tooling.
-
 - Search, filter and sort (decided 2026-09-13): optional, listed at the end
   of `tasks.md` after password reset. The PDF does not ask for them, and
   `GET /users` in the PDF contract defines only `skip` and `limit`, so adding
@@ -145,6 +154,10 @@ All pre-implementation decisions are made.
   - AG Grid claims WCAG 2.0 AA, not 2.2. It recommends pagination for screen
     readers, but the 2.2 additions (target size, focus appearance and so on)
     are ours to check around the grid.
+- A Claude Code session only gets the `angular-cli` MCP tools if it started
+  after the server was approved. A session already open when `.mcp.json`
+  landed (such as the VS Code chat that generated it) does not have them
+  until it restarts; check with `/mcp`.
 
 ## Not done
 
@@ -165,6 +178,16 @@ All pre-implementation decisions are made.
 - The user decides; confirm before acting. They ask yes/no questions, ask for
   one-sentence answers, and expect a proposed commit message shown before the
   commit is made. Answer the question asked, then stop.
+- Short replies carry weight: "y" adopts the recommendation on the table,
+  "Go" means start the next task in `tasks.md`, and "Next task?" wants the
+  single next unchecked item in one line. After each task, update the handoff
+  and `tasks.md`, propose a commit message, and wait for "y" before
+  committing.
+- The user asks for a quick web check of a library before relying on it (as
+  with AG Grid) and wants the sources cited.
+- Tell the user about side effects a command had beyond the task, such as the
+  extra `.mcp.json` from `ai-config` or a stray `angular.json` change, and ask
+  before committing them.
 - A design canvas (the `/design` skill) can preview the UI in Tailwind markup,
   but it cannot run Angular or a real component library. Treat any canvas as a
   visual mock, not a prototype.
