@@ -57,8 +57,9 @@ How it works:
 - `.playwright-mcp/` (Playwright MCP screenshots and logs) is now in
   `.gitignore`.
 - Port 4200 was already in use during this session, so the check ran on
-  4300. AG Grid is not installed yet; add
-`ag-grid-angular` with the user list task.
+  4300.
+
+AG Grid is not installed yet; add `ag-grid-angular` with the user list task.
 
 The API layer lives in `src/app/core/api/` and was built through the OpenSpec
 change `openspec/changes/build-user-api-client/` (all 10 tasks done, not yet
@@ -106,15 +107,15 @@ project.
 `angular.json` sets `cli.analytics` to `false`, which stops the Angular CLI
 sending usage data to Google and suppresses its first-run prompt.
 
-`npm start` serves the app at http://localhost:4200; the user has previewed
-the starter page there.
+`npm start` serves the app at http://localhost:4200. The user previewed the
+CLI starter page there before the shell replaced it.
 
 The scaffold replaced `.gitignore` with Angular's version; the PDF ignore
 rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last commit is
-`ffafddb`; commit `handoff.md` and `tasks.md` edits after each task.
+`288f748`; commit `handoff.md` and `tasks.md` edits after each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
