@@ -23,6 +23,17 @@ and the 2025 file naming style (`app.ts`, not `app.component.ts`).
 `ng build` and `ng test --watch=false` both pass (2 of 2 starter tests). AG
 Grid is not installed yet; add `ag-grid-angular` with the user list task.
 
+`CLAUDE.md` and `.mcp.json` came from `ng generate ai-config --tool
+claude-code` (2026-09-13). `CLAUDE.md` is Angular's own best-practices file:
+signals, `input()`/`output()`, Signal Forms for new forms, `@Service` for new
+root services, `inject()`, native control flow, and OnPush as the default in
+v22 so it is never set explicitly. Regenerate it with the CLI rather than
+editing it by hand; Angular's raw file is not fetchable from
+`angular.dev/context/...` (those URLs return the SPA shell). `.mcp.json`
+registers the Angular CLI MCP server through `npx -y @angular/cli mcp`, which
+is unpinned and pulls the latest CLI rather than the workspace's 22.1.8. Its
+AXE and "WCAG AA" lines are a floor; the project target is WCAG 2.2.
+
 The scaffold replaced `.gitignore` with Angular's version; the PDF ignore
 rule was re-added at the top.
 
@@ -139,10 +150,6 @@ All pre-implementation decisions are made.
 
 - No API layer and no UI beyond the CLI starter page in `src/app/app.html`,
   which the nav task should replace.
-- `CLAUDE.md` does not exist yet. Run `ng generate ai-config` to write Angular's own maintained best-practices
-  rules into it. Angular's raw file is not fetchable from
-  `angular.dev/context/...` (those URLs return the SPA shell), so use the CLI
-  rather than curl.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
