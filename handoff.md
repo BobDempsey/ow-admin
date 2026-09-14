@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13, user list committed in `3901bcf` (earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-13, `build-user-list` archived (earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -63,9 +63,9 @@ How it works:
   4300.
 
 The user list was built through the OpenSpec change
-`openspec/changes/build-user-list/` (all 13 tasks done, committed in
-`3901bcf`, not yet archived; its delta modifies `openspec/specs/user-list/`).
-How it works:
+`openspec/changes/archive/2026-09-13-build-user-list/` (all 13 tasks done,
+committed in `3901bcf`, archived 2026-09-13 with its delta merged into
+`openspec/specs/user-list/`). How it works:
 
 - `ag-grid-angular` 36.1.0 is pinned exactly in `package.json`. The grid
   code registers only `InfiniteRowModelModule`, `PaginationModule` and, in
@@ -154,13 +154,15 @@ task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
-`accessibility` (33 requirements total). The change that created them is at
+`accessibility` (37 requirements total). The change that created them is at
 `openspec/changes/archive/2026-09-10-establish-user-management-specs/`; the
 two 2026-09-13 archives added five requirements to `user-api-client` and
-five to `admin-navigation`, and widened "Placeholder nav entries". The
+five to `admin-navigation`, and widened "Placeholder nav entries"; the
+`build-user-list` archive added four requirements to `user-list` and
+widened "Server-side paginated list" and "Navigate to user detail". The
 merged text is hard-wrapped to match the existing main specs.
-`openspec validate --specs --strict` passes all six. One OpenSpec change is
-active, `build-user-list`, which passes `openspec validate --strict`.
+`openspec validate --specs --strict` passes all six. No OpenSpec change is
+active; the user management screens need a new `/opsx:propose`.
 
 ## Decisions made
 
@@ -295,9 +297,6 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- The `build-user-list` change is implemented and committed but not
-  archived. Archiving merges its `user-list` delta into
-  `openspec/specs/user-list/`.
 - The create, view and edit screens are not built; `/users/:id` is a
   heading only. `UsersService` has `loadPage` only; single-user loads and
   ETags beside records come with the user management task.
