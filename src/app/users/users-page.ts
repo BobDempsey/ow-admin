@@ -1,21 +1,26 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
 import { UsersGrid } from './users-grid';
 
 /** The user list screen: the total, load status, and the paged user grid. */
 @Component({
   selector: 'app-users-page',
-  imports: [DecimalPipe, UsersGrid],
+  imports: [DecimalPipe, RouterLink, UsersGrid],
   template: `
-    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <h1 #heading tabindex="-1" class="text-2xl font-semibold text-slate-900 focus:outline-none">
         Users
       </h1>
       @if (total() !== undefined) {
         <p class="text-slate-600">{{ total() | number }} users</p>
       }
+      <a
+        routerLink="/users/new"
+        class="ml-auto inline-flex min-h-11 items-center rounded bg-sky-700 px-4 font-medium text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+        >New user</a
+      >
     </div>
     <p role="status" class="mt-2 min-h-6 text-sm text-slate-600">
       @if (loading()) {

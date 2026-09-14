@@ -75,6 +75,15 @@ describe('UsersPage', () => {
     expect(document.activeElement).toBe(element.querySelector('h1'));
   });
 
+  it('links New user to the create screen', async () => {
+    const { element } = await renderPage();
+    const link = Array.from(element.querySelectorAll('a')).find(
+      (candidate) => candidate.textContent?.trim() === 'New user',
+    );
+
+    expect(link?.getAttribute('href')).toBe('/users/new');
+  });
+
   it('opens the user detail screen', async () => {
     const { grid } = await renderPage();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);

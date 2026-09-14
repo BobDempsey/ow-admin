@@ -1,6 +1,6 @@
 # Remaining tasks
 
-- [ ] Build create/view/edit user screens with conflict handling
+- [x] Build create/view/edit user screens with conflict handling
 - [ ] Implement and verify WCAG 2.2 accessibility
 
 # Optional

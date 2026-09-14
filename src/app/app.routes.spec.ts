@@ -42,4 +42,12 @@ describe('routes', () => {
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('User');
     expect(TestBed.inject(Title).getTitle()).toBe('User | Orbweaver Admin');
   });
+
+  it('shows and titles the new user screen', async () => {
+    const harness = await RouterTestingHarness.create('/users/new');
+
+    expect(TestBed.inject(Router).url).toBe('/users/new');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('New user');
+    expect(TestBed.inject(Title).getTitle()).toBe('New user | Orbweaver Admin');
+  });
 });

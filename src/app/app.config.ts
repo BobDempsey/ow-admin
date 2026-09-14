@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { TitleStrategy, provideRouter } from '@angular/router';
+import { TitleStrategy, provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { provideUsersApi } from './core/api/provide-users-api';
 import { PageTitleStrategy } from './core/page-title-strategy';
@@ -7,7 +7,7 @@ import { PageTitleStrategy } from './core/page-title-strategy';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     { provide: TitleStrategy, useExisting: PageTitleStrategy },
     provideUsersApi(),
   ],

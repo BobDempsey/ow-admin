@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-14, dev server ports corrected after sync (earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-14, user management screens built through `build-user-management`, not yet committed or archived (earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -12,15 +12,16 @@ distilled from `Admin_User_Management_Take-Home.pdf`.
 ## State
 
 The Angular workspace is scaffolded at the repo root (2026-09-13). It holds
-the client-side API layer, the app shell with the top nav, and the user list
-at `/users`; `/users/:id` shows only a heading so far. It was generated with `@angular/cli@22.1.8`:
+the client-side API layer, the app shell with the top nav, the user list
+at `/users`, the create screen at `/users/new`, and the view and edit screen
+at `/users/:id`. It was generated with `@angular/cli@22.1.8`:
 `ng new orbweaver-admin --directory . --style tailwind --skip-git
 --package-manager npm --ssr false --zoneless --ai-config none
 --test-runner vitest --defaults`. That gives Angular 22.1, TypeScript 6.0,
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (97 tests in 14 files), and
+`ng build` and `ng test --watch=false` both pass (155 tests in 19 files), and
 `npx prettier --check src` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -98,6 +99,57 @@ committed in `3901bcf`, archived 2026-09-13 with its delta merged into
   This work did not start that server and left it running; ask the user
   before killing it, or pick another port.
 
+The create, view and edit screens were built through the OpenSpec change
+`openspec/changes/build-user-management/` (all 17 tasks done on
+2026-09-14). The change and its code are **not yet committed or archived**.
+How it works:
+
+- Routes: `users/new` (title `New user`) is declared before `users/:id` so
+  `new` is never read as an id. `provideRouter` now has
+  `withComponentInputBinding()`, which binds `:id` to
+  `UserDetailPage.id`.
+- `UsersPage` has a New user link (a link, since it navigates) in the
+  heading row.
+- Forms use Signal Forms (`@angular/forms/signals`). `userDraftSchema`
+  (`user-draft-schema.ts`) holds the client rules; `toFieldErrors` maps a
+  400 `ApiError`'s `fieldErrors` onto form fields as submission errors.
+  `UserFormFields` renders the four labeled controls for both screens and
+  wires `aria-invalid` and `aria-describedby` itself (the `[formField]`
+  directive sets neither). Errors show once a field is touched, and
+  `submit()` touches all. `focusFirstError` moves focus to the first
+  invalid control after a failed submit.
+- `NewUserPage` starts at role Member and status invited, and on success
+  navigates to `/users/{id}` with `state: { notice: 'created' }`, which
+  the detail page reads through `Location.getState()` and announces.
+- `UserDetailPage` loads with `resource()` and holds the user and its ETag
+  as one `Versioned<User>` value; a save writes the response into the
+  resource with `set()`, so there is no `GET` after a save. The draft is a
+  `linkedSignal` of the loaded value. One `<h1>` stays in the DOM for every
+  state (User, the user's name, User not found) so the focus `App` puts
+  on it survives the load.
+- `ConflictDialog` is a native `<dialog>` opened with `showModal()` through
+  its `show()` method, with Keep editing focused first. Escape counts as
+  Keep editing. Overwrite loads the current ETag and saves the admin's
+  values with it; a second 412 reopens the dialog.
+- `UsersService.simulateConcurrentEdit` does a real `GET` then `PUT` with
+  the status moved to the next value, so the page's held ETag goes stale.
+  The detail screen shows it in a dashed "Demo" section as "Simulate an
+  edit by another admin".
+- Browser check on 2026-09-14 (Playwright, dev server on 4500, which this
+  session started and stopped), keyboard only at 1280 px: New user link to
+  `/users/new` put focus on the heading; an empty submit marked both text
+  fields invalid and focused Name; create landed on `/users/u-500000` with
+  "User created."; save announced "User saved."; simulate then Save opened
+  the dialog with focus on Keep editing; Tab cycled Keep editing, Reload,
+  Overwrite and the browser chrome without reaching the page; Escape closed
+  it with the edit kept and focus on Save; Reload showed the simulated
+  status; Overwrite saved the admin's values. `/users/u-999999` showed User
+  not found. At 320 px `/users`, `/users/new` and `/users/u-000042` did not
+  scroll sideways and the dialog fit with 16 px margins. axe in the
+  browser, color contrast included, found no violations on the list, the
+  create screen with errors, the detail screen, not found, and the open
+  dialog at both widths.
+
 The API layer lives in `src/app/core/api/` and was built through the OpenSpec
 change `openspec/changes/archive/2026-09-13-build-user-api-client/` (all 10
 tasks done, archived 2026-09-13 with its delta merged into
@@ -152,8 +204,9 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`3901bcf` (user list); commit `handoff.md` and `tasks.md` edits after each
-task.
+`3901bcf` (user list); the user management screens and their OpenSpec
+change are uncommitted. Commit `handoff.md` and `tasks.md` edits after
+each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
@@ -164,8 +217,11 @@ five to `admin-navigation`, and widened "Placeholder nav entries"; the
 `build-user-list` archive added four requirements to `user-list` and
 widened "Server-side paginated list" and "Navigate to user detail". The
 merged text is hard-wrapped to match the existing main specs.
-`openspec validate --specs --strict` passes all six. No OpenSpec change is
-active; the user management screens need a new `/opsx:propose`.
+`openspec validate --specs --strict` passes all six. One OpenSpec change is
+active: `build-user-management`, with all tasks done and
+`openspec validate build-user-management --strict` passing. It modifies
+four `user-management` requirements, adds four more there, and adds one to
+`user-list`; archiving it merges those deltas.
 
 ## Decisions made
 
@@ -194,6 +250,20 @@ active; the user management screens need a new `/opsx:propose`.
   `getRows`, so `UsersService.loadPage` returns a Promise instead. The list
   endpoint returns no ETags, so ETags beside records start with the user
   management task, which can still use `resource()` for single users.
+  Revised 2026-09-14 in `build-user-management`'s design: `UsersService`
+  stays stateless, and the ETag lives beside the record in
+  `UserDetailPage`'s `resource()` value. Only that screen reads single
+  users, and a service-held ETag cache would need invalidation after
+  simulate, reload and overwrite with no second reader.
+- User management UI (decided 2026-09-14): create is its own route at
+  `/users/new`, not a dialog; the detail screen is always an editable
+  form with Save and Cancel, not a read-only view with an Edit button; a
+  412 opens a modal dialog, not an inline alert; a created user opens on
+  its detail screen, not the list.
+- Conflict demo (decided 2026-09-14): a visible "Simulate an edit by
+  another admin" control on the detail screen, chosen over a dev-mode-only
+  control or console-only forcing. The in-memory store lives in one tab
+  and resets on reload, so without it a reviewer cannot reach the 412 flow.
 - Components (decided 2026-09-13): build UI components in-house with
   Tailwind, and use AG Grid Community (MIT, free) for the user list. This
   mirrors the reviewing team, who build nearly everything in-house to cut
@@ -297,12 +367,41 @@ All pre-implementation decisions are made.
   "Permission denied" on 2026-09-13 (a Windows handle, likely the editor or
   a watcher). PowerShell `Move-Item` moved the same directories; git then
   sees the moves as deletes plus untracked files until they are staged.
+- Signal Forms facts found while building the forms on 2026-09-14
+  (`@angular/forms` 22.1.6):
+  - `[formField]` sets no `aria-invalid` or `aria-describedby`; wire them
+    in the template.
+  - `required` accepts whitespace, so the name rule is a `validate` that
+    trims.
+  - Errors returned from a `submit()` action land on the field named by
+    `fieldTree` and clear when that field is edited.
+  - `submit()` returns `false` at once while a submission is running,
+    which guards against double saves.
+  - In jsdom tests a `<select>` bound with `[formField]` updates on an
+    `input` event, not `change`.
+- jsdom has no `HTMLDialogElement.showModal` or `close`.
+  `src/testing/dialog.ts` exports `stubDialogMethods()`, which defines
+  and spies on both and clears calls from earlier tests.
+- `ConflictDialog` first opened through an `open` input driven by
+  `afterRenderEffect`. When an overwrite's retry answered 412 before the
+  next render, the input went false and back to true unseen and the dialog
+  stayed shut. It now opens through `show()`.
+- A template reference variable with the same name as a component member
+  shadows it in the template (`#heading` broke `heading()`), and only
+  `ng build` reports it.
+- Shell heredocs with Angular template syntax failed to parse in this
+  session's Git Bash; writing files through the editor tool worked.
+- The first browser run on 2026-09-14 logged two
+  `NG0953: Unexpected emit for destroyed OutputRef` warnings while leaving
+  `/users` for `/users/new` by keyboard. A second run of the same
+  navigation logged none. `UsersGrid` is the only component there that
+  emits outputs from async work, so check its datasource callbacks if it
+  comes back.
 
 ## Not done
 
-- The create, view and edit screens are not built; `/users/:id` is a
-  heading only. `UsersService` has `loadPage` only; single-user loads and
-  ETags beside records come with the user management task.
+- The user management screens are built but uncommitted, and
+  `build-user-management` is not archived.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
