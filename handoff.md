@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-13, API client and top nav changes archived (earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-13, user list built through `build-user-list` (earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -12,15 +12,15 @@ distilled from `Admin_User_Management_Take-Home.pdf`.
 ## State
 
 The Angular workspace is scaffolded at the repo root (2026-09-13). It holds
-the client-side API layer and the app shell with the top nav; `/users` shows
-only a heading so far. It was generated with `@angular/cli@22.1.8`:
+the client-side API layer, the app shell with the top nav, and the user list
+at `/users`; `/users/:id` shows only a heading so far. It was generated with `@angular/cli@22.1.8`:
 `ng new orbweaver-admin --directory . --style tailwind --skip-git
 --package-manager npm --ssr false --zoneless --ai-config none
 --test-runner vitest --defaults`. That gives Angular 22.1, TypeScript 6.0,
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (84 tests in 10 files), and
+`ng build` and `ng test --watch=false` both pass (97 tests in 14 files), and
 `npx prettier --check src` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -44,7 +44,8 @@ How it works:
   style is bold plus a sky-400 bottom border, driven by
   `aria-[current=page]:` Tailwind variants.
 - Routes: `''` and `**` redirect to `users`; `users` lazy-loads
-  `src/app/users/users-page.ts` (default export, heading only).
+  `src/app/users/users-page.ts` and `users/:id` lazy-loads
+  `src/app/users/user-detail-page.ts` (title `User`, heading only).
 - `PageTitleStrategy` (`src/app/core/page-title-strategy.ts`) sets
   `<route title> | Orbweaver Admin`.
 - `axe-core` 4.13.0 is a dev dependency. `src/testing/axe.ts` exports
@@ -61,7 +62,37 @@ How it works:
 - Port 4200 was already in use during this session, so the check ran on
   4300.
 
-AG Grid is not installed yet; add `ag-grid-angular` with the user list task.
+The user list was built through the OpenSpec change
+`openspec/changes/build-user-list/` (all 13 tasks done, not yet archived or
+committed; its delta modifies `openspec/specs/user-list/`). How it works:
+
+- `ag-grid-angular` 36.1.0 is pinned exactly in `package.json`. The grid
+  code registers only `InfiniteRowModelModule`, `PaginationModule` and, in
+  dev mode, `ValidationModule`, at module scope in `users-grid.ts`, so AG
+  Grid ships in the lazy `users-page` chunk (859 kB raw, 196 kB transfer);
+  the initial bundle stayed at 283 kB.
+- `UsersPage` holds the total, a `role="status"` loading line and a
+  `role="alert"` error with Try again, and navigates on `openUser`.
+  `UsersGrid` owns the AG Grid instance. `createUsersDatasource` in
+  `users-datasource.ts` maps `startRow`/`endRow` onto `skip`/`limit` and is
+  tested without the grid. `UsersService.loadPage` wraps `UsersApi.list`.
+  `UserNameCell` renders the name as a `routerLink`.
+- One request per page: `cacheBlockSize` equals the page size (25, 50 or
+  100, default 25) and `maxBlocksInCache` is 1, so going back a page asks
+  the API again. The user chose this on 2026-09-13 over fetching 100 rows
+  and paging locally.
+- Browser check on 2026-09-13 (Playwright, dev server on 4400): Next Page
+  issued `skip=25&limit=25` then `skip=50&limit=25`; switching to 50 issued
+  one `skip=0&limit=50`; clicking a row and pressing Enter on a focused row
+  both opened `/users/{id}`; Tab goes skip link, nav, grid header, Page
+  Size, paging buttons; the page does not scroll sideways at 320 px and the
+  paging panel wraps; axe in the browser, color contrast included, found no
+  violations at 1280 px, at 320 px, or with the error shown; a forced
+  failure showed the alert and Try again recovered the page with focus on
+  the heading. The failure was forced by wrapping `loadPage` from the
+  browser console (`ng.getComponent`), with no source change.
+- Ports 4200 and 4300 were both held by other `ng serve` processes of this
+  app during the session, so the check ran on 4400.
 
 The API layer lives in `src/app/core/api/` and was built through the OpenSpec
 change `openspec/changes/archive/2026-09-13-build-user-api-client/` (all 10
@@ -127,8 +158,8 @@ Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 two 2026-09-13 archives added five requirements to `user-api-client` and
 five to `admin-navigation`, and widened "Placeholder nav entries". The
 merged text is hard-wrapped to match the existing main specs.
-`openspec validate --specs --strict` passes all six. No OpenSpec change is
-active; the next screen needs a new `/opsx:propose`.
+`openspec validate --specs --strict` passes all six. One OpenSpec change is
+active, `build-user-list`, which passes `openspec validate --strict`.
 
 ## Decisions made
 
@@ -152,7 +183,11 @@ active; the next screen needs a new `/opsx:propose`.
   holding each loaded user's ETag beside the record, with Angular's
   `resource()` API loading the paged list. The app is almost entirely server
   state, so NgRx SignalStore, classic NgRx Store and TanStack Query were
-  rejected as more setup than three screens need.
+  rejected as more setup than three screens need. The list does not use
+  `resource()` (2026-09-13): AG Grid's Infinite Row Model pulls rows through
+  `getRows`, so `UsersService.loadPage` returns a Promise instead. The list
+  endpoint returns no ETags, so ETags beside records start with the user
+  management task, which can still use `resource()` for single users.
 - Components (decided 2026-09-13): build UI components in-house with
   Tailwind, and use AG Grid Community (MIT, free) for the user list. This
   mirrors the reviewing team, who build nearly everything in-house to cut
@@ -233,7 +268,25 @@ All pre-implementation decisions are made.
   after the server was approved. A session already open when `.mcp.json`
   landed (such as the VS Code chat that generated it) does not have them
   until it restarts; check with `/mcp`.
-
+- AG Grid behavior found while building the list on 2026-09-13:
+  - Changing the page size makes the grid reload with the old block size
+    before `paginationChanged` handlers run (25 to 50 fired two 25-row
+    requests). `blockLoadDebounceMillis` 50 lets the handler's purge cancel
+    them. Removing the debounce brings the extra requests back.
+  - By default Tab steps through every header and cell before reaching the
+    pagination panel. `tabToNextCell` and `tabToNextHeader` return `false`
+    so the grid is one tab stop.
+  - Quartz draws the focus ring at half opacity, under 3:1 on the header;
+    `focusShadow` is set to a solid sky-700 ring.
+  - The paging buttons are 16 px and the panel is a fixed-height row that
+    scrolls sideways at 320 px. Two rules in `src/styles.css` scoped to
+    `app-users-grid` fix both; the wrap has to target
+    `.ag-paging-panel-content`, not `.ag-paging-panel`.
+  - `domLayout: 'autoHeight'` renders every row of the page with no inner
+    scroll box, so the column header scrolls off-screen on long pages. The
+    optional fixed table header task has to change that.
+  - AG Grid in jsdom is not exercised; page tests stub `UsersGrid` with the
+    same selector and outputs.
 - `git mv` of a directory under `openspec/changes/` failed with
   "Permission denied" on 2026-09-13 (a Windows handle, likely the editor or
   a watcher). PowerShell `Move-Item` moved the same directories; git then
@@ -241,10 +294,12 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- The user list, create, view and edit screens are not built; `/users` is a
-  heading only. The `UsersService` from the state decision (signals,
-  ETags beside records, `resource()` for pages) does not exist yet; build it
-  over `UsersApi` with the user list and user management tasks.
+- The `build-user-list` change is implemented but not committed or
+  archived. Archiving merges its `user-list` delta into
+  `openspec/specs/user-list/`.
+- The create, view and edit screens are not built; `/users/:id` is a
+  heading only. `UsersService` has `loadPage` only; single-user loads and
+  ETags beside records come with the user management task.
 - Accessibility work (WCAG 2.2) is specified but not implemented.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.

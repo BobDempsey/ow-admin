@@ -34,4 +34,12 @@ describe('routes', () => {
 
     expect(TestBed.inject(Title).getTitle()).toBe('Users | Orbweaver Admin');
   });
+
+  it('shows and titles a user detail screen', async () => {
+    const harness = await RouterTestingHarness.create('/users/u-000001');
+
+    expect(TestBed.inject(Router).url).toBe('/users/u-000001');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('User');
+    expect(TestBed.inject(Title).getTitle()).toBe('User | Orbweaver Admin');
+  });
 });
