@@ -25,8 +25,8 @@ the user management screen.
 
 ### Requirement: Placeholder nav entries
 
-Nav entries other than user management SHALL be rendered as non-functional
-placeholders that do not navigate or error when activated. Each placeholder
+Nav entries other than user management and About SHALL be rendered as
+non-functional placeholders that do not navigate or error when activated. Each placeholder
 SHALL stay keyboard-focusable and SHALL be exposed to assistive technology
 as unavailable.
 
@@ -50,6 +50,11 @@ not depend on color alone.
 - **WHEN** an admin is on the user management screen
 - **THEN** the user management nav entry has `aria-current="page"` and a
   visible non-color indicator, and no other entry has `aria-current`
+
+#### Scenario: About entry marked current
+- **WHEN** an admin is on the About screen
+- **THEN** the About nav entry has `aria-current="page"` and a visible
+  non-color indicator, and no other entry has `aria-current`
 
 ### Requirement: Skip to main content
 

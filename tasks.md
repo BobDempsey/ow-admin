@@ -4,7 +4,7 @@
 - [x] Archive the accessibility change
 - [x] Check that we've done everything required from the PDF
 - [x] Add an about this app page and navbar item
-- [ ] Archive the About page change
+- [x] Archive the About page change
 
 # Optional
 
