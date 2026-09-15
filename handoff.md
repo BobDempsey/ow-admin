@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, last code commit, port note and follow-ups corrected after sync (earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -97,10 +97,10 @@ committed in `3901bcf`, archived 2026-09-13 with its delta merged into
   the heading. The failure was forced by wrapping `loadPage` from the
   browser console (`ng.getComponent`), with no source change.
 - Ports 4200 and 4300 were both held by other `ng serve` processes of this
-  app during the session, so the check ran on 4400. A check on
-  2026-09-15 found 4300 free and an `ng serve` of this app on 4200 (PID
-  7260). The sync session did not start that server; ask the user before killing
-  it, or pick another port.
+  app during the session, so the check ran on 4400. A later check on
+  2026-09-15 found nothing listening on 4200, 4300 or 4600. If a stray
+  `ng serve` turns up again, ask the user before killing it, or pick another
+  port.
 
 The create, view and edit screens were built through the OpenSpec change
 `openspec/changes/archive/2026-09-14-build-user-management/` (all 17
@@ -209,7 +209,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`5279cab` (list sort and search and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
+`4e09f2c` (the Draggable columns hint), committed after `5279cab` (list sort and search and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Nine capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -254,10 +254,10 @@ No OpenSpec change is active. List sort and search went through `openspec/change
 The settings dialog went through `openspec/changes/archive/2026-09-15-add-settings-dialog/` (all 15 tasks done, committed in `05d0a93`, archived 2026-09-15 with its deltas merged). It adds a `settings-dialog` capability, exempts Settings in `admin-navigation`'s "Placeholder nav entries", and rewrites `accessibility`'s "No drag-only interactions" to allow opt-in column dragging. What it built:
 
 - Settings in the nav is now a button with `aria-haspopup="dialog"` (`NavEntry` has an `action` kind) that emits itself; `App` renders `SettingsDialog` (`src/app/layout/settings-dialog.ts`) once after `<main>` and calls `show(opener)`. The dialog follows `ConflictDialog`'s native `<dialog>` pattern, focuses its `h2` on open, and returns focus to the opener on Close or Escape.
-- The dialog has Theme radios (named `settings-theme`, sharing `ThemeService` with the header control), and a Table section: Striped rows, Density (Comfortable 64 px, Compact 48 px) and Draggable columns.
+- The dialog has Theme radios (named `settings-theme`, sharing `ThemeService` with the header control), and a Table section: Striped rows, Density (Comfortable 64 px, Compact 48 px) and Draggable columns. Since `4e09f2c`, Draggable columns always carries the hint "Drag a column header to reorder the columns. Column widths stay the same." (`settings-movable-columns-hint`), and `aria-describedby` lists the hint plus the WCAG note while the setting is on.
 - `TableSettingsService` (`src/app/core/table-settings.service.ts`) stores all three as one JSON value under `orbweaver-admin-table-settings`, writing only on change. `storageOf` moved to `src/app/core/browser-storage.ts` and both services use it.
 - WCAG notes are data: `WCAG_FAILURES` in `settings-dialog.ts` maps a setting value to the criterion it fails. Only Draggable columns on has one (2.5.7), shown beside the checkbox and tied to it with `aria-describedby`. Add an entry there for any future setting that breaks a criterion.
-- `UsersGrid` binds a `striped` host class (rule and `--color-row-stripe` token in `styles.css`, slate-100 light and slate-800 dark), sets row height from density with `setGridOption('rowHeight')` plus `refreshInfiniteCache()`, and binds `suppressMovableColumns` to the setting. Column order from dragging is not remembered, and resizing stays off.
+- `UsersGrid` binds a `striped` host class (rule and `--color-row-stripe` token in `styles.css`, slate-100 light and slate-800 dark; `3fe5b7f` moved the light AG Grid `headerBackgroundColor` from slate-50 to slate-100 to match), sets row height from density with `setGridOption('rowHeight')` plus `refreshInfiniteCache()`, and binds `suppressMovableColumns` to the setting. Column order from dragging is not remembered, and resizing stays off.
 - `docs/accessibility.md` lists 2.5.7 as a known gap only while Draggable columns is on, with 12 axe states (48 runs). `README.md` describes Settings.
 - Checks on 2026-09-15: `ng test` 197 passed, `ng build` passed, `npm run test:a11y` 153 passed, Prettier clean, `openspec validate add-settings-dialog --strict` valid; screenshots of the dialog with the note and the striped compact list looked right in both themes at 1280 and 320 px.
 
@@ -646,11 +646,11 @@ All pre-implementation decisions are made.
 - The user added "improve ui styling to a modern look" to `tasks.md` on
   2026-09-15, not specified or built.
 - While `add-settings-dialog` was being built, the user added four
-  follow-ups to `tasks.md`, none built: Compact as the default density; a
-  Draggable columns label that says it reorders rather than resizes; column
-  resizing as a setting; and a darker light-mode stripe. The light stripe
-  moved from slate-50 to slate-100 during the build, before that note was
-  seen. The first and third contradict the `settings-dialog` spec as
+  follow-ups to `tasks.md`: Compact as the default density (not built); a
+  Draggable columns label that says it reorders rather than resizes (built
+  in `4e09f2c`); column resizing as a setting (not built); and a darker
+  light-mode stripe (built, slate-50 to slate-100 during the build, with the
+  light header following in `3fe5b7f`). Compact default and resizing contradict the `settings-dialog` spec as
   written (Comfortable default, no resizing), and resizing by drag also
   fails 2.5.7, so they need a spec change.
 - The optional password reset UI action is not built, and the
