@@ -112,6 +112,34 @@ describe('UsersApi', () => {
     expect(error.fieldErrors).toEqual({ skip: expect.any(String) });
   });
 
+  it('sends the sort and a trimmed search', async () => {
+    const sorted = await firstValueFrom(
+      api.list({ sort: { field: 'role', direction: 'desc' }, limit: 5 }),
+    );
+    const searched = await firstValueFrom(api.list({ q: '  radia.lamport.42@ ' }));
+
+    expect(sorted.items.map((user) => user.id)).toEqual([
+      'u-000005',
+      'u-000010',
+      'u-000015',
+      'u-000025',
+      'u-000030',
+    ]);
+    expect(searched).toEqual({ items: [seedUser(42)], total: 1 });
+  });
+
+  it('keeps plus signs, spaces and @ in a search', async () => {
+    const created = await firstValueFrom(
+      api.create({ ...draft, name: 'Jo+Ann Lee', email: 'jo+ann@example.com' }),
+    );
+
+    expect(await firstValueFrom(api.list({ q: 'jo+ann l' }))).toEqual({
+      items: [created.data],
+      total: 1,
+    });
+    expect((await firstValueFrom(api.list({ q: 'jo+ann@' }))).total).toBe(1);
+  });
+
   it('lists a created user on the last page', async () => {
     const created = await firstValueFrom(api.create(draft));
     const page = await firstValueFrom(api.list({ skip: 500_000 }));

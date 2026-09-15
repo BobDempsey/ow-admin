@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced (earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks), not yet committed or archived (earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -21,8 +21,8 @@ at `/users/:id`, and the About screen at `/about`. It was generated with `@angul
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (197 tests in 24 files),
-`npm run test:a11y` passes (153 Playwright tests, 2026-09-15), and
+`ng build` and `ng test --watch=false` both pass (230 tests in 24 files),
+`npm run test:a11y` passes (186 Playwright tests, 2026-09-15), and
 `npx prettier --check src e2e` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -237,7 +237,17 @@ Settings in "Placeholder nav entries", and rewrote "No drag-only
 interactions" in `accessibility` for opt-in column dragging.
 `openspec validate --specs --strict` passes all nine.
 
-No OpenSpec change is active. The settings dialog went through `openspec/changes/archive/2026-09-15-add-settings-dialog/` (all 15 tasks done, committed in `05d0a93`, archived 2026-09-15 with its deltas merged). It adds a `settings-dialog` capability, exempts Settings in `admin-navigation`'s "Placeholder nav entries", and rewrites `accessibility`'s "No drag-only interactions" to allow opt-in column dragging. What it built:
+`openspec/changes/add-list-sort-and-search/` is active: all 13 tasks done, uncommitted and not archived. It adds three requirements to `user-api-client` (sorted list, searched list, their validation) and three to `user-list` (sort by column, search, result announcement), and rewrites "Total count displayed". What it built:
+
+- `GET /users` takes `sort=<name|email|role|status>:<asc|desc>` and `q=<text>` (trimmed, name or email contains, ignoring case, max 100 characters), validated by `validateListQuery` in `user-validation.ts`. Both extend the PDF contract; the README table marks them so.
+- `UserStore.list(skip, limit, sort?, q?)` builds each field's seed order once as `Int32Array`s (ascending and descending, ids ascending among equal values) from lower-cased keys, merges written users into that order on read, and caches the last search's matching indices keyed by query, sort and a write counter. Measured in Vitest on Node's V8: email keys 231 ms plus 340 ms sort, name 390 ms plus 373 ms, a full scan 316 to 423 ms. `Intl.Collator` sorting took about 1,060 ms and was dropped, so "Spärck" sorts after the unaccented names.
+- `UsersApi.list` sends `sort` and `q` with an `encodeURIComponent` codec, because Angular's default `HttpParams` codec leaves `+` unencoded and the server would read it as a space.
+- The grid sorts one column at a time (asc, desc, none) through `sortModel`, shows "No users match your search." when empty, and restarts from page one when its `query` input changes. `UsersPage` has a visible "Search users" label, a `type="search"` field with placeholder "Name or email", a 300 ms debounce, a total worded "N users match" once a search has loaded, and the status line announcing "N users match" or "No users match" after a search or cleared search loads.
+- Browser timing on 2026-09-15: an already built sort showed in about 370 ms including the 250 ms API latency; a search was announced about 1.35 s after typing, including the 300 ms debounce and the latency.
+- `docs/accessibility.md` covers the search label, keyboard sorting, `aria-sort` and the announcements, with 14 axe states (56 runs).
+- Checks on 2026-09-15: `ng test` 230 passed, `ng build` passed, `npm run test:a11y` 186 passed, Prettier clean, `openspec validate add-list-sort-and-search --strict` valid.
+
+No other OpenSpec change is active. The settings dialog went through `openspec/changes/archive/2026-09-15-add-settings-dialog/` (all 15 tasks done, committed in `05d0a93`, archived 2026-09-15 with its deltas merged). It adds a `settings-dialog` capability, exempts Settings in `admin-navigation`'s "Placeholder nav entries", and rewrites `accessibility`'s "No drag-only interactions" to allow opt-in column dragging. What it built:
 
 - Settings in the nav is now a button with `aria-haspopup="dialog"` (`NavEntry` has an `action` kind) that emits itself; `App` renders `SettingsDialog` (`src/app/layout/settings-dialog.ts`) once after `<main>` and calls `show(opener)`. The dialog follows `ConflictDialog`'s native `<dialog>` pattern, focuses its `h2` on open, and returns focus to the opener on Close or Escape.
 - The dialog has Theme radios (named `settings-theme`, sharing `ThemeService` with the header control), and a Table section: Striped rows, Density (Comfortable 64 px, Compact 48 px) and Draggable columns.
@@ -371,6 +381,8 @@ scaffolding and "Additional Resources" boilerplate is gone. Prettier
 formatted it; `npx prettier --check src e2e` does not cover it.
 
 ## Decisions made
+
+- List sort and search (decided 2026-09-15): every column sorts; search matches name and email only; the placeholder "Name or email" tells the admin what it matches, with the visible "Search users" label kept; sort and search shipped as one change. This supersedes the 2026-09-13 note that they were optional extras.
 
 - Settings dialog (decided 2026-09-15): opened from the Settings nav entry, not a gear button; the header Theme control stays; changes apply at once and are remembered, with one Close button rather than Save and Cancel; density is Comfortable and Compact only. Column dragging is drag only with a WCAG note, chosen by the user over adding Move buttons, so 2.5.7 is a known gap while the setting is on. The user wants the app to say when a setting fails WCAG, which is why failures are listed in `WCAG_FAILURES` rather than written into one control's markup.
 
@@ -607,6 +619,11 @@ All pre-implementation decisions are made.
   - Angular's module script is deferred, so it renders `<app-root>` before `DOMContentLoaded`. A test that wants the state before Angular renders has to use a `MutationObserver` in `page.addInitScript`.
   - jsdom has no `matchMedia`; `ThemeService` treats the OS scheme as light without it, and `theme.service.spec.ts` defines a stub on `window` per test.
   - Playwright's `toHaveScreenshot` with `maxDiffPixels: 0` was stable across runs on this app, which made it usable for proving a refactor changed no pixels. The temporary test was deleted afterwards.
+- Sort and search facts found on 2026-09-15:
+  - Vitest in this workspace swallows `console.log` from specs; a throwaway measurement reported its numbers through a deliberately failing `expect(lines).toEqual([])`.
+  - `.ag-center-cols-container .ag-row` matches nothing in AG Grid 36; select data rows with `.ag-row:has(a)`.
+  - The page's total must take its wording from the query of the last loaded result, not the typed query, or it reads "500,000 users match" before the search loads.
+  - `e2e/support/app.ts` `recordListRequests` wraps `UsersService.loadPage` through `ng.getComponent` to assert the requests the list sends, since the in-memory API has no network.
 - Settings dialog facts found on 2026-09-15:
   - AG Grid's `api.resetRowHeights()` logs error #200 on the Infinite Row Model because it needs the Enterprise `ServerSideRowModelApiModule`. `setGridOption('rowHeight', …)` then `refreshInfiniteCache()` re-lays the page and keeps the page number.
   - The closed Settings dialog stays in the DOM, so a test locator such as `page.locator('label', { hasText: 'Dark' })` matches its labels too. Scope header queries to `header`, or use role queries, which skip the closed dialog.

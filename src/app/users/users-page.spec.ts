@@ -1,16 +1,17 @@
-import { Component, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
 import { ApiError } from '../core/api/api-error';
 import { UsersGrid } from './users-grid';
-import UsersPage from './users-page';
+import UsersPage, { SEARCH_DEBOUNCE_MS } from './users-page';
 
 @Component({
   selector: 'app-users-grid',
   template: '',
 })
 class StubUsersGrid {
+  readonly query = input('');
   readonly loadingChange = output<boolean>();
   readonly loaded = output<number>();
   readonly failed = output<ApiError>();
@@ -36,7 +37,7 @@ async function renderPage() {
 describe('UsersPage', () => {
   it('shows the formatted total once a page loads', async () => {
     const { element, grid, settle } = await renderPage();
-    expect(element.textContent).not.toContain('users');
+    expect(element.textContent).not.toMatch(/\d users/);
 
     grid.loaded.emit(500_000);
     await settle();
@@ -99,6 +100,142 @@ describe('UsersPage', () => {
     await settle();
 
     await expectNoAxeViolations(element);
+  });
+
+  describe('search', () => {
+    beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }));
+    afterEach(() => vi.useRealTimers());
+
+    async function type(
+      page: Awaited<ReturnType<typeof renderPage>>,
+      text: string,
+      pauseMs = SEARCH_DEBOUNCE_MS,
+    ) {
+      const field = page.element.querySelector<HTMLInputElement>('#users-search')!;
+      field.value = text;
+      field.dispatchEvent(new Event('input'));
+      await page.settle();
+      vi.advanceTimersByTime(pauseMs);
+      await page.settle();
+    }
+
+    const statusText = (element: HTMLElement) =>
+      element.querySelector('[role="status"]')?.textContent?.replace(/\s+/g, ' ').trim();
+
+    it('has a visible Search users label and a Name or email placeholder', async () => {
+      const { element } = await renderPage();
+      const field = element.querySelector<HTMLInputElement>('input[type="search"]')!;
+      const label = element.querySelector<HTMLLabelElement>(`label[for="${field.id}"]`);
+
+      expect(label?.textContent?.trim()).toBe('Search users');
+      expect(field.placeholder).toBe('Name or email');
+    });
+
+    it('sends the trimmed search only after typing pauses', async () => {
+      const page = await renderPage();
+
+      await type(page, 'h', 100);
+      await type(page, 'hop', 100);
+      await type(page, ' hopper ', SEARCH_DEBOUNCE_MS - 1);
+      expect(page.grid.query()).toBe('');
+
+      vi.advanceTimersByTime(1);
+      await page.settle();
+      expect(page.grid.query()).toBe('hopper');
+    });
+
+    it('does not search again for spaces around the same text', async () => {
+      const page = await renderPage();
+      await type(page, 'hopper');
+      page.grid.loaded.emit(1_000);
+      await page.settle();
+
+      await type(page, 'hopper  ');
+      page.grid.loaded.emit(900);
+      await page.settle();
+
+      expect(page.grid.query()).toBe('hopper');
+      // A new search would announce this load; the same search does not.
+      expect(statusText(page.element)).toBe('1,000 users match');
+    });
+
+    it('shows and announces the match count once the search loads', async () => {
+      const page = await renderPage();
+      page.grid.loaded.emit(500_000);
+      await type(page, 'lamport');
+
+      page.grid.loadingChange.emit(true);
+      await page.settle();
+      expect(statusText(page.element)).toBe('Loading users…');
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(17_241);
+      await page.settle();
+
+      expect(page.element.textContent).toContain('17,241 users match');
+      expect(statusText(page.element)).toBe('17,241 users match');
+    });
+
+    it('keeps the total worded for the last loaded result until the search loads', async () => {
+      const page = await renderPage();
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+
+      await type(page, 'lamport');
+
+      expect(page.element.textContent).toContain('500,000 users');
+      expect(page.element.textContent).not.toContain('users match');
+    });
+
+    it('says No users match when nothing matches', async () => {
+      const page = await renderPage();
+      await type(page, 'no-such-user');
+
+      page.grid.loaded.emit(0);
+      await page.settle();
+
+      expect(page.element.textContent).toContain('0 users match');
+      expect(statusText(page.element)).toBe('No users match');
+    });
+
+    it('shows and announces all users again when the search is cleared', async () => {
+      const page = await renderPage();
+      await type(page, 'lamport');
+      page.grid.loaded.emit(17_241);
+      await page.settle();
+
+      await type(page, '');
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+
+      expect(page.grid.query()).toBe('');
+      expect(page.element.textContent).toContain('500,000 users');
+      expect(page.element.textContent).not.toContain('match');
+      expect(statusText(page.element)).toBe('500,000 users');
+    });
+
+    it('does not announce a page load that no search started', async () => {
+      const page = await renderPage();
+      await type(page, 'lamport');
+      page.grid.loaded.emit(17_241);
+      await page.settle();
+
+      page.grid.loadingChange.emit(true);
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(17_241);
+      await page.settle();
+
+      expect(statusText(page.element)).toBe('');
+    });
+
+    it('has no axe violations with a search and its result', async () => {
+      const page = await renderPage();
+      await type(page, 'lamport');
+      page.grid.loaded.emit(17_241);
+      await page.settle();
+
+      vi.useRealTimers();
+      await expectNoAxeViolations(page.element);
+    });
   });
 
   it('has no axe violations when a page fails', async () => {

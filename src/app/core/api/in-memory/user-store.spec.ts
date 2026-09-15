@@ -1,4 +1,4 @@
-import { UserDraft } from '../user.model';
+import { User, UserDraft, UserSort } from '../user.model';
 import { seedUser } from './user-seed';
 import { UserStore, etagOf } from './user-store';
 
@@ -82,5 +82,104 @@ describe('UserStore', () => {
 
   it('formats ETags from id and version', () => {
     expect(etagOf({ user: seedUser(42), version: 3 })).toBe('"u-000042.3"');
+  });
+
+  describe('sorted and searched lists', () => {
+    const byName: UserSort = { field: 'name', direction: 'asc' };
+
+    /** Fails unless users are in `sort` order, with ids ascending among equal values. */
+    function expectInOrder(users: User[], { field, direction }: UserSort) {
+      for (let position = 1; position < users.length; position++) {
+        const [before, after] = [users[position - 1], users[position]];
+        const [a, b] = [before[field].toLowerCase(), after[field].toLowerCase()];
+        if (a === b) {
+          expect(before.id < after.id, `${before.id} before ${after.id}`).toBe(true);
+        } else {
+          expect(direction === 'asc' ? a < b : a > b, `${a} before ${b}`).toBe(true);
+        }
+      }
+    }
+
+    it('sorts by name ascending with ids ascending among equal names', () => {
+      const page = store.list(0, 100, byName);
+
+      expect(page.total).toBe(500_000);
+      expect(page.items[0].id).toBe('u-000000');
+      expectInOrder(page.items, byName);
+    });
+
+    it('puts Viewers first by role descending, lowest ids first', () => {
+      const ids = store.list(0, 5, { field: 'role', direction: 'desc' }).items.map((u) => u.id);
+
+      expect(ids).toEqual(['u-000005', 'u-000010', 'u-000015', 'u-000025', 'u-000030']);
+    });
+
+    it('pages through a descending email sort without gaps or repeats', () => {
+      const sort: UserSort = { field: 'email', direction: 'desc' };
+      const users = [...store.list(0, 25, sort).items, ...store.list(25, 25, sort).items];
+
+      expectInOrder(users, sort);
+      expect(new Set(users.map((user) => user.id)).size).toBe(50);
+    });
+
+    it('sorts edited and created users by their current values', () => {
+      store.update('u-000042', { ...draft, name: 'Aaron Aardvark' });
+      const created = store.create({ ...draft, name: 'Zelda Quartermaine' });
+
+      expect(store.list(0, 1, byName).items[0].id).toBe('u-000042');
+      expect(store.list(0, 1, { field: 'name', direction: 'desc' }).items[0]).toEqual(created.user);
+      const middle = store.list(250_000, 50, byName);
+      expect(middle.total).toBe(500_001);
+      expectInOrder(middle.items, byName);
+      const ids = store.list(0, 100, byName).items.map((user) => user.id);
+      expect(ids.filter((id) => id === 'u-000042')).toHaveLength(1);
+    });
+
+    it('finds users whose name or email contains the search, ignoring case', () => {
+      const page = store.list(0, 25, undefined, 'Lamport');
+
+      expect(page.total).toBe(17_241);
+      for (const user of page.items) {
+        expect(`${user.name} ${user.email}`.toLowerCase()).toContain('lamport');
+      }
+      expect(store.list(0, 25, undefined, 'radia.lamport.42@').items).toEqual([seedUser(42)]);
+    });
+
+    it('combines search, sort and skip', () => {
+      const sort: UserSort = { field: 'email', direction: 'asc' };
+      const expected = Array.from({ length: 500_000 }, (_, index) => seedUser(index))
+        .filter((user) => `${user.name}\n${user.email}`.toLowerCase().includes('hopper'))
+        .sort((a, b) =>
+          a.email.toLowerCase() < b.email.toLowerCase()
+            ? -1
+            : a.email.toLowerCase() > b.email.toLowerCase()
+              ? 1
+              : a.id < b.id
+                ? -1
+                : 1,
+        );
+
+      const page = store.list(25, 25, sort, 'hopper');
+
+      expect(page.total).toBe(expected.length);
+      expect(page.items.map((user) => user.id)).toEqual(
+        expected.slice(25, 50).map((user) => user.id),
+      );
+    });
+
+    it('returns an empty page when nothing matches', () => {
+      expect(store.list(0, 25, undefined, 'no-such-user-xyz')).toEqual({ items: [], total: 0 });
+    });
+
+    it('rebuilds a cached search after a write', () => {
+      expect(store.list(0, 25, undefined, 'quartermaine').total).toBe(0);
+
+      const created = store.create({ ...draft, name: 'Zelda Quartermaine' });
+
+      expect(store.list(0, 25, undefined, 'quartermaine')).toEqual({
+        items: [created.user],
+        total: 1,
+      });
+    });
   });
 });

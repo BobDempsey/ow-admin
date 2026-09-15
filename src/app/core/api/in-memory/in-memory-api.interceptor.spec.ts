@@ -99,6 +99,57 @@ describe('inMemoryApiInterceptor', () => {
       expect(error.status).toBe(400);
       expect(error.error.fieldErrors).toEqual({ limit: expect.any(String) });
     });
+
+    it('returns a sorted page for sort=role:desc', async () => {
+      const page = await firstValueFrom(
+        http.get<UserPage>('/api/users', { params: { sort: 'role:desc', limit: 5 } }),
+      );
+
+      expect(page.items.map((user) => user.id)).toEqual([
+        'u-000005',
+        'u-000010',
+        'u-000015',
+        'u-000025',
+        'u-000030',
+      ]);
+      expect(page.total).toBe(500_000);
+    });
+
+    it('returns only matching users and their count for q', async () => {
+      const page = await firstValueFrom(http.get<UserPage>('/api/users?q=radia.lamport.42%40'));
+
+      expect(page).toEqual({ items: [seedUser(42)], total: 1 });
+    });
+
+    it('combines q with sort and limit', async () => {
+      const page = await firstValueFrom(
+        http.get<UserPage>('/api/users?q=hopper&sort=email:desc&limit=10'),
+      );
+      const emails = page.items.map((user) => user.email);
+
+      expect(page.total).toBeGreaterThan(10);
+      expect(emails).toHaveLength(10);
+      expect(emails.every((email, i) => i === 0 || emails[i - 1] >= email)).toBe(true);
+      for (const user of page.items) {
+        expect(`${user.name} ${user.email}`.toLowerCase()).toContain('hopper');
+      }
+    });
+
+    it('rejects an unknown sort field or direction with 400', async () => {
+      for (const sort of ['password:asc', 'name:up']) {
+        const error = await failure(http.get(`/api/users?sort=${sort}`));
+
+        expect(error.status).toBe(400);
+        expect(error.error.fieldErrors).toEqual({ sort: expect.any(String) });
+      }
+    });
+
+    it('rejects a q longer than 100 characters with 400', async () => {
+      const error = await failure(http.get(`/api/users?q=${'a'.repeat(101)}`));
+
+      expect(error.status).toBe(400);
+      expect(error.error.fieldErrors).toEqual({ q: expect.any(String) });
+    });
   });
 
   describe('GET /users/{id}', () => {

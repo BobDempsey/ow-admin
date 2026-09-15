@@ -57,6 +57,8 @@ test.describe('keyboard flows', () => {
 
     await pressUntilFocused(page, 'New user');
     await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Search users');
+    await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAttribute('role', 'columnheader');
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
@@ -65,10 +67,29 @@ test.describe('keyboard flows', () => {
     await expect(focused(page)).toHaveRole('heading');
   });
 
+  test('list: Enter on a column header sorts without opening a user', async ({ page }) => {
+    await openList(page);
+
+    await pressUntilFocused(page, 'New user');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAttribute('role', 'columnheader');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Enter');
+
+    await expect(page.getByRole('columnheader', { name: 'Role' })).toHaveAttribute(
+      'aria-sort',
+      'ascending',
+    );
+    expect(new URL(page.url()).pathname).toBe('/users');
+  });
+
   test('list: Tab leaves the grid for the pagination controls', async ({ page }) => {
     await openList(page);
 
     await pressUntilFocused(page, 'New user');
+    await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
 

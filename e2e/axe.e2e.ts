@@ -13,12 +13,16 @@ import {
   openNewUser,
   openSettingsDialog,
   showNewUserErrors,
+  showNoSearchResults,
+  showSearchResults,
   showSettingsWcagNote,
 } from './support/app';
 import { expectNoAxeViolations } from './support/axe';
 
 const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user list', open: openList },
+  { name: 'user list with search results', open: showSearchResults },
+  { name: 'user list with no search results', open: showNoSearchResults },
   { name: 'user list load failure (forced through ng.getComponent)', open: forceListFailure },
   { name: 'new user', open: openNewUser },
   { name: 'new user with errors', open: showNewUserErrors },

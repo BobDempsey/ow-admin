@@ -1,16 +1,16 @@
-import { IGetRowsParams } from 'ag-grid-community';
+import { IGetRowsParams, SortModelItem } from 'ag-grid-community';
 import { ApiError } from '../core/api/api-error';
 import { seedUser } from '../core/api/in-memory/user-seed';
 import { PageRequest, UserPage } from '../core/api/user.model';
 import { UsersDatasourceEvents, createUsersDatasource } from './users-datasource';
 
-function rowsParams(startRow: number, endRow: number) {
+function rowsParams(startRow: number, endRow: number, sortModel: SortModelItem[] = []) {
   return {
     startRow,
     endRow,
     successCallback: vi.fn(),
     failCallback: vi.fn(),
-    sortModel: [],
+    sortModel,
     filterModel: {},
   } as unknown as IGetRowsParams & {
     successCallback: ReturnType<typeof vi.fn>;
@@ -41,6 +41,44 @@ describe('createUsersDatasource', () => {
     expect(params.successCallback).toHaveBeenCalledWith(page.items, 500_000);
     expect(params.failCallback).not.toHaveBeenCalled();
     expect(calls).toEqual(['loading:true', 'loaded:500000', 'loading:false']);
+  });
+
+  it('sends the grid sort in either direction', async () => {
+    const loadPage = vi.fn((_request: PageRequest) => Promise.resolve({ items: [], total: 0 }));
+    const datasource = createUsersDatasource(loadPage, trackEvents().events);
+
+    await datasource.getRows(rowsParams(0, 25, [{ colId: 'email', sort: 'asc' }]));
+    await datasource.getRows(rowsParams(25, 50, [{ colId: 'status', sort: 'desc' }]));
+
+    expect(loadPage.mock.calls.map(([request]) => request)).toEqual([
+      { skip: 0, limit: 25, sort: { field: 'email', direction: 'asc' } },
+      { skip: 25, limit: 25, sort: { field: 'status', direction: 'desc' } },
+    ]);
+  });
+
+  it('ignores a sort on a column the API cannot sort', async () => {
+    const loadPage = vi.fn((_request: PageRequest) => Promise.resolve({ items: [], total: 0 }));
+
+    await createUsersDatasource(loadPage, trackEvents().events).getRows(
+      rowsParams(0, 25, [{ colId: 'id', sort: 'asc' }]),
+    );
+
+    expect(loadPage).toHaveBeenCalledExactlyOnceWith({ skip: 0, limit: 25 });
+  });
+
+  it('sends the current search, trimmed, and leaves out a blank one', async () => {
+    const loadPage = vi.fn((_request: PageRequest) => Promise.resolve({ items: [], total: 0 }));
+    let query = ' lamport ';
+    const datasource = createUsersDatasource(loadPage, trackEvents().events, () => query);
+
+    await datasource.getRows(rowsParams(0, 25));
+    query = '  ';
+    await datasource.getRows(rowsParams(0, 25));
+
+    expect(loadPage.mock.calls.map(([request]) => request)).toEqual([
+      { skip: 0, limit: 25, q: 'lamport' },
+      { skip: 0, limit: 25 },
+    ]);
   });
 
   it('fails the block and reports the ApiError when the page request fails', async () => {

@@ -1,8 +1,17 @@
 import { FieldErrors } from '../api-error';
-import { USER_ROLES, USER_STATUSES, UserDraft } from '../user.model';
+import {
+  SortDirection,
+  USER_ROLES,
+  USER_SORT_FIELDS,
+  USER_STATUSES,
+  UserDraft,
+  UserSort,
+  UserSortField,
+} from '../user.model';
 
 export const DEFAULT_LIMIT = 25;
 export const MAX_LIMIT = 100;
+export const MAX_QUERY_LENGTH = 100;
 
 export type ValidationResult<T> = { ok: true; value: T } | { ok: false; errors: FieldErrors };
 
@@ -70,6 +79,38 @@ export function validatePage(
     return { ok: false, errors };
   }
   return { ok: true, value: { skip: parsedSkip, limit: Math.min(parsedLimit, MAX_LIMIT) } };
+}
+
+const SORT_PATTERN = new RegExp(`^(${USER_SORT_FIELDS.join('|')}):(asc|desc)$`);
+
+/**
+ * Parses the optional `sort` (`<field>:<asc|desc>`) and `q` query values. A blank `q` means no
+ * search; otherwise it is trimmed.
+ */
+export function validateListQuery(
+  sort: string | null,
+  q: string | null,
+): ValidationResult<{ sort?: UserSort; q?: string }> {
+  const errors: Record<string, string> = {};
+  const match = sort === null ? null : SORT_PATTERN.exec(sort);
+  if (sort !== null && !match) {
+    errors['sort'] =
+      `sort must be <field>:<direction>, with field one of ${USER_SORT_FIELDS.join(', ')} and direction asc or desc.`;
+  }
+  if (q !== null && q.length > MAX_QUERY_LENGTH) {
+    errors['q'] = `q must be ${MAX_QUERY_LENGTH} characters or fewer.`;
+  }
+  if (Object.keys(errors).length) {
+    return { ok: false, errors };
+  }
+  const value: { sort?: UserSort; q?: string } = {};
+  if (match) {
+    value.sort = { field: match[1] as UserSortField, direction: match[2] as SortDirection };
+  }
+  if (q?.trim()) {
+    value.q = q.trim();
+  }
+  return { ok: true, value };
 }
 
 function parseInteger(value: string): number | null {

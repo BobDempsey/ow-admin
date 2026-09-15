@@ -1,9 +1,20 @@
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParameterCodec, HttpParams, HttpResponse } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
 import { MonoTypeOperatorFunction, Observable, catchError, map, throwError } from 'rxjs';
 import { API_BASE_URL } from './api-config';
 import { ApiError, toApiError } from './api-error';
 import { PageRequest, User, UserDraft, UserPage, Versioned } from './user.model';
+
+/**
+ * Encodes every reserved character. Angular's default codec leaves `+` as is, which a server reads
+ * as a space, so a search for "jo+ann" would arrive as "jo ann".
+ */
+const URI_COMPONENT_CODEC: HttpParameterCodec = {
+  encodeKey: encodeURIComponent,
+  encodeValue: encodeURIComponent,
+  decodeKey: decodeURIComponent,
+  decodeValue: decodeURIComponent,
+};
 
 /** Typed client for the user API. Every failure is emitted as an `ApiError`. */
 @Service()
@@ -11,13 +22,19 @@ export class UsersApi {
   private readonly http = inject(HttpClient);
   private readonly usersUrl = `${inject(API_BASE_URL)}/users`;
 
-  list({ skip, limit }: PageRequest = {}): Observable<UserPage> {
-    let params = new HttpParams();
+  list({ skip, limit, sort, q }: PageRequest = {}): Observable<UserPage> {
+    let params = new HttpParams({ encoder: URI_COMPONENT_CODEC });
     if (skip !== undefined) {
       params = params.set('skip', skip);
     }
     if (limit !== undefined) {
       params = params.set('limit', limit);
+    }
+    if (sort) {
+      params = params.set('sort', `${sort.field}:${sort.direction}`);
+    }
+    if (q?.trim()) {
+      params = params.set('q', q.trim());
     }
     return this.http.get<UserPage>(this.usersUrl, { params }).pipe(catchApiError());
   }

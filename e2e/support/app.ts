@@ -38,6 +38,38 @@ export async function openAbout(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: 'About this app' })).toBeVisible();
 }
 
+/** The user list's own status line (loading text and search result announcements). */
+export const listStatus = (page: Page) => page.locator('app-users-page p[role="status"]');
+
+/** Opens the list and searches it, waiting for the result to be announced. */
+export async function searchList(page: Page, text: string): Promise<void> {
+  await openList(page);
+  await page.getByLabel('Search users').fill(text);
+  await expect(listStatus(page)).toContainText(/match/);
+}
+
+export const showSearchResults = (page: Page) => searchList(page, 'lamport');
+export const showNoSearchResults = (page: Page) => searchList(page, 'no-such-user-xyz');
+
+/**
+ * Records every page request the list makes from now on, by wrapping `UsersService.loadPage` on
+ * the live grid through `ng.getComponent`. Dev server only. Returns a reader for the requests.
+ */
+export async function recordListRequests(page: Page): Promise<() => Promise<unknown[]>> {
+  await page.evaluate(() => {
+    const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+    const grid = debug.getComponent(document.querySelector('app-users-grid')!);
+    const record = window as unknown as { listRequests: unknown[] };
+    const original = grid.users.loadPage.bind(grid.users);
+    record.listRequests = [];
+    grid.users.loadPage = (request: unknown) => {
+      record.listRequests.push(request);
+      return original(request);
+    };
+  });
+  return () => page.evaluate(() => (window as unknown as { listRequests: unknown[] }).listRequests);
+}
+
 /** Opens the Settings dialog from the nav on the user list. */
 export async function openSettingsDialog(page: Page): Promise<void> {
   await openList(page);

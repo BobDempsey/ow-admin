@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, isDevMode, output, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  isDevMode,
+  output,
+  untracked,
+} from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   CellKeyDownEvent,
@@ -83,6 +92,8 @@ const usersGridTheme = themeQuartz
       [blockLoadDebounceMillis]="50"
       domLayout="autoHeight"
       [ensureDomOrder]="true"
+      [suppressMultiSort]="true"
+      [overlayNoRowsTemplate]="noRowsTemplate"
       [suppressMovableColumns]="!settings.movableColumns()"
       [suppressDragLeaveHidesColumns]="true"
       [tabToNextCell]="leaveGridOnTab"
@@ -106,7 +117,21 @@ export class UsersGrid {
   private readonly rowHeight = computed(() => ROW_HEIGHTS[this.settings.density()]);
   protected readonly initialRowHeight = untracked(this.rowHeight);
 
+  /** The committed search text. A change starts the list again from its first page. */
+  readonly query = input('');
+
   constructor() {
+    let previousQuery = untracked(this.query);
+    effect(() => {
+      const query = this.query();
+      const api = this.api;
+      if (api && query !== previousQuery) {
+        api.purgeInfiniteCache();
+        api.paginationGoToFirstPage();
+      }
+      previousQuery = query;
+    });
+
     // A density change re-lays the current page. `resetRowHeights` needs an Enterprise module,
     // so the page is requested again at the new height instead.
     effect(() => {
@@ -134,14 +159,17 @@ export class UsersGrid {
     { field: 'status', headerName: 'Status', width: 130 },
   ];
   /**
-   * Columns cannot be moved or resized: both need dragging in AG Grid Community, and WCAG 2.5.7
-   * asks for a way that does not. Columns flex to fill the width instead.
+   * Every column sorts through the API, one at a time, cycling ascending, descending and unsorted;
+   * a header sorts on click or Enter. Columns cannot be resized: that needs dragging in AG Grid
+   * Community, and WCAG 2.5.7 asks for a way that does not. Columns flex to fill the width instead.
    */
   protected readonly defaultColDef: ColDef<User> = {
-    sortable: false,
+    sortable: true,
+    sortingOrder: ['asc', 'desc', null],
     filter: false,
     resizable: false,
   };
+  protected readonly noRowsTemplate = '<span>No users match your search.</span>';
 
   /**
    * AG Grid moves focus to some of its controls, such as Page Size, without scrolling them into
@@ -157,11 +185,15 @@ export class UsersGrid {
    * the pagination controls are reachable. Arrow keys move between cells.
    */
   protected readonly leaveGridOnTab = () => false as const;
-  protected readonly datasource = createUsersDatasource((request) => this.users.loadPage(request), {
-    loading: (inFlight) => this.loadingChange.emit(inFlight),
-    loaded: (total) => this.loaded.emit(total),
-    failed: (error) => this.failed.emit(error),
-  });
+  protected readonly datasource = createUsersDatasource(
+    (request) => this.users.loadPage(request),
+    {
+      loading: (inFlight) => this.loadingChange.emit(inFlight),
+      loaded: (total) => this.loaded.emit(total),
+      failed: (error) => this.failed.emit(error),
+    },
+    () => untracked(this.query),
+  );
 
   /** Requests the current page again, for example after a failed load. */
   refresh(): void {

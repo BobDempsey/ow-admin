@@ -1,5 +1,5 @@
 import { UserDraft } from '../user.model';
-import { validateDraft, validatePage, validateUser } from './user-validation';
+import { validateDraft, validateListQuery, validatePage, validateUser } from './user-validation';
 
 const draft: UserDraft = {
   name: 'Ada Lovelace',
@@ -114,5 +114,52 @@ describe('validatePage', () => {
         errors: { skip: expect.any(String), limit: expect.any(String) },
       });
     }
+  });
+});
+
+describe('validateListQuery', () => {
+  it('accepts no sort and no search', () => {
+    expect(validateListQuery(null, null)).toEqual({ ok: true, value: {} });
+  });
+
+  it('parses every field in both directions', () => {
+    for (const field of ['name', 'email', 'role', 'status'] as const) {
+      for (const direction of ['asc', 'desc'] as const) {
+        expect(validateListQuery(`${field}:${direction}`, null)).toEqual({
+          ok: true,
+          value: { sort: { field, direction } },
+        });
+      }
+    }
+  });
+
+  it('rejects an unknown field, a bad direction and a malformed value', () => {
+    for (const sort of ['password:asc', 'name:up', 'name', 'name:', ':asc', '', 'Name:asc']) {
+      expect(validateListQuery(sort, null)).toEqual({
+        ok: false,
+        errors: { sort: expect.any(String) },
+      });
+    }
+  });
+
+  it('trims the search and treats blank text as no search', () => {
+    expect(validateListQuery(null, '  Lamport ')).toEqual({ ok: true, value: { q: 'Lamport' } });
+    expect(validateListQuery(null, '   ')).toEqual({ ok: true, value: {} });
+    expect(validateListQuery(null, '')).toEqual({ ok: true, value: {} });
+  });
+
+  it('accepts 100 characters and rejects 101', () => {
+    expect(validateListQuery(null, 'a'.repeat(100)).ok).toBe(true);
+    expect(validateListQuery(null, 'a'.repeat(101))).toEqual({
+      ok: false,
+      errors: { q: expect.any(String) },
+    });
+  });
+
+  it('reports sort and search errors together', () => {
+    expect(validateListQuery('name:up', 'a'.repeat(101))).toEqual({
+      ok: false,
+      errors: { sort: expect.any(String), q: expect.any(String) },
+    });
   });
 });

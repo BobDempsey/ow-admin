@@ -1,5 +1,5 @@
 import { Page, expect, test } from '@playwright/test';
-import { openList, storeTableSettings } from './support/app';
+import { openList, recordListRequests, storeTableSettings } from './support/app';
 import { applyTextSpacing, clippedText, waitForLoaded } from './support/layout';
 
 const headerNames = (page: Page) =>
@@ -79,4 +79,70 @@ test.describe('user grid', () => {
       expect((await role.boundingBox())!.width).toBeCloseTo(before.width, 0);
     });
   }
+});
+
+test.describe('user grid sorting', () => {
+  const firstEmails = (page: Page) =>
+    page
+      .locator('.ag-row:has(a)')
+      .evaluateAll((rows) =>
+        rows
+          .map((row) => row.querySelector('[col-id="email"]')?.textContent?.trim() ?? '')
+          .filter(Boolean),
+      );
+  const header = (page: Page, name: string) => page.getByRole('columnheader', { name });
+  const lastRequest = async (read: () => Promise<unknown[]>) => (await read()).at(-1);
+
+  test('clicking a header sorts ascending, then descending, then clears', async ({ page }) => {
+    await openList(page);
+    const requests = await recordListRequests(page);
+
+    await header(page, 'Email').click();
+    await expect
+      .poll(() => lastRequest(requests))
+      .toEqual({
+        skip: 0,
+        limit: 25,
+        sort: { field: 'email', direction: 'asc' },
+      });
+    await expect(header(page, 'Email')).toHaveAttribute('aria-sort', 'ascending');
+    await expect
+      .poll(async () => {
+        const emails = await firstEmails(page);
+        return emails.length > 1 && emails.every((email, i) => i === 0 || emails[i - 1] <= email);
+      })
+      .toBe(true);
+
+    await header(page, 'Email').click();
+    await expect
+      .poll(() => lastRequest(requests))
+      .toEqual({
+        skip: 0,
+        limit: 25,
+        sort: { field: 'email', direction: 'desc' },
+      });
+    await expect(header(page, 'Email')).toHaveAttribute('aria-sort', 'descending');
+
+    await header(page, 'Email').click();
+    await expect.poll(() => lastRequest(requests)).toEqual({ skip: 0, limit: 25 });
+    await expect(header(page, 'Email')).not.toHaveAttribute('aria-sort', /ascending|descending/);
+    await expect(header(page, 'Name')).not.toHaveAttribute('aria-sort', /ascending|descending/);
+  });
+
+  test('paging keeps the sort', async ({ page }) => {
+    await openList(page);
+    const requests = await recordListRequests(page);
+    await header(page, 'Status').click();
+    await expect.poll(async () => (await requests()).length).toBe(1);
+
+    await page.getByRole('button', { name: 'Next Page' }).click();
+
+    await expect
+      .poll(() => lastRequest(requests))
+      .toEqual({
+        skip: 25,
+        limit: 25,
+        sort: { field: 'status', direction: 'asc' },
+      });
+  });
 });

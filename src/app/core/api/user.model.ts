@@ -20,9 +20,22 @@ export interface UserPage {
   total: number;
 }
 
+export const USER_SORT_FIELDS = ['name', 'email', 'role', 'status'] as const;
+export type UserSortField = (typeof USER_SORT_FIELDS)[number];
+export type SortDirection = 'asc' | 'desc';
+
+/** One column to sort the list by. Sent as `sort=<field>:<direction>`. */
+export interface UserSort {
+  field: UserSortField;
+  direction: SortDirection;
+}
+
 export interface PageRequest {
   skip?: number;
   limit?: number;
+  sort?: UserSort;
+  /** Text to find in names and emails, ignoring case. Blank means no search. */
+  q?: string;
 }
 
 /** A resource paired with the ETag the server returned for it. */

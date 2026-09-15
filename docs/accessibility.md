@@ -4,11 +4,11 @@ Orbweaver Admin targets WCAG 2.2 level AA. This report lists every level A and A
 
 ## Scope and setup
 
-The report covers every screen and state in the app: the top navigation and skip link, the user list at `/users` (AG Grid Community 36.1 with pagination), the create screen at `/users/new`, the view and edit screen at `/users/:id` with its loading, not found, load failure and save failure states, the edit conflict dialog, the About screen at `/about`, the Theme control in the header, and the Settings dialog opened from the nav. Every screen and state is checked in both the light and the dark theme.
+The report covers every screen and state in the app: the top navigation and skip link, the user list at `/users` (AG Grid Community 36.1 with pagination), the create screen at `/users/new`, the view and edit screen at `/users/:id` with its loading, not found, load failure and save failure states, the edit conflict dialog, the About screen at `/about`, the Theme control in the header, the Settings dialog opened from the nav, and sorting and searching the user list. Every screen and state is checked in both the light and the dark theme.
 
 We checked conformance four ways:
 
-- **Browser suite.** `npm run test:a11y` runs Playwright 1.63 with Chromium against the dev server. It runs axe-core 4.13 with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa` rule tags, color contrast included, on 12 states at 1280 and 320 CSS pixels wide, once in the light theme and once in the dark theme (48 runs). It also replays keyboard flows, checks that focus is never fully hidden, measures reflow and target sizes in both themes, and applies WCAG text spacing and 200 percent zoom in both themes. `e2e/theme.e2e.ts` covers the Theme control and `e2e/settings.e2e.ts` the Settings dialog and its table settings. Test files live in `e2e/`.
+- **Browser suite.** `npm run test:a11y` runs Playwright 1.63 with Chromium against the dev server. It runs axe-core 4.13 with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa` rule tags, color contrast included, on 14 states at 1280 and 320 CSS pixels wide, once in the light theme and once in the dark theme (56 runs). It also replays keyboard flows, checks that focus is never fully hidden, measures reflow and target sizes in both themes, and applies WCAG text spacing and 200 percent zoom in both themes. `e2e/theme.e2e.ts` covers the Theme control, `e2e/settings.e2e.ts` the Settings dialog and its table settings, and `e2e/search.e2e.ts` the list search. Test files live in `e2e/`.
 - **Unit tests.** `ng test` runs axe in jsdom, color contrast excluded, on each component and state, and tests labels, error association, status messages and focus movement.
 - **Manual review.** We reviewed markup, ARIA and design against criteria automation cannot judge, and looked at screenshots taken under text spacing and zoom.
 - **Screen reader (partial).** A person ran steps 1 and 2 of the NVDA script at the end of this report with Chrome on Windows. Steps 3 to 21 were not run. The PDF does not require a screen reader pass.
@@ -58,7 +58,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 1.2.3 Audio Description or Media Alternative (Prerecorded) | A | Not applicable | No video. |
 | 1.2.4 Captions (Live) | AA | Not applicable | No live media. |
 | 1.2.5 Audio Description (Prerecorded) | AA | Not applicable | No video. |
-| 1.3.1 Info and Relationships | A | Passes | Landmarks (`header`, `nav` named Primary, `main`), one `h1` per screen, a `treegrid` with column headers and `aria-rowcount="500001"` (`e2e/grid.e2e.ts`), `label for` on every form control and `aria-describedby` on errors (`user-form-fields.spec.ts`). The Theme control is a `fieldset` with the legend "Theme" around three native radios (`theme-switcher.spec.ts`). |
+| 1.3.1 Info and Relationships | A | Passes | Landmarks (`header`, `nav` named Primary, `main`), one `h1` per screen, a `treegrid` with column headers and `aria-rowcount="500001"` (`e2e/grid.e2e.ts`), `label for` on every form control and `aria-describedby` on errors (`user-form-fields.spec.ts`). The Theme control is a `fieldset` with the legend "Theme" around three native radios (`theme-switcher.spec.ts`). The list search field has a `label for` reading "Search users" (`users-page.spec.ts`). |
 | 1.3.2 Meaningful Sequence | A | Passes | DOM order matches visual order; AG Grid runs with `ensureDomOrder`. Keyboard flows in `e2e/keyboard.e2e.ts` follow reading order. |
 | 1.3.3 Sensory Characteristics | A | Passes | No instruction depends on shape, position or sound. |
 | 1.3.4 Orientation | AA | Passes | No orientation lock; layouts reflow at 320 px (`e2e/layout.e2e.ts`). |
@@ -77,7 +77,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 
 | Criterion | Level | Result | Evidence |
 | --- | --- | --- | --- |
-| 2.1.1 Keyboard | A | Passes | Every task runs from the keyboard: nav, opening a user from the grid with Enter, pagination, create, edit, cancel, simulate, and every conflict choice (`e2e/keyboard.e2e.ts`). The theme is chosen with the arrow keys inside the Theme group (`e2e/theme.e2e.ts`). |
+| 2.1.1 Keyboard | A | Passes | Every task runs from the keyboard: nav, opening a user from the grid with Enter, pagination, create, edit, cancel, simulate, and every conflict choice (`e2e/keyboard.e2e.ts`). The theme is chosen with the arrow keys inside the Theme group (`e2e/theme.e2e.ts`). Tab reaches Search users before the grid, and Enter on a focused column header sorts by it without opening a user (`e2e/keyboard.e2e.ts`). |
 | 2.1.2 No Keyboard Trap | A | Passes | Tab leaves the grid in one press. The conflict dialog holds focus while open, as a modal should, and Escape or any button closes it. The Settings dialog does the same, and Escape or Close closes it (`e2e/settings.e2e.ts`). |
 | 2.1.4 Character Key Shortcuts | A | Passes | No single-character shortcuts. |
 | 2.2.1 Timing Adjustable | A | Not applicable | No time limits. |
@@ -110,7 +110,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 3.2.4 Consistent Identification | AA | Passes | "Back to users", Save, Cancel and the status and alert patterns look and read the same wherever they appear. |
 | 3.2.6 Consistent Help | A | Not applicable | The app offers no help mechanism. |
 | 3.3.1 Error Identification | A | Passes | Invalid fields get `aria-invalid` and a text message tied by `aria-describedby`; save and load failures show `role="alert"` text (`new-user-page.spec.ts`, `user-detail-page.spec.ts`). |
-| 3.3.2 Labels or Instructions | A | Passes | Every field has a visible label; error messages say what to enter, for example "Enter an email address like name@example.com." |
+| 3.3.2 Labels or Instructions | A | Passes | Every field has a visible label; error messages say what to enter, for example "Enter an email address like name@example.com." The list search keeps its "Search users" label visible; its placeholder "Name or email" only says what it matches (`e2e/search.e2e.ts`). |
 | 3.3.3 Error Suggestion | AA | Passes | Messages suggest the fix, and API field errors appear on the matching field. |
 | 3.3.4 Error Prevention (Legal, Financial, Data) | AA | Passes | Input is checked before it is sent and the admin can correct it; Cancel discards unsaved changes; overwriting another admin's change needs an explicit choice in the conflict dialog. |
 | 3.3.7 Redundant Entry | A | Passes | No step asks for information entered earlier. After a conflict, Keep editing and Overwrite keep the admin's values; only Reload, chosen explicitly, discards them. |
@@ -120,8 +120,8 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 
 | Criterion | Level | Result | Evidence |
 | --- | --- | --- | --- |
-| 4.1.2 Name, Role, Value | A | Passes | Native controls (including the Theme radios, whose checked state follows the choice), AG Grid's ARIA roles, `aria-disabled` placeholders, a Settings button with `aria-haspopup="dialog"`, a labelled and described conflict `dialog`, a labelled Settings `dialog` whose 2.5.7 note is the Draggable columns checkbox's description; axe `aria-*`, `button-name`, `label` and `link-name` rules pass in every state (`e2e/axe.e2e.ts`). |
-| 4.1.3 Status Messages | AA | Passes | Loading, saving, saved, created and simulated-edit messages use `role="status"`; failures use `role="alert"` (unit tests and `e2e/keyboard.e2e.ts`). |
+| 4.1.2 Name, Role, Value | A | Passes | Native controls (including the Theme radios, whose checked state follows the choice), AG Grid's ARIA roles, column headers whose `aria-sort` follows the sort (`e2e/grid.e2e.ts`), `aria-disabled` placeholders, a Settings button with `aria-haspopup="dialog"`, a labelled and described conflict `dialog`, a labelled Settings `dialog` whose 2.5.7 note is the Draggable columns checkbox's description; axe `aria-*`, `button-name`, `label` and `link-name` rules pass in every state (`e2e/axe.e2e.ts`). |
+| 4.1.3 Status Messages | AA | Passes | Loading, saving, saved, created and simulated-edit messages use `role="status"`, and so do search results ("N users match", "No users match"), announced without moving focus from the search field (`e2e/search.e2e.ts`); failures use `role="alert"` (unit tests and `e2e/keyboard.e2e.ts`). |
 
 4.1.1 Parsing is obsolete in WCAG 2.2 and not listed.
 

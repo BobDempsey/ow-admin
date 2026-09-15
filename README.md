@@ -17,12 +17,12 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
 
 ## Screens
 
-- `/users` lists users 25, 50 or 100 at a time. Each page is one request to the API. Click a row, or press Enter on a focused row, to open that user.
+- `/users` lists users 25, 50 or 100 at a time. Each page is one request to the API. Click a row, or press Enter on a focused row, to open that user. Click a column header, or press Enter on a focused one, to sort by it, and type in Search users to find people by name or email.
 - `/users/new` creates a user. On success the app opens the new user's detail screen. New users take the next index, so they appear on the last page of the list.
 - `/users/:id` shows a user as an editable form with Save and Cancel.
 - `/about` explains the app and how to try it.
 
-Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
+Dashboard and Reports in the navigation are placeholders and do nothing.
 
 The Theme control in the header switches between Light, Dark and System. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
 
@@ -32,13 +32,15 @@ Settings in the navigation opens a dialog with the same theme choice and three s
 
 The typed client is `UsersApi` in `src/app/core/api/`. It calls `HttpClient`, and `inMemoryApiInterceptor` answers every request under `/api` with a real `HttpResponse` or `HttpErrorResponse`, including status codes and headers.
 
-| Method and path                       | Result                                                                                                       |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `GET /api/users?skip&limit`           | 200 with `items` and `total`. `limit` defaults to 25 and is capped at 100.                                   |
-| `GET /api/users/{id}`                 | 200 with an `ETag`, or 404.                                                                                  |
-| `POST /api/users`                     | 201 with `ETag` and `Location`, or 400 with `fieldErrors`.                                                   |
-| `PUT /api/users/{id}`                 | 200 with a new `ETag`. 428 without `If-Match`, 412 when the `If-Match` ETag is stale, 400 on invalid fields. |
-| `POST /api/users/{id}/password-reset` | 204. No UI calls it yet.                                                                                     |
+| Method and path                       | Result                                                                                                                                                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/users?skip&limit`           | 200 with `items` and `total`. `limit` defaults to 25 and is capped at 100.                                                                                                                            |
+| `GET /api/users?sort=name:asc`        | Added beyond the PDF contract. Sorts by `name`, `email`, `role` or `status`, `asc` or `desc`, ignoring case, ties by id. 400 for any other value.                                                     |
+| `GET /api/users?q=text`               | Added beyond the PDF contract. Only users whose name or email contains the text, ignoring case, with `total` counting the matches. Combines with `sort`, `skip` and `limit`. 400 over 100 characters. |
+| `GET /api/users/{id}`                 | 200 with an `ETag`, or 404.                                                                                                                                                                           |
+| `POST /api/users`                     | 201 with `ETag` and `Location`, or 400 with `fieldErrors`.                                                                                                                                            |
+| `PUT /api/users/{id}`                 | 200 with a new `ETag`. 428 without `If-Match`, 412 when the `If-Match` ETag is stale, 400 on invalid fields.                                                                                          |
+| `POST /api/users/{id}/password-reset` | 204. No UI calls it yet.                                                                                                                                                                              |
 
 Other methods on a known path return 405 with an `Allow` header.
 

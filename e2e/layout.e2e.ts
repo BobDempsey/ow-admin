@@ -9,6 +9,8 @@ import {
   openMissingUser,
   openNewUser,
   showNewUserErrors,
+  showNoSearchResults,
+  showSearchResults,
   showSettingsWcagNote,
 } from './support/app';
 import {
@@ -22,6 +24,8 @@ import {
 
 const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user list', slug: 'list', open: openList },
+  { name: 'user list with search results', slug: 'search', open: showSearchResults },
+  { name: 'user list with no search results', slug: 'no-results', open: showNoSearchResults },
   { name: 'new user with errors', slug: 'new-errors', open: showNewUserErrors },
   { name: 'user detail', slug: 'detail', open: openDetail },
   { name: 'user not found', slug: 'not-found', open: openMissingUser },
