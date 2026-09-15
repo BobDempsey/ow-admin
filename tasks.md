@@ -1,12 +1,10 @@
-- [ ] Say "1 user matches" for a single search result
-- [ ] Show the search match count once, not beside the heading and under the search field
-- [ ] Make unchecked radios look unselected in dark mode
-- [ ] set table density to compact by default
-- [ ] Hide or explain table settings on screens without a table
-- [ ] Stop the "Loading users" flash when density changes
+- [!] Make unchecked radios look unselected in dark mode
+- [!] set table density to compact by default
+- [!] Hide or explain table settings on screens without a table
 - [ ] (Optional) Build password reset action
-- [ ] add table cols resizing to settings dialog
-- [ ] (Optional) Add filter to the user list
-- [ ] (Optional) Add fixed table header
-- [ ] (Optional) Add mobile nav menu and drawer
+- [!] add table cols resizing to settings dialog
+- [!] (Optional) Add filter to the user list
+- [!] (Optional) Add fixed table header
+- [!] Update the theme switcher UI in the navbar
+- [!] (Optional) Add mobile nav menu and drawer
 - [ ] improve ui styling to a modern look
