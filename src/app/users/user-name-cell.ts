@@ -12,7 +12,7 @@ import { User } from '../core/api/user.model';
     @if (user(); as user) {
       <a
         [routerLink]="['/users', user.id]"
-        class="font-medium text-sky-700 underline underline-offset-2 hover:text-sky-900"
+        class="font-medium text-link underline underline-offset-2 hover:text-link-hover"
         >{{ user.name }}</a
       >
     }

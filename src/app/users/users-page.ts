@@ -10,19 +10,19 @@ import { UsersGrid } from './users-grid';
   imports: [DecimalPipe, RouterLink, UsersGrid],
   template: `
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <h1 #heading tabindex="-1" class="text-2xl font-semibold text-slate-900 focus:outline-none">
+      <h1 #heading tabindex="-1" class="text-2xl font-semibold text-ink focus:outline-none">
         Users
       </h1>
       @if (total() !== undefined) {
-        <p class="text-slate-600">{{ total() | number }} users</p>
+        <p class="text-ink-subtle">{{ total() | number }} users</p>
       }
       <a
         routerLink="/users/new"
-        class="ml-auto inline-flex min-h-11 items-center rounded bg-sky-700 px-4 font-medium text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+        class="ml-auto inline-flex min-h-11 items-center rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >New user</a
       >
     </div>
-    <p role="status" class="mt-2 min-h-6 text-sm text-slate-600">
+    <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">
       @if (loading()) {
         Loading users…
       }
@@ -30,13 +30,13 @@ import { UsersGrid } from './users-grid';
     @if (error()) {
       <div
         role="alert"
-        class="mt-2 flex flex-wrap items-center gap-3 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800"
+        class="mt-2 flex flex-wrap items-center gap-3 rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
       >
         <span>Users could not be loaded.</span>
         <button
           type="button"
           (click)="retry(grid)"
-          class="min-h-11 rounded border border-red-300 bg-white px-4 font-medium text-red-800 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 rounded border border-danger-line-strong bg-surface px-4 font-medium text-danger-ink hover:bg-danger-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Try again
         </button>

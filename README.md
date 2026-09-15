@@ -24,6 +24,8 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
 
 Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
 
+The Theme control in the header switches between Light, Dark and System. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
+
 ## How the API layer works
 
 The typed client is `UsersApi` in `src/app/core/api/`. It calls `HttpClient`, and `inMemoryApiInterceptor` answers every request under `/api` with a real `HttpResponse` or `HttpErrorResponse`, including status codes and headers.

@@ -1,5 +1,6 @@
-import { Page, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
 import {
+  COLOR_SCHEMES,
   VIEWPORTS,
   forceDetailLoadFailure,
   forceListFailure,
@@ -27,16 +28,20 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'about', open: openAbout },
 ];
 
-for (const viewport of VIEWPORTS) {
-  test.describe(`axe WCAG A and AA at ${viewport.name}`, () => {
-    test.use({ viewport: { width: viewport.width, height: viewport.height } });
+// With no stored choice the app follows System, so the emulated OS scheme picks the theme.
+for (const colorScheme of COLOR_SCHEMES) {
+  for (const viewport of VIEWPORTS) {
+    test.describe(`axe WCAG A and AA, ${colorScheme} theme at ${viewport.name}`, () => {
+      test.use({ colorScheme, viewport: { width: viewport.width, height: viewport.height } });
 
-    for (const state of STATES) {
-      test(state.name, async ({ page }) => {
-        await state.open(page);
+      for (const state of STATES) {
+        test(state.name, async ({ page }) => {
+          await state.open(page);
+          await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme);
 
-        await expectNoAxeViolations(page);
-      });
-    }
-  });
+          await expectNoAxeViolations(page);
+        });
+      }
+    });
+  }
 }

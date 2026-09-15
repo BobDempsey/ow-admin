@@ -19,10 +19,10 @@ export type ConflictChoice = 'keep' | 'reload' | 'overwrite';
       aria-labelledby="conflict-dialog-heading"
       aria-describedby="conflict-dialog-description"
       (cancel)="onCancel($event)"
-      class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-lg bg-white p-6 text-slate-900 shadow-xl backdrop:bg-slate-900/60"
+      class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
       <h2 id="conflict-dialog-heading" class="text-xl font-semibold">This user changed</h2>
-      <p id="conflict-dialog-description" class="mt-3 text-slate-700">
+      <p id="conflict-dialog-description" class="mt-3 text-ink-muted">
         Another admin saved changes to this user after you opened it. Reload to see their changes
         and discard yours, or overwrite their changes with yours.
       </p>
@@ -31,21 +31,21 @@ export type ConflictChoice = 'keep' | 'reload' | 'overwrite';
           #keep
           type="button"
           (click)="choose('keep')"
-          class="min-h-11 rounded border border-slate-300 px-4 font-medium hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 rounded border border-line px-4 font-medium hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Keep editing
         </button>
         <button
           type="button"
           (click)="choose('reload')"
-          class="min-h-11 rounded border border-slate-300 px-4 font-medium hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 rounded border border-line px-4 font-medium hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Reload
         </button>
         <button
           type="button"
           (click)="choose('overwrite')"
-          class="min-h-11 rounded bg-red-700 px-4 font-medium text-white hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 rounded bg-danger-button px-4 font-medium text-on-primary hover:bg-danger-button-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Overwrite
         </button>

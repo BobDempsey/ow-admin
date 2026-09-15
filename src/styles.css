@@ -2,6 +2,87 @@
 
 @import 'tailwindcss';
 
+/* `dark:` follows the resolved theme on <html>, which the inline script in index.html sets. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+ * Named colors. Light values are the Tailwind palette colors the templates used before theming;
+ * dark values override them below. Components use these (`bg-surface`, `text-ink`), never palette
+ * classes, so each color has exactly one light and one dark definition.
+ */
+@theme {
+  --color-surface: var(--color-white);
+  --color-surface-muted: var(--color-slate-100);
+  --color-ink: var(--color-slate-900);
+  --color-ink-muted: var(--color-slate-700);
+  --color-ink-subtle: var(--color-slate-600);
+  --color-line: var(--color-slate-300);
+  --color-line-strong: var(--color-slate-400);
+  --color-line-input: var(--color-slate-500);
+  --color-link: var(--color-sky-700);
+  --color-link-hover: var(--color-sky-900);
+  --color-focus: var(--color-sky-700);
+  --color-primary: var(--color-sky-700);
+  --color-primary-hover: var(--color-sky-800);
+  --color-on-primary: var(--color-white);
+  --color-danger-ink: var(--color-red-800);
+  --color-danger-surface: var(--color-red-50);
+  --color-danger-surface-hover: var(--color-red-100);
+  --color-danger-line: var(--color-red-200);
+  --color-danger-line-strong: var(--color-red-300);
+  --color-danger-field: var(--color-red-700);
+  --color-danger-button: var(--color-red-700);
+  --color-danger-button-hover: var(--color-red-800);
+  --color-header: var(--color-slate-900);
+  --color-header-hover: var(--color-slate-800);
+  --color-header-ink: var(--color-white);
+  --color-header-muted: var(--color-slate-300);
+  --color-header-focus: var(--color-sky-400);
+  --color-header-accent: var(--color-sky-400);
+  --color-header-line: transparent;
+  --color-backdrop: var(--color-slate-900);
+}
+
+:root {
+  color-scheme: light;
+}
+
+/* Contrast for each text, border and focus pair is recorded in docs/accessibility.md. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-surface: var(--color-slate-900);
+  --color-surface-muted: var(--color-slate-800);
+  --color-ink: var(--color-slate-100);
+  --color-ink-muted: var(--color-slate-300);
+  --color-ink-subtle: var(--color-slate-400);
+  --color-line: var(--color-slate-600);
+  --color-line-strong: var(--color-slate-500);
+  --color-line-input: var(--color-slate-400);
+  --color-link: var(--color-sky-300);
+  --color-link-hover: var(--color-sky-200);
+  --color-focus: var(--color-sky-400);
+  --color-primary: var(--color-sky-700);
+  --color-primary-hover: var(--color-sky-800);
+  --color-on-primary: var(--color-white);
+  --color-danger-ink: var(--color-red-200);
+  --color-danger-surface: var(--color-red-950);
+  --color-danger-surface-hover: var(--color-red-900);
+  --color-danger-line: var(--color-red-900);
+  --color-danger-line-strong: var(--color-red-800);
+  --color-danger-field: var(--color-red-400);
+  --color-danger-button: var(--color-red-700);
+  --color-danger-button-hover: var(--color-red-800);
+  /* The header stays dark in both themes; in dark it sits a step darker with a bottom rule. */
+  --color-header: var(--color-slate-950);
+  --color-header-hover: var(--color-slate-800);
+  --color-header-ink: var(--color-white);
+  --color-header-muted: var(--color-slate-300);
+  --color-header-focus: var(--color-sky-400);
+  --color-header-accent: var(--color-sky-400);
+  --color-header-line: var(--color-slate-700);
+  --color-backdrop: var(--color-black);
+}
+
 /* AG Grid's pagination panel is one fixed-height row that clips at narrow widths; let it wrap. */
 app-users-grid .ag-paging-panel {
   height: auto;

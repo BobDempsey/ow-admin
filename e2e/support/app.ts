@@ -6,6 +6,9 @@ export const VIEWPORTS = [
   { name: '320px', width: 320, height: 800 },
 ] as const;
 
+/** The themes every screen is checked in, set through the emulated OS color scheme. */
+export const COLOR_SCHEMES = ['light', 'dark'] as const;
+
 export const USER_ID = 'u-000042';
 export const MISSING_USER_ID = 'u-999999';
 

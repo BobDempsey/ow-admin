@@ -34,41 +34,44 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
   template: `
     <a
       routerLink="/users"
-      class="text-sky-700 underline underline-offset-2 hover:text-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+      class="text-link underline underline-offset-2 hover:text-link-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >Back to users</a
     >
     <!-- One heading element for every state, so the focus placed on it after navigation stays. -->
     <h1
       #headingElement
       tabindex="-1"
-      class="mt-4 text-2xl font-semibold break-words text-slate-900 focus:outline-none"
+      class="mt-4 text-2xl font-semibold break-words text-ink focus:outline-none"
     >
       {{ heading() }}
     </h1>
-    <p role="status" class="mt-2 min-h-6 text-sm text-slate-600">{{ status() }}</p>
+    <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">{{ status() }}</p>
 
     @if (notFound()) {
-      <p class="mt-4 text-slate-700">No user exists with the id {{ id() }}.</p>
+      <p class="mt-4 text-ink-muted">No user exists with the id {{ id() }}.</p>
     } @else if (loadFailed()) {
       <div
         role="alert"
-        class="mt-2 flex flex-wrap items-center gap-3 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800"
+        class="mt-2 flex flex-wrap items-center gap-3 rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
       >
         <span>The user could not be loaded.</span>
         <button
           type="button"
           (click)="retry()"
-          class="min-h-11 rounded border border-red-300 bg-white px-4 font-medium text-red-800 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 rounded border border-danger-line-strong bg-surface px-4 font-medium text-danger-ink hover:bg-danger-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Try again
         </button>
       </div>
     } @else if (user.hasValue()) {
-      <p class="text-sm text-slate-600">ID {{ user.value().data.id }}</p>
+      <p class="text-sm text-ink-subtle">ID {{ user.value().data.id }}</p>
       <form novalidate (submit)="save($event)" class="mt-4 grid gap-6">
         <app-user-form-fields [fields]="fields" />
         @if (saveFailed()) {
-          <div role="alert" class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+          <div
+            role="alert"
+            class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+          >
             The user could not be saved. Try again.
           </div>
         }
@@ -76,14 +79,14 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
           <button
             #saveButton
             type="submit"
-            class="min-h-11 rounded bg-sky-700 px-4 font-medium text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+            class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             Save
           </button>
           <button
             type="button"
             (click)="cancel()"
-            class="min-h-11 rounded border border-slate-300 px-4 font-medium text-slate-900 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+            class="min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             Cancel
           </button>
@@ -92,17 +95,17 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
 
       <section
         aria-labelledby="demo-heading"
-        class="mt-10 max-w-md rounded border border-dashed border-slate-400 p-4"
+        class="mt-10 max-w-md rounded border border-dashed border-line-strong p-4"
       >
-        <h2 id="demo-heading" class="font-semibold text-slate-900">Demo</h2>
-        <p class="mt-1 text-sm text-slate-700">
+        <h2 id="demo-heading" class="font-semibold text-ink">Demo</h2>
+        <p class="mt-1 text-sm text-ink-muted">
           Changes this user's status the way another admin would, without updating this screen, so
           the next Save shows the edit conflict.
         </p>
         <button
           type="button"
           (click)="simulate()"
-          class="mt-3 min-h-11 rounded border border-slate-300 px-4 font-medium text-slate-900 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Simulate an edit by another admin
         </button>

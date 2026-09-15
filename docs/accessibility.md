@@ -4,16 +4,47 @@ Orbweaver Admin targets WCAG 2.2 level AA. This report lists every level A and A
 
 ## Scope and setup
 
-The report covers every screen and state in the app: the top navigation and skip link, the user list at `/users` (AG Grid Community 36.1 with pagination), the create screen at `/users/new`, the view and edit screen at `/users/:id` with its loading, not found, load failure and save failure states, the edit conflict dialog, and the About screen at `/about`.
+The report covers every screen and state in the app: the top navigation and skip link, the user list at `/users` (AG Grid Community 36.1 with pagination), the create screen at `/users/new`, the view and edit screen at `/users/:id` with its loading, not found, load failure and save failure states, the edit conflict dialog, the About screen at `/about`, and the Theme control in the header. Every screen and state is checked in both the light and the dark theme.
 
 We checked conformance four ways:
 
-- **Browser suite.** `npm run test:a11y` runs Playwright 1.63 with Chromium against the dev server. It runs axe-core 4.13 with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa` rule tags, color contrast included, on 10 states at 1280 and 320 CSS pixels wide. It also replays keyboard flows, checks that focus is never fully hidden, measures reflow and target sizes, and applies WCAG text spacing and 200 percent zoom. Test files live in `e2e/`.
+- **Browser suite.** `npm run test:a11y` runs Playwright 1.63 with Chromium against the dev server. It runs axe-core 4.13 with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa` rule tags, color contrast included, on 10 states at 1280 and 320 CSS pixels wide, once in the light theme and once in the dark theme (40 runs). It also replays keyboard flows, checks that focus is never fully hidden, measures reflow and target sizes in both themes, and applies WCAG text spacing and 200 percent zoom in both themes. `e2e/theme.e2e.ts` covers the Theme control. Test files live in `e2e/`.
 - **Unit tests.** `ng test` runs axe in jsdom, color contrast excluded, on each component and state, and tests labels, error association, status messages and focus movement.
 - **Manual review.** We reviewed markup, ARIA and design against criteria automation cannot judge, and looked at screenshots taken under text spacing and zoom.
 - **Screen reader (partial).** A person ran steps 1 and 2 of the NVDA script at the end of this report with Chrome on Windows. Steps 3 to 21 were not run. The PDF does not require a screen reader pass.
 
 Not covered: Firefox and Safari, mobile screen readers, and Windows forced colors mode (not required at AA). The 200 percent zoom check uses CSS `zoom` on the root element in Chromium, which approximates browser zoom; the manual Ctrl and plus check at 200 percent is step 21 of the NVDA script, which was not run.
+
+### Theme colors
+
+Components use named color tokens defined in `src/styles.css`, each with one light and one dark value. We measured every text, border and focus pair in Chromium from the rendered colors. Text needs 4.5:1; input borders and focus indicators need 3:1.
+
+| Pair | Needs | Light | Dark |
+| --- | --- | --- | --- |
+| Body text on page | 4.5:1 | 17.8:1 | 16.3:1 |
+| Secondary text on page | 4.5:1 | 10.4:1 | 12.0:1 |
+| Status and ID text on page | 4.5:1 | 7.6:1 | 6.8:1 |
+| Body text on hover and code backgrounds | 4.5:1 | 16.3:1 | 13.3:1 |
+| Links on page | 4.5:1 | 5.9:1 | 10.7:1 |
+| Links on hover | 4.5:1 | 9.5:1 | 13.4:1 |
+| Primary button text | 4.5:1 | 5.9:1 | 5.9:1 |
+| Primary button text on hover | 4.5:1 | 7.5:1 | 7.5:1 |
+| Alert text on alert background | 4.5:1 | 7.6:1 | 11.1:1 |
+| Alert text on Try again hover | 4.5:1 | 6.9:1 | 6.9:1 |
+| Alert text on Try again button | 4.5:1 | 8.4:1 | 12.3:1 |
+| Field error text on page | 4.5:1 | 6.4:1 | 6.2:1 |
+| Overwrite button text | 4.5:1 | 6.4:1 | 6.4:1 |
+| Overwrite button text on hover | 4.5:1 | 8.4:1 | 8.4:1 |
+| Header text | 4.5:1 | 17.8:1 | 20.2:1 |
+| Header text on hover | 4.5:1 | 14.6:1 | 14.6:1 |
+| Placeholder nav entries and Theme label | 4.5:1 | 12.0:1 | 13.6:1 |
+| Input borders | 3:1 | 4.8:1 | 6.8:1 |
+| Invalid input borders | 3:1 | 6.4:1 | 6.2:1 |
+| Focus ring on page | 3:1 | 5.9:1 | 8.2:1 |
+| Focus ring on grid header | 3:1 | 5.3:1 | 6.7:1 |
+| Focus ring on alert | 3:1 | 5.4:1 | 7.4:1 |
+| Focus ring in header | 3:1 | 8.2:1 | 9.3:1 |
+| Current nav entry and chosen theme underline | 3:1 | 8.2:1 | 9.3:1 |
 
 Results use three values. **Passes** means the app meets the criterion. **Not applicable** means the app has no content the criterion covers. **Known gap** means the app does not fully meet it; each gap is also listed under "Known gaps".
 
@@ -27,18 +58,18 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 1.2.3 Audio Description or Media Alternative (Prerecorded) | A | Not applicable | No video. |
 | 1.2.4 Captions (Live) | AA | Not applicable | No live media. |
 | 1.2.5 Audio Description (Prerecorded) | AA | Not applicable | No video. |
-| 1.3.1 Info and Relationships | A | Passes | Landmarks (`header`, `nav` named Primary, `main`), one `h1` per screen, a `treegrid` with column headers and `aria-rowcount="500001"` (`e2e/grid.e2e.ts`), `label for` on every form control and `aria-describedby` on errors (`user-form-fields.spec.ts`). |
+| 1.3.1 Info and Relationships | A | Passes | Landmarks (`header`, `nav` named Primary, `main`), one `h1` per screen, a `treegrid` with column headers and `aria-rowcount="500001"` (`e2e/grid.e2e.ts`), `label for` on every form control and `aria-describedby` on errors (`user-form-fields.spec.ts`). The Theme control is a `fieldset` with the legend "Theme" around three native radios (`theme-switcher.spec.ts`). |
 | 1.3.2 Meaningful Sequence | A | Passes | DOM order matches visual order; AG Grid runs with `ensureDomOrder`. Keyboard flows in `e2e/keyboard.e2e.ts` follow reading order. |
 | 1.3.3 Sensory Characteristics | A | Passes | No instruction depends on shape, position or sound. |
 | 1.3.4 Orientation | AA | Passes | No orientation lock; layouts reflow at 320 px (`e2e/layout.e2e.ts`). |
 | 1.3.5 Identify Input Purpose | AA | Not applicable | The forms collect data about other users, not the admin filling them in, so the criterion's input purposes do not apply. |
-| 1.4.1 Use of Color | A | Passes | The current nav entry is bold and underlined as well as colored. Invalid fields carry a text message and `aria-invalid`. Status is shown as text in the grid. |
+| 1.4.1 Use of Color | A | Passes | The current nav entry and the chosen theme are bold and underlined as well as colored. Invalid fields carry a text message and `aria-invalid`. Status is shown as text in the grid. |
 | 1.4.2 Audio Control | A | Not applicable | No audio. |
-| 1.4.3 Contrast (Minimum) | AA | Passes | axe `color-contrast` passes in every state at both widths (`e2e/axe.e2e.ts`). Measured by hand on the header: white 17.8:1, slate-300 placeholders 12:1. |
+| 1.4.3 Contrast (Minimum) | AA | Passes | axe `color-contrast` passes in every state at both widths in both themes (`e2e/axe.e2e.ts`). Every text pair is at least 5.9:1 in light and dark; see "Theme colors" above. |
 | 1.4.4 Resize Text | AA | Passes | At 200 percent zoom every screen and the dialog show no clipped text and no page-level sideways scroll (`e2e/layout.e2e.ts`). Grid rows are 64 px and cell text wraps, because the Infinite Row Model cannot size rows to content. |
 | 1.4.5 Images of Text | AA | Not applicable | No images of text. |
 | 1.4.10 Reflow | AA | Passes | No page-level sideways scroll at 320 px on any screen or the dialog (`e2e/layout.e2e.ts`). The grid scrolls sideways inside its own box, which the criterion allows for data tables. |
-| 1.4.11 Non-text Contrast | AA | Passes | Input borders (slate-500) are 4.8:1 on white. Focus rings are sky-700 on white (5.9:1) and sky-400 on the slate-900 header (8.2:1). Secondary buttons have a light border but are identified by their text, which meets 1.4.3. Disabled paging buttons are exempt. |
+| 1.4.11 Non-text Contrast | AA | Passes | Input borders are 4.8:1 in light and 6.8:1 in dark. Focus rings are at least 5.3:1 in light and 6.7:1 in dark on every background they sit on, and the header's current-entry and chosen-theme underline is 8.2:1 and 9.3:1 (see "Theme colors" above). Secondary buttons have a light border but are identified by their text, which meets 1.4.3. Disabled paging buttons are exempt. |
 | 1.4.12 Text Spacing | AA | Passes | With WCAG spacing applied at 320 px no text is clipped on any screen or the dialog (`e2e/layout.e2e.ts`). This failed on the grid before cells wrapped; see `openspec/changes/archive/2026-09-15-verify-wcag-accessibility/audit-findings.md`. |
 | 1.4.13 Content on Hover or Focus | AA | Not applicable | No tooltips or content that appears on hover or focus. |
 
@@ -46,7 +77,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 
 | Criterion | Level | Result | Evidence |
 | --- | --- | --- | --- |
-| 2.1.1 Keyboard | A | Passes | Every task runs from the keyboard: nav, opening a user from the grid with Enter, pagination, create, edit, cancel, simulate, and every conflict choice (`e2e/keyboard.e2e.ts`). |
+| 2.1.1 Keyboard | A | Passes | Every task runs from the keyboard: nav, opening a user from the grid with Enter, pagination, create, edit, cancel, simulate, and every conflict choice (`e2e/keyboard.e2e.ts`). The theme is chosen with the arrow keys inside the Theme group (`e2e/theme.e2e.ts`). |
 | 2.1.2 No Keyboard Trap | A | Passes | Tab leaves the grid in one press. The conflict dialog holds focus while open, as a modal should, and Escape or any button closes it. |
 | 2.1.4 Character Key Shortcuts | A | Passes | No single-character shortcuts. |
 | 2.2.1 Timing Adjustable | A | Not applicable | No time limits. |
@@ -58,7 +89,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 2.4.4 Link Purpose (In Context) | A | Passes | Links are "Back to users", "New user", "Users", "About", each user's name, and on the About screen "Go to users" and "Create a user" (`about-page.spec.ts`). |
 | 2.4.5 Multiple Ways | AA | Passes | The user list is reached from the nav and the wordmark, and every screen has a direct URL. A user's detail screen is the result of choosing that user from the list, which the criterion exempts. |
 | 2.4.6 Headings and Labels | AA | Passes | Headings name each screen or user; form labels are Name, Email, Role and Status; the dialog heading is "This user changed". |
-| 2.4.7 Focus Visible | AA | Passes | Every control shows a solid 2 px outline; grid cells and headers show a solid 3 px sky-700 ring. |
+| 2.4.7 Focus Visible | AA | Passes | Every control shows a solid 2 px outline; grid cells and headers show a solid 3 px ring. The Theme radios are visually hidden, so the outline is drawn on the focused radio's label. Rings are sky-700 in light and sky-400 in dark. |
 | 2.4.11 Focus Not Obscured (Minimum) | AA | Passes | Tabbing through each screen at both widths leaves every focused element at least partly visible (`e2e/keyboard.e2e.ts`). AG Grid moved focus to Page Size without scrolling before this audit; the grid now scrolls focused elements into view. |
 | 2.5.1 Pointer Gestures | A | Passes | No multipoint or path-based gestures. |
 | 2.5.2 Pointer Cancellation | A | Passes | Actions fire on click (pointer up). |
@@ -74,7 +105,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 3.1.1 Language of Page | A | Passes | `<html lang="en">`. |
 | 3.1.2 Language of Parts | AA | Not applicable | All content is English. |
 | 3.2.1 On Focus | A | Passes | Focus never changes context. |
-| 3.2.2 On Input | A | Passes | Changing a form field never submits. Changing Page Size reloads the grid at page one without moving focus or opening anything. |
+| 3.2.2 On Input | A | Passes | Changing a form field never submits. Choosing a theme changes colors only; focus and the screen stay where they were. Changing Page Size reloads the grid at page one without moving focus or opening anything. |
 | 3.2.3 Consistent Navigation | AA | Passes | The skip link and nav are the same on every screen. |
 | 3.2.4 Consistent Identification | AA | Passes | "Back to users", Save, Cancel and the status and alert patterns look and read the same wherever they appear. |
 | 3.2.6 Consistent Help | A | Not applicable | The app offers no help mechanism. |
@@ -89,7 +120,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 
 | Criterion | Level | Result | Evidence |
 | --- | --- | --- | --- |
-| 4.1.2 Name, Role, Value | A | Passes | Native controls, AG Grid's ARIA roles, `aria-disabled` placeholders and a labelled and described `dialog`; axe `aria-*`, `button-name`, `label` and `link-name` rules pass in every state (`e2e/axe.e2e.ts`). |
+| 4.1.2 Name, Role, Value | A | Passes | Native controls (including the Theme radios, whose checked state follows the choice), AG Grid's ARIA roles, `aria-disabled` placeholders and a labelled and described `dialog`; axe `aria-*`, `button-name`, `label` and `link-name` rules pass in every state (`e2e/axe.e2e.ts`). |
 | 4.1.3 Status Messages | AA | Passes | Loading, saving, saved, created and simulated-edit messages use `role="status"`; failures use `role="alert"` (unit tests and `e2e/keyboard.e2e.ts`). |
 
 4.1.1 Parsing is obsolete in WCAG 2.2 and not listed.

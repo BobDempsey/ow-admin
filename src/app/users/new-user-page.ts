@@ -14,13 +14,11 @@ import { UsersService } from './users.service';
   template: `
     <a
       routerLink="/users"
-      class="text-sky-700 underline underline-offset-2 hover:text-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+      class="text-link underline underline-offset-2 hover:text-link-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >Back to users</a
     >
-    <h1 tabindex="-1" class="mt-4 text-2xl font-semibold text-slate-900 focus:outline-none">
-      New user
-    </h1>
-    <p role="status" class="mt-2 min-h-6 text-sm text-slate-600">
+    <h1 tabindex="-1" class="mt-4 text-2xl font-semibold text-ink focus:outline-none">New user</h1>
+    <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">
       @if (fields().submitting()) {
         Creating user…
       }
@@ -28,20 +26,23 @@ import { UsersService } from './users.service';
     <form novalidate (submit)="create($event)" class="mt-4 grid gap-6">
       <app-user-form-fields [fields]="fields" />
       @if (failed()) {
-        <div role="alert" class="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+        <div
+          role="alert"
+          class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+        >
           The user could not be created. Try again.
         </div>
       }
       <div class="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          class="min-h-11 rounded bg-sky-700 px-4 font-medium text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           Create user
         </button>
         <a
           routerLink="/users"
-          class="inline-flex min-h-11 items-center rounded border border-slate-300 px-4 font-medium text-slate-900 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >Cancel</a
         >
       </div>

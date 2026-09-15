@@ -22,7 +22,7 @@ export function focusFirstError(fields: FieldTree<UserDraft>): void {
       @let state = fields()[field.key]();
       @let error = state.touched() ? state.errors()[0]?.message : undefined;
       <div class="grid gap-1">
-        <label [for]="id(field.key)" class="font-medium text-slate-900">{{ field.label }}</label>
+        <label [for]="id(field.key)" class="font-medium text-ink">{{ field.label }}</label>
         <input
           [id]="id(field.key)"
           [type]="field.type"
@@ -30,20 +30,20 @@ export function focusFirstError(fields: FieldTree<UserDraft>): void {
           [formField]="fields()[field.key]"
           [attr.aria-invalid]="error ? 'true' : null"
           [attr.aria-describedby]="error ? id(field.key) + '-error' : null"
-          class="min-h-11 w-full max-w-md rounded border border-slate-500 px-3 text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 aria-invalid:border-red-700"
+          class="min-h-11 w-full max-w-md rounded border border-line-input px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-invalid:border-danger-field"
         />
         @if (error) {
-          <p [id]="id(field.key) + '-error'" class="text-sm text-red-700">{{ error }}</p>
+          <p [id]="id(field.key) + '-error'" class="text-sm text-danger-field">{{ error }}</p>
         }
       </div>
     }
     @for (field of selectFields; track field.key) {
       <div class="grid gap-1">
-        <label [for]="id(field.key)" class="font-medium text-slate-900">{{ field.label }}</label>
+        <label [for]="id(field.key)" class="font-medium text-ink">{{ field.label }}</label>
         <select
           [id]="id(field.key)"
           [formField]="fields()[field.key]"
-          class="min-h-11 w-full max-w-md rounded border border-slate-500 bg-white px-3 text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+          class="min-h-11 w-full max-w-md rounded border border-line-input bg-surface px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           @for (option of field.options; track option) {
             <option [value]="option">{{ option }}</option>

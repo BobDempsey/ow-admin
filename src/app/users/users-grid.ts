@@ -29,21 +29,36 @@ ModuleRegistry.registerModules([
 
 const DEFAULT_PAGE_SIZE = 25;
 
-/** Tailwind slate and sky values, so the grid matches the rest of the app. */
-const usersGridTheme = themeQuartz.withParams({
-  fontFamily: 'inherit',
-  foregroundColor: '#0f172a',
-  backgroundColor: '#ffffff',
-  headerBackgroundColor: '#f8fafc',
-  borderColor: '#e2e8f0',
-  accentColor: '#0369a1',
-  // Quartz tints the focus ring to half opacity, which drops below 3:1 on the header.
-  focusShadow: { radius: 0, spread: 3, color: '#0369a1' },
-  // Tall enough for two wrapped lines under WCAG text spacing; the Infinite Row Model cannot
-  // size rows to their content.
-  rowHeight: 64,
-  headerHeight: 44,
-});
+/**
+ * Tailwind slate and sky values, so the grid matches the app's color tokens in styles.css. AG Grid
+ * uses the dark set when `data-ag-theme-mode="dark"` is on `<html>`, which ThemeService sets.
+ */
+const usersGridTheme = themeQuartz
+  .withParams({
+    fontFamily: 'inherit',
+    foregroundColor: '#0f172a',
+    backgroundColor: '#ffffff',
+    headerBackgroundColor: '#f8fafc',
+    borderColor: '#e2e8f0',
+    accentColor: '#0369a1',
+    // Quartz tints the focus ring to half opacity, which drops below 3:1 on the header.
+    focusShadow: { radius: 0, spread: 3, color: '#0369a1' },
+    // Tall enough for two wrapped lines under WCAG text spacing; the Infinite Row Model cannot
+    // size rows to their content.
+    rowHeight: 64,
+    headerHeight: 44,
+  })
+  .withParams(
+    {
+      foregroundColor: '#f1f5f9',
+      backgroundColor: '#0f172a',
+      headerBackgroundColor: '#1e293b',
+      borderColor: '#334155',
+      accentColor: '#38bdf8',
+      focusShadow: { radius: 0, spread: 3, color: '#38bdf8' },
+    },
+    'dark',
+  );
 
 /**
  * The paged user grid. Each page is one block of the Infinite Row Model and one `GET /users`

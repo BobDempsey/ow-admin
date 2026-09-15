@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, README rewritten to describe the app (earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks), not yet committed or archived (earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -21,8 +21,8 @@ at `/users/:id`, and the About screen at `/about`. It was generated with `@angul
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (166 tests in 20 files),
-`npm run test:a11y` passes (76 Playwright tests, 2026-09-15), and
+`ng build` and `ng test --watch=false` both pass (180 tests in 22 files),
+`npm run test:a11y` passes (125 Playwright tests, 2026-09-15), and
 `npx prettier --check src e2e` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -231,7 +231,19 @@ exempted About in "Placeholder nav entries", and added an About scenario
 to "Current screen indicated". `openspec validate --specs --strict` passes
 all seven.
 
-No OpenSpec change is active. The About page went through
+`openspec/changes/add-theme-switcher/` is active: all 14 tasks done, uncommitted and not archived. It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
+
+- Named color tokens in `src/styles.css` (`@theme`, 30 tokens such as `surface`, `ink`, `link`, `primary`, `danger-*`, `header-*`). Light values point at the palette variables the templates used before (`var(--color-slate-900)`), so light pixels did not change: six full-page light screenshots at 1280 px matched with zero differing pixels before and after the class mapping. `:root[data-theme='dark']` redefines every token and sets `color-scheme: dark`. No component uses a palette class any more; use token classes (`bg-surface`, `text-ink-muted`) for new UI.
+- The header stays dark in both themes (slate-900 in light, slate-950 in dark). In dark it gets a 1 px rule drawn with an inset shadow, so light layout does not shift.
+- `ThemeService` (`src/app/core/theme.service.ts`) holds the preference, follows `matchMedia` under System, and writes `data-theme` and `data-ag-theme-mode` on `<html>`. It writes `localStorage['orbweaver-admin-theme']` only when the admin chooses, so a first visit stores nothing.
+- An inline script in `src/index.html` applies the stored theme before Angular loads. Keep its key and values in step with the service.
+- `ThemeSwitcher` (`src/app/layout/theme-switcher.ts`) is a `fieldset` with legend "Theme" and three visually hidden native radios whose labels carry the underline, bold and focus ring. `App`'s header now wraps `TopNav` and the switcher in one `max-w-7xl` row, so `TopNav`'s `<nav>` lost its own container classes. At 320 px the switcher wraps to its own row under the nav.
+- AG Grid gets dark params through `.withParams({...}, 'dark')` in `users-grid.ts`.
+- `e2e/axe.e2e.ts` and `e2e/layout.e2e.ts` loop over `COLOR_SCHEMES` (in `e2e/support/app.ts`) with `test.use({ colorScheme })`; with nothing stored the app follows System, so the emulated scheme picks the theme. `e2e/theme.e2e.ts` covers first visit, arrow keys, reload, OS change and blocked storage.
+- `docs/accessibility.md` has a "Theme colors" table of 24 measured pairs in both themes (lowest text pair 5.9:1, lowest non-text 4.8:1) and updated rows for 1.3.1, 1.4.1, 1.4.3, 1.4.11, 2.1.1, 2.4.7, 3.2.2 and 4.1.2. `README.md` mentions the control.
+- Checks on 2026-09-15: `ng test` 180 passed, `ng build` passed, `npm run test:a11y` 125 passed, Prettier clean, `openspec validate add-theme-switcher --strict` valid; screenshots of all six screens in both themes at 1280 and 320 px looked right.
+
+The About page went through
 `openspec/changes/archive/2026-09-15-add-about-page/` (all 8 tasks done,
 committed in `ae56a1f`, archived 2026-09-15 with its deltas merged). Its
 `admin-navigation` delta lets About be a working entry beside Users (the
@@ -343,6 +355,8 @@ scaffolding and "Additional Resources" boilerplate is gone. Prettier
 formatted it; `npx prettier --check src e2e` does not cover it.
 
 ## Decisions made
+
+- Theme switcher (decided 2026-09-15): Light, Dark and System radios in the header rather than on the About page; named color tokens rather than `dark:` classes in every template; System as the default for a first visit. The skip link's focus outline moved from sky-600 to the `focus` token (sky-700), the only light color that changed, and only while the skip link has focus. Tabs do not sync the choice; another tab picks it up on its next load.
 
 - About page (decided 2026-09-15): a fifth nav entry after Settings, not
   right-aligned and not replacing a placeholder; copy kept short like a
@@ -570,6 +584,11 @@ All pre-implementation decisions are made.
   - A WebFetch summary of the WCAG 2.2 recommendation returned wrong level
     counts. The report's list (31 A, 24 AA, 4.1.1 obsolete) was checked by
     hand.
+- Theme facts found on 2026-09-15:
+  - Tailwind 4 utilities read `@theme` colors through `var()`, so redefining `--color-*` under `[data-theme='dark']` restyles `bg-surface` with no `dark:` class. A token can point at a palette variable (`var(--color-slate-900)`) even when no template uses that palette class.
+  - Angular's module script is deferred, so it renders `<app-root>` before `DOMContentLoaded`. A test that wants the state before Angular renders has to use a `MutationObserver` in `page.addInitScript`.
+  - jsdom has no `matchMedia`; `ThemeService` treats the OS scheme as light without it, and `theme.service.spec.ts` defines a stub on `window` per test.
+  - Playwright's `toHaveScreenshot` with `maxDiffPixels: 0` was stable across runs on this app, which made it usable for proving a refactor changed no pixels. The temporary test was deleted afterwards.
 - An agent cannot run the NVDA pass: it cannot hear speech output or press
   keys in the user's own Chrome window. Only the user can add screen reader
   results.
@@ -583,12 +602,17 @@ All pre-implementation decisions are made.
   with information about WCAG.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
-- The user added three optional tasks to `tasks.md` on 2026-09-13, none
-  specified or built: a light, dark and system theme switcher; striped table
-  rows as a setting; and a fixed table header. The fixed header conflicts
-  with the list's `domLayout: 'autoHeight'` (see the AG Grid gotchas). The
-  theme switcher would need dark values for the Tailwind classes and the
-  AG Grid theme params, which are all light-only today.
+- The user added three optional tasks to `tasks.md` on 2026-09-13: a light,
+  dark and system theme switcher (built 2026-09-15, see State); striped
+  table rows as a setting; and a fixed table header. The last two are not
+  specified or built. The fixed header conflicts with the list's
+  `domLayout: 'autoHeight'` (see the AG Grid gotchas). Striped rows need a
+  token with a dark value, like every other color now.
+- `add-theme-switcher` is not committed or archived yet.
+- The user added an optional mobile nav menu and drawer task to `tasks.md`
+  on 2026-09-15, not specified or built. At 320 px the header now wraps to
+  four rows (the wordmark, two rows of nav entries, then Theme), which
+  that task would address.
 
 ## Working style notes
 

@@ -38,6 +38,17 @@ describe('App', () => {
     expect(element.querySelector('main#main h1')?.textContent).toContain('Users');
   });
 
+  it('shows the Theme control in the header after the nav', async () => {
+    const { element } = await renderApp();
+    const header = element.querySelector('header');
+    const nav = header!.querySelector('nav')!;
+    const group = header!.querySelector('fieldset')!;
+
+    expect(group.querySelector('legend')?.textContent?.trim()).toBe('Theme');
+    expect(group.querySelectorAll('input[type="radio"]').length).toBe(3);
+    expect(nav.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('moves focus to main without changing the URL when the skip link is used', async () => {
     const { element, router } = await renderApp();
 

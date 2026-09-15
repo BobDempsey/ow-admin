@@ -19,13 +19,10 @@ const NAV_ENTRIES: readonly NavEntry[] = [
   selector: 'app-top-nav',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav
-      aria-label="Primary"
-      class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-1 px-4 py-1"
-    >
+    <nav aria-label="Primary" class="flex flex-wrap items-center gap-x-6 gap-y-1">
       <a
         routerLink="/users"
-        class="inline-flex min-h-11 items-center text-lg font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        class="inline-flex min-h-11 items-center text-lg font-bold text-header-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
       >
         Orbweaver Admin
       </a>
@@ -37,7 +34,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
                 [routerLink]="entry.path"
                 routerLinkActive
                 ariaCurrentWhenActive="page"
-                class="inline-flex min-h-11 items-center border-b-[3px] border-transparent px-3 text-sm text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 aria-[current=page]:border-sky-400 aria-[current=page]:font-semibold"
+                class="inline-flex min-h-11 items-center border-b-[3px] border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
               >
                 {{ entry.label }}
               </a>
@@ -45,7 +42,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
               <button
                 type="button"
                 aria-disabled="true"
-                class="inline-flex min-h-11 cursor-not-allowed items-center border-b-[3px] border-transparent px-3 text-sm text-slate-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                class="inline-flex min-h-11 cursor-not-allowed items-center border-b-[3px] border-transparent px-3 text-sm text-header-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
               >
                 {{ entry.label }}<span class="sr-only"> (not available yet)</span>
               </button>
