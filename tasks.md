@@ -1,6 +1,6 @@
 # Remaining tasks
 
-- [ ] Rewrite the README to describe the app
+- [x] Rewrite the README to describe the app
 
 # Optional
 
