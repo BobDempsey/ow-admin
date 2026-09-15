@@ -39,7 +39,7 @@ const usersGridTheme = themeQuartz
     fontFamily: 'inherit',
     foregroundColor: '#0f172a',
     backgroundColor: '#ffffff',
-    headerBackgroundColor: '#f8fafc',
+    headerBackgroundColor: '#f1f5f9',
     borderColor: '#e2e8f0',
     accentColor: '#0369a1',
     // Quartz tints the focus ring to half opacity, which drops below 3:1 on the header.

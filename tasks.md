@@ -9,7 +9,7 @@
 
 # UI gaps
 
-- [ ] light mode: striped table rows gray isn't dark enough. dark mode is fine
+- [x] light mode: striped table rows gray isn't dark enough. dark mode is fine
 - [ ] draggable cols setting in dialog should designate drag to reorder cols or something to inform the user they're reordering instead of resizing
 - [ ] (Optional) Add mobile nav menu and drawer
 - [ ] (Optional) Add sort to the user list
