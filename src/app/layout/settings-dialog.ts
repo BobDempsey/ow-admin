@@ -118,14 +118,15 @@ const RADIO_CLASSES =
           <input
             type="checkbox"
             [checked]="table.movableColumns()"
-            [attr.aria-describedby]="
-              movableColumnsFailure() ? 'settings-movable-columns-wcag' : null
-            "
+            [attr.aria-describedby]="movableColumnsDescription()"
             (change)="table.update({ movableColumns: checked($event) })"
             class="${RADIO_CLASSES}"
           />
           Draggable columns
         </label>
+        <p id="settings-movable-columns-hint" class="pl-8 text-sm text-ink-subtle">
+          Drag a column header to reorder the columns. Column widths stay the same.
+        </p>
         @if (movableColumnsFailure(); as failure) {
           <p
             id="settings-movable-columns-wcag"
@@ -162,6 +163,12 @@ export class SettingsDialog {
   protected readonly densityLabels = DENSITY_LABELS;
   protected readonly movableColumnsFailure = computed(() =>
     WCAG_FAILURES.movableColumns(this.table.movableColumns()),
+  );
+  /** The hint always describes the checkbox; the WCAG note joins it while the setting is on. */
+  protected readonly movableColumnsDescription = computed(() =>
+    this.movableColumnsFailure()
+      ? 'settings-movable-columns-hint settings-movable-columns-wcag'
+      : 'settings-movable-columns-hint',
   );
 
   /** Opens the dialog as a modal with focus on its heading; closing returns focus to `opener`. */

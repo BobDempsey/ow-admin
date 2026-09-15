@@ -114,20 +114,25 @@ describe('SettingsDialog', () => {
     const { fixture, control, note } = await openDialog();
     const checkbox = control('Draggable columns');
     expect(note()).toBeNull();
-    expect(checkbox.hasAttribute('aria-describedby')).toBe(false);
+    expect(checkbox.getAttribute('aria-describedby')).toBe('settings-movable-columns-hint');
+    expect(document.getElementById('settings-movable-columns-hint')?.textContent).toContain(
+      'Drag a column header to reorder the columns.',
+    );
 
     checkbox.click();
     await fixture.whenStable();
 
     expect(note()?.textContent).toContain('Fails WCAG 2.5.7 Dragging Movements.');
     expect(note()?.textContent).toContain('only by dragging');
-    expect(checkbox.getAttribute('aria-describedby')).toBe(note()?.id);
+    expect(checkbox.getAttribute('aria-describedby')).toBe(
+      `settings-movable-columns-hint ${note()?.id}`,
+    );
 
     checkbox.click();
     await fixture.whenStable();
 
     expect(note()).toBeNull();
-    expect(checkbox.hasAttribute('aria-describedby')).toBe(false);
+    expect(checkbox.getAttribute('aria-describedby')).toBe('settings-movable-columns-hint');
   });
 
   it('shows no WCAG note for any conforming combination', async () => {
