@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks), not yet committed or archived (earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, theme switcher committed in `916c1cc` (earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -209,7 +209,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`ae56a1f` (About page, nav entry and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
+`916c1cc` (theme switcher, color tokens and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Seven capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -231,7 +231,7 @@ exempted About in "Placeholder nav entries", and added an About scenario
 to "Current screen indicated". `openspec validate --specs --strict` passes
 all seven.
 
-`openspec/changes/add-theme-switcher/` is active: all 14 tasks done, uncommitted and not archived. It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
+`openspec/changes/add-theme-switcher/` is active: all 14 tasks done, committed in `916c1cc`, not archived. It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
 
 - Named color tokens in `src/styles.css` (`@theme`, 30 tokens such as `surface`, `ink`, `link`, `primary`, `danger-*`, `header-*`). Light values point at the palette variables the templates used before (`var(--color-slate-900)`), so light pixels did not change: six full-page light screenshots at 1280 px matched with zero differing pixels before and after the class mapping. `:root[data-theme='dark']` redefines every token and sets `color-scheme: dark`. No component uses a palette class any more; use token classes (`bg-surface`, `text-ink-muted`) for new UI.
 - The header stays dark in both themes (slate-900 in light, slate-950 in dark). In dark it gets a 1 px rule drawn with an inset shadow, so light layout does not shift.
@@ -608,7 +608,7 @@ All pre-implementation decisions are made.
   specified or built. The fixed header conflicts with the list's
   `domLayout: 'autoHeight'` (see the AG Grid gotchas). Striped rows need a
   token with a dark value, like every other color now.
-- `add-theme-switcher` is not committed or archived yet.
+- `add-theme-switcher` is committed in `916c1cc` but not archived; archive it next.
 - The user added an optional mobile nav menu and drawer task to `tasks.md`
   on 2026-09-15, not specified or built. At 320 px the header now wraps to
   four rows (the wordmark, two rows of nav entries, then Theme), which
