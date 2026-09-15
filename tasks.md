@@ -1,4 +1,4 @@
-- [ ] Archive the sort and search change
+- [x] Archive the sort and search change
 - [ ] Say "1 user matches" for a single search result
 - [ ] Show the search match count once, not beside the heading and under the search field
 - [ ] Make unchecked radios look unselected in dark mode
