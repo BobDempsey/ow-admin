@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
 import { stubDialogMethods } from '../../testing/dialog';
@@ -150,6 +151,18 @@ describe('UserDetailPage', () => {
       expect(page.alert()).toBeUndefined();
       expect(page.control('Name')?.value).toBe(seeded.name);
       expect(document.activeElement).toBe(page.heading());
+    });
+
+    it('titles the document with the loaded user name', async () => {
+      await renderPage();
+
+      expect(TestBed.inject(Title).getTitle()).toBe(`${seeded.name} | Orbweaver Admin`);
+    });
+
+    it('titles the document User not found for a missing user', async () => {
+      await renderPage({ id: 'u-999999' });
+
+      expect(TestBed.inject(Title).getTitle()).toBe('User not found | Orbweaver Admin');
     });
 
     it('announces a user that was just created', async () => {

@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   computed,
+  effect,
   inject,
   input,
   linkedSignal,
@@ -11,8 +12,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { FieldTree, ValidationError, form, submit } from '@angular/forms/signals';
+import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { toApiError } from '../core/api/api-error';
+import { APP_NAME } from '../core/page-title-strategy';
 import { User, UserDraft, Versioned } from '../core/api/user.model';
 import { ConflictChoice, ConflictDialog } from './conflict-dialog';
 import { toFieldErrors, userDraftSchema } from './user-draft-schema';
@@ -152,6 +155,16 @@ export default class UserDetailPage {
     }
     return this.notice();
   });
+
+  constructor() {
+    const title = inject(Title);
+    // The route title is only `User`; once the load settles, name the user (WCAG 2.4.2).
+    effect(() => {
+      if (this.loaded() || this.notFound()) {
+        title.setTitle(`${this.heading()} | ${APP_NAME}`);
+      }
+    });
+  }
 
   protected retry(): void {
     // Try again leaves the DOM with the alert, so hand focus to the heading instead of losing it.

@@ -46,3 +46,7 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Playwright accessibility suite output
+/test-results
+/playwright-report

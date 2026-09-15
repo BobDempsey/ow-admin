@@ -44,15 +44,15 @@ To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use th
 ng test
 ```
 
-## Running end-to-end tests
+## Running accessibility tests
 
-For end-to-end (e2e) testing, run:
+The browser accessibility suite runs Playwright and axe against the dev server, which it starts on port 4600. Stop anything already listening there first.
 
 ```bash
-ng e2e
+npm run test:a11y
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The results and the WCAG 2.2 conformance report are in `docs/accessibility.md`.
 
 ## Additional Resources
 

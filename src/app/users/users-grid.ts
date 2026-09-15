@@ -39,7 +39,9 @@ const usersGridTheme = themeQuartz.withParams({
   accentColor: '#0369a1',
   // Quartz tints the focus ring to half opacity, which drops below 3:1 on the header.
   focusShadow: { radius: 0, spread: 3, color: '#0369a1' },
-  rowHeight: 44,
+  // Tall enough for two wrapped lines under WCAG text spacing; the Infinite Row Model cannot
+  // size rows to their content.
+  rowHeight: 64,
   headerHeight: 44,
 });
 
@@ -50,6 +52,7 @@ const usersGridTheme = themeQuartz.withParams({
 @Component({
   selector: 'app-users-grid',
   imports: [AgGridAngular],
+  host: { '(focusin)': 'revealFocus($event)' },
   template: `
     <ag-grid-angular
       class="block w-full"
@@ -66,6 +69,7 @@ const usersGridTheme = themeQuartz.withParams({
       [blockLoadDebounceMillis]="50"
       domLayout="autoHeight"
       [ensureDomOrder]="true"
+      [suppressMovableColumns]="true"
       [tabToNextCell]="leaveGridOnTab"
       [tabToNextHeader]="leaveGridOnTab"
       (gridReady)="onGridReady($event)"
@@ -93,7 +97,25 @@ export class UsersGrid {
     { field: 'role', headerName: 'Role', width: 120 },
     { field: 'status', headerName: 'Status', width: 130 },
   ];
-  protected readonly defaultColDef: ColDef<User> = { sortable: false, filter: false };
+  /**
+   * Columns cannot be moved or resized: both need dragging in AG Grid Community, and WCAG 2.5.7
+   * asks for a way that does not. Columns flex to fill the width instead.
+   */
+  protected readonly defaultColDef: ColDef<User> = {
+    sortable: false,
+    filter: false,
+    resizable: false,
+  };
+
+  /**
+   * AG Grid moves focus to some of its controls, such as Page Size, without scrolling them into
+   * view (WCAG 2.4.11). `nearest` leaves an already visible element where it is.
+   */
+  protected revealFocus(event: FocusEvent): void {
+    if (event.target instanceof HTMLElement) {
+      event.target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+  }
   /**
    * Tab leaves the grid instead of stepping through every cell, so the grid is one tab stop and
    * the pagination controls are reachable. Arrow keys move between cells.

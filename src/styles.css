@@ -16,6 +16,20 @@ app-users-grid .ag-paging-panel-content {
   row-gap: 4px;
 }
 
+/*
+ * Rows have a fixed height (the Infinite Row Model cannot size rows to content), so cell text
+ * wraps onto a second line instead of being cut off with an ellipsis under text spacing or zoom
+ * (WCAG 1.4.12, 1.4.4). Long emails break anywhere.
+ */
+app-users-grid .ag-cell {
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
 /* The paging buttons are 16px icons; give each the 24px minimum target size (WCAG 2.5.8). */
 app-users-grid .ag-paging-button {
   display: inline-flex;

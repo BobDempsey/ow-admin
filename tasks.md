@@ -1,7 +1,9 @@
 # Remaining tasks
 
-- [x] Build create/view/edit user screens with conflict handling
-- [ ] Implement and verify WCAG 2.2 accessibility
+- [x] Finish WCAG 2.2 verification
+- [ ] Commit and archive the accessibility change
+- [ ] Check that we've done everything required from the PDF
+- [ ] Add an about this app page and navbar item
 
 # Optional
 
@@ -12,3 +14,4 @@
 - [ ] (Optional) Add sort to the user list
 - [ ] (Optional) Add filter to the user list
 - [ ] (Optional) Add search to the user list
+- [ ] (Optional) Add a ui setting for table density and draggable columns with info about wcag

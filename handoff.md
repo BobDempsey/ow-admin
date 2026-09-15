@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-14, `build-user-management` archived with its deltas synced (earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks, uncommitted (earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -21,7 +21,8 @@ at `/users/:id`. It was generated with `@angular/cli@22.1.8`:
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (155 tests in 19 files), and
+`ng build` and `ng test --watch=false` both pass (157 tests in 19 files),
+`npm run test:a11y` passes (68 Playwright tests, 2026-09-15), and
 `npx prettier --check src` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -221,8 +222,46 @@ merged text is hard-wrapped to match the existing main specs.
 The `build-user-management` archive rewrote the four existing
 `user-management` requirements, added four more there, and added "New user
 entry point" to `user-list`. `openspec validate --specs --strict` passes
-all six. No OpenSpec change is active; the WCAG 2.2 task needs a new
-`/opsx:propose`.
+all six.
+
+One OpenSpec change is active: `openspec/changes/verify-wcag-accessibility/`,
+with all 14 tasks done on 2026-09-15 and **nothing committed yet**. It
+modifies the accessibility spec's keyboard scenario (password reset
+dropped) and adds six accessibility requirements. The "Published
+conformance report" requirement asks for automated and keyboard checks
+only; it named a screen reader pass until 2026-09-15. What exists so far:
+
+- A Playwright browser suite: `playwright.config.ts` at the root, tests in
+  `e2e/*.e2e.ts` (named so Vitest never picks them up), its own
+  `e2e/tsconfig.json`, and `npm run test:a11y`. `@playwright/test` 1.63.0
+  and `@axe-core/playwright` 4.13.0 are exact dev dependencies. The config
+  starts `ng serve` on port 4600 itself with `reuseExistingServer: false`,
+  and uses the cached Chromium 1243. `/test-results` and
+  `/playwright-report` are in `.gitignore`.
+- `e2e/support/` has axe with the WCAG A and AA tags, layout helpers
+  (reflow, focus not obscured, 24 px targets, text spacing, CSS zoom,
+  clipped text) and screen openers. `e2e/support.e2e.ts` proves each helper
+  fails on a broken fixture page.
+- `openspec/changes/verify-wcag-accessibility/audit-findings.md` records
+  what the first run found before fixes: drag-only column move and resize
+  (2.5.7), focus landing off-screen on AG Grid's Page Size (2.4.11), grid
+  cells cut off with an ellipsis under text spacing and zoom (1.4.12,
+  1.4.4), and a detail title that did not name the user (2.4.2). All four
+  are fixed in `users-grid.ts`, `src/styles.css` and
+  `user-detail-page.ts`.
+- `docs/accessibility.md` is the conformance report: all 55 WCAG 2.2 A and
+  AA criteria (31 A, 24 AA) with result and evidence, no known gaps, and a
+  21-step NVDA script. Its Observed column reads "As expected" for steps 1
+  and 2 and "Not run" for 3 to 21, and the setup, Known gaps and
+  Enter-on-row notes say the rest of the pass did not happen.
+- `e2e/smoke.e2e.ts` loads `/users` and finds the Users heading (task 1.2).
+  The README's unused `ng e2e` section is now "Running accessibility
+  tests", naming `npm run test:a11y` and port 4600.
+- Final checks on 2026-09-15 (task 5.1): `npm run test:a11y` 68 passed,
+  `ng build` passed, `ng test --watch=false` 157 passed in 19 files,
+  `npx prettier --check src e2e` clean, and `openspec validate
+  verify-wcag-accessibility --strict` valid.
+- Remaining: commit, then archive, which merges the accessibility delta.
 
 ## Decisions made
 
@@ -285,6 +324,32 @@ all six. No OpenSpec change is active; the WCAG 2.2 task needs a new
   any of them means extending the API contract with new query parameters.
 
 All pre-implementation decisions are made.
+
+- WCAG 2.2 verification (decided 2026-09-15): the evidence is a
+  criterion-by-criterion report in `docs/accessibility.md`, not handoff
+  notes; browser checks are a repeatable Playwright and axe suite, not
+  one-off MCP runs; the user runs a scripted NVDA pass rather than skipping
+  screen reader testing; and password reset is dropped from the
+  accessibility keyboard scenario because the reset UI is optional.
+- Grid columns cannot be moved or resized (decided 2026-09-15). AG Grid
+  Community offers only dragging for both, which fails WCAG 2.5.7, and the
+  list does not need either. The user's optional "draggable columns"
+  setting would have to bring a non-drag alternative or stay a documented
+  gap.
+- Grid rows are a fixed 64 px with wrapping cell text (decided 2026-09-15),
+  chosen over wider minimum columns or accepting truncation as a gap. AG
+  Grid does not allow variable row height with the Infinite Row Model.
+- Enter on a grid row keeps opening the user (decided 2026-09-15): arrow
+  keys still move between cells, the grid is one tab stop, and each name
+  cell is a link. What NVDA announces there is unverified, because the
+  pass stopped before that step.
+- NVDA pass (decided 2026-09-15): the user ran steps 1 and 2, both as
+  expected, and stopped. They first asked to mark every step "as
+  expected"; the report marks 3 to 21 "Not run" instead, so it claims
+  nothing nobody heard. The PDF says only "Consideration for accessibility
+  standard (WCAG 2.2)" and never mentions a screen reader, so the
+  conformance report requirement no longer names a screen reader pass.
+  `proposal.md` and `design.md` in the change record the same revision.
 
 ## Gotchas
 
@@ -398,10 +463,39 @@ All pre-implementation decisions are made.
   navigation logged none. `UsersGrid` is the only component there that
   emits outputs from async work, so check its datasource callbacks if it
   comes back.
+- Browser suite facts found on 2026-09-15:
+  - AG Grid renders placeholder `.ag-row` elements before the page answers.
+    Wait for `.ag-row a` (a name link) or tests run against an empty grid;
+    that made Enter on a row look broken when it was not.
+  - AG Grid focuses its Page Size combobox without scrolling it into view.
+    `UsersGrid` now scrolls any focused element inside it with
+    `scrollIntoView({ block: 'nearest' })` from a host `focusin` listener.
+  - Injecting a stylesheet (text spacing, zoom) makes the grid reload its
+    page; wait for "Loading" to leave every `role="status"` region.
+  - Tailwind 4's `sr-only` uses `clip-path: inset(50%)`, not `clip`, so
+    visually hidden checks must test `clipPath`.
+  - The in-memory API has no network, so `page.route` cannot force
+    failures. `e2e/support/app.ts` replaces `users.loadPage`, `loadUser` or
+    `saveUser` on a live component through `ng.getComponent`, which only
+    works on the dev server.
+  - `npm run test:a11y` fails to start if port 4600 is already held,
+    because the config does not reuse servers.
+  - A WebFetch summary of the WCAG 2.2 recommendation returned wrong level
+    counts. The report's list (31 A, 24 AA, 4.1.1 obsolete) was checked by
+    hand.
+- An agent cannot run the NVDA pass: it cannot hear speech output or press
+  keys in the user's own Chrome window. Only the user can add screen reader
+  results.
 
 ## Not done
 
-- Accessibility work (WCAG 2.2) is specified but not implemented.
+- `verify-wcag-accessibility` is built and verified but not committed or
+  archived. NVDA steps 3 to 21 were never run and are not planned.
+- The user added tasks to `tasks.md` on 2026-09-15, none specified or
+  built: check the app against everything the PDF requires; add an "About
+  this app" page with a nav entry (today the nav has one working entry and
+  three placeholders); and, optional, a UI setting for table density and
+  draggable columns with information about WCAG.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
 - The user added three optional tasks to `tasks.md` on 2026-09-13, none
@@ -430,6 +524,16 @@ All pre-implementation decisions are made.
   work as uncommitted; the user checks for that.
 - The user asks for a quick web check of a library before relying on it (as
   with AG Grid) and wants the sources cited.
+- The user adds tasks to `tasks.md` directly between turns, including an
+  "Optional" section. Keep their items and wording when rewriting the file.
+- The user asks "why" questions about design choices mid-task (for example
+  why columns stopped dragging) and wants the reason in one sentence.
+- A question ending in "yn" wants a yes or no answer first. The user sends
+  manual test results as terse lines ("1 as expected"); collect them and
+  write them in when the pass ends, not after each line.
+- When the user asks to record results nobody observed, say so and propose
+  "Not run"; on 2026-09-15 they accepted that over marking NVDA steps "as
+  expected". Check a claim against the PDF before stating what it requires.
 - Tell the user about side effects a command had beyond the task, such as the
   extra `.mcp.json` from `ai-config` or a stray `angular.json` change, and ask
   before committing them.
