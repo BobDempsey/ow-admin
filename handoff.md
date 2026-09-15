@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, `add-about-page` archived with its deltas synced (earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, routes, ports and `tasks.md` corrected after sync (earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -46,8 +46,10 @@ How it works:
   style is bold plus a sky-400 bottom border, driven by
   `aria-[current=page]:` Tailwind variants.
 - Routes: `''` and `**` redirect to `users`; `users` lazy-loads
-  `src/app/users/users-page.ts` and `users/:id` lazy-loads
-  `src/app/users/user-detail-page.ts` (title `User`, heading only).
+  `src/app/users/users-page.ts`, `users/new` lazy-loads
+  `src/app/users/new-user-page.ts`, `users/:id` lazy-loads
+  `src/app/users/user-detail-page.ts` (title `User`, the edit form), and
+  `about` lazy-loads `src/app/about/about-page.ts`.
 - `PageTitleStrategy` (`src/app/core/page-title-strategy.ts`) sets
   `<route title> | Orbweaver Admin`.
 - `axe-core` 4.13.0 is a dev dependency. `src/testing/axe.ts` exports
@@ -95,10 +97,10 @@ committed in `3901bcf`, archived 2026-09-13 with its delta merged into
   the heading. The failure was forced by wrapping `loadPage` from the
   browser console (`ng.getComponent`), with no source change.
 - Ports 4200 and 4300 were both held by other `ng serve` processes of this
-  app during the session, so the check ran on 4400. A later check on
-  2026-09-14 found 4200 free and only 4300 still listening (PID 3492).
-  This work did not start that server and left it running; ask the user
-  before killing it, or pick another port.
+  app during the session, so the check ran on 4400. A check on
+  2026-09-15 found 4300 free and an `ng serve` of this app on 4200 (PID
+  7260). The sync session did not start that server; ask the user before killing
+  it, or pick another port.
 
 The create, view and edit screens were built through the OpenSpec change
 `openspec/changes/archive/2026-09-14-build-user-management/` (all 17
@@ -575,7 +577,7 @@ All pre-implementation decisions are made.
   `password-reset` spec still needs softening to match the optional status.
 - `README.md` does not describe the app, its API layer, or the conflict
   demo; it is the Angular CLI template plus the accessibility tests section.
-  Not on `tasks.md`.
+  Added to `tasks.md` on 2026-09-15 as the one non-optional task left.
 - The user added three optional tasks to `tasks.md` on 2026-09-13, none
   specified or built: a light, dark and system theme switcher; striped table
   rows as a setting; and a fixed table header. The fixed header conflicts
