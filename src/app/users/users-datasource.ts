@@ -9,6 +9,17 @@ export interface UsersDatasourceEvents {
   failed(error: ApiError): void;
 }
 
+/** The grid's datasource, plus a way to keep its next load from reporting loading. */
+export interface UsersDatasource extends IDatasource {
+  /**
+   * Makes the next `getRows` call skip `loading` if it asks for the same request as the last one,
+   * for a reload that keeps the rows on screen. It still reports `loaded` and `failed`. A request
+   * merged with a page, sort or search change differs, so it reports loading. The mark clears when
+   * the next request starts.
+   */
+  quietNextLoad(): void;
+}
+
 /**
  * Adapts page loading to AG Grid's Infinite Row Model. The grid asks for one block per page, so
  * each `getRows` call becomes one `skip`/`limit` request, carrying the grid's sort and the current
@@ -18,23 +29,34 @@ export function createUsersDatasource(
   loadPage: (request: PageRequest) => Promise<UserPage>,
   events: UsersDatasourceEvents,
   query: () => string = () => '',
-): IDatasource {
+): UsersDatasource {
+  let lastRequest: string | undefined;
+  let quietRequest: string | undefined;
   return {
+    quietNextLoad: () => {
+      quietRequest = lastRequest;
+    },
     getRows: async (params: IGetRowsParams) => {
-      events.loading(true);
+      const request: PageRequest = {
+        skip: params.startRow,
+        limit: params.endRow - params.startRow,
+      };
+      const sort = toUserSort(params.sortModel[0]);
+      if (sort) {
+        request.sort = sort;
+      }
+      const q = query().trim();
+      if (q) {
+        request.q = q;
+      }
+      const key = JSON.stringify(request);
+      const reportLoading = quietRequest !== key;
+      lastRequest = key;
+      quietRequest = undefined;
+      if (reportLoading) {
+        events.loading(true);
+      }
       try {
-        const request: PageRequest = {
-          skip: params.startRow,
-          limit: params.endRow - params.startRow,
-        };
-        const sort = toUserSort(params.sortModel[0]);
-        if (sort) {
-          request.sort = sort;
-        }
-        const q = query().trim();
-        if (q) {
-          request.q = q;
-        }
         const page = await loadPage(request);
         params.successCallback(page.items, page.total);
         events.loaded(page.total);
@@ -42,7 +64,9 @@ export function createUsersDatasource(
         params.failCallback();
         events.failed(toApiError(error));
       } finally {
-        events.loading(false);
+        if (reportLoading) {
+          events.loading(false);
+        }
       }
     },
   };

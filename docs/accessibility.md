@@ -121,7 +121,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | Criterion | Level | Result | Evidence |
 | --- | --- | --- | --- |
 | 4.1.2 Name, Role, Value | A | Passes | Native controls (including the Theme radios, whose checked state follows the choice), AG Grid's ARIA roles, column headers whose `aria-sort` follows the sort (`e2e/grid.e2e.ts`), `aria-disabled` placeholders, a Settings button with `aria-haspopup="dialog"`, a labelled and described conflict `dialog`, a labelled Settings `dialog` whose 2.5.7 note is the Draggable columns checkbox's description; axe `aria-*`, `button-name`, `label` and `link-name` rules pass in every state (`e2e/axe.e2e.ts`). |
-| 4.1.3 Status Messages | AA | Passes | Loading, saving, saved, created and simulated-edit messages use `role="status"`, and so do search results ("N users match", "No users match"), announced without moving focus from the search field (`e2e/search.e2e.ts`); failures use `role="alert"` (unit tests and `e2e/keyboard.e2e.ts`). |
+| 4.1.3 Status Messages | AA | Passes | Loading, saving, saved, created and simulated-edit messages use `role="status"`, and so do search results ("N users match", "1 user matches", "No users match"), announced without moving focus from the search field (`e2e/search.e2e.ts`). The search announcement is visually hidden because the total beside the heading already shows the count, while "Loading users…" stays visible; failures use `role="alert"` (unit tests and `e2e/keyboard.e2e.ts`). |
 
 4.1.1 Parsing is obsolete in WCAG 2.2 and not listed.
 

@@ -133,12 +133,15 @@ export class UsersGrid {
     });
 
     // A density change re-lays the current page. `resetRowHeights` needs an Enterprise module,
-    // so the page is requested again at the new height instead.
+    // so the page is requested again at the new height instead, quietly since the rows stay put.
+    // The datasource stays quiet only for that same request, so a page change merged into the
+    // debounced load still shows loading.
     effect(() => {
       const height = this.rowHeight();
       const api = this.api;
       if (api && api.getGridOption('rowHeight') !== height) {
         api.setGridOption('rowHeight', height);
+        this.datasource.quietNextLoad();
         api.refreshInfiniteCache();
       }
     });

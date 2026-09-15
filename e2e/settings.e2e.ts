@@ -11,6 +11,34 @@ const firstRowHeight = (page: Page) =>
     .first()
     .evaluate((link) => link.closest('.ag-row')!.getBoundingClientRect().height);
 
+/**
+ * Records each text the list status shows from now on, and counts page requests that settle, by
+ * wrapping `UsersService.loadPage` on the live grid. Dev server only. Returns a reader.
+ */
+async function watchList(
+  page: Page,
+): Promise<() => Promise<{ statusTexts: string[]; settledLoads: number }>> {
+  await page.evaluate(() => {
+    const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+    const grid = debug.getComponent(document.querySelector('app-users-grid')!);
+    const watch = window as unknown as { statusTexts: string[]; settledLoads: number };
+    const status = document.querySelector('app-users-page p[role="status"]')!;
+    watch.statusTexts = [];
+    watch.settledLoads = 0;
+    new MutationObserver(() => {
+      watch.statusTexts.push(status.textContent?.trim() ?? '');
+    }).observe(status, { childList: true, characterData: true, subtree: true });
+    const original = grid.users.loadPage.bind(grid.users);
+    grid.users.loadPage = (request: unknown) =>
+      original(request).finally(() => watch.settledLoads++);
+  });
+  return () =>
+    page.evaluate(() => {
+      const watch = window as unknown as { statusTexts: string[]; settledLoads: number };
+      return { statusTexts: watch.statusTexts, settledLoads: watch.settledLoads };
+    });
+}
+
 /** WCAG contrast ratio between two CSS colors, measured from what the browser renders. */
 function contrast(page: Page, foreground: string, background: string): Promise<number> {
   return page.evaluate(
@@ -97,12 +125,37 @@ test.describe('settings dialog', () => {
     expect(await firstRowHeight(page)).toBeCloseTo(64, 0);
 
     await settingsButton(page).click();
+    const watched = await watchList(page);
     await dialog(page).getByRole('radio', { name: 'Compact' }).check();
-    await waitForLoaded(page);
+    // Loading never shows, so wait for the reload itself rather than for Loading to leave.
+    await expect.poll(async () => (await watched()).settledLoads).toBe(1);
     await page.locator('.ag-row a').first().waitFor();
 
     await expect.poll(() => firstRowHeight(page)).toBeCloseTo(48, 0);
     await expect(page.locator('.ag-paging-description')).toHaveText(pageLabel!);
+    expect((await watched()).statusTexts.join(' | ')).not.toContain('Loading');
+  });
+
+  test('a density change right after Next Page still shows loading for the page', async ({
+    page,
+  }) => {
+    await openList(page);
+    const pageNumber = page.getByRole('spinbutton', { name: /Page number/ });
+    await expect(pageNumber).toHaveValue('1');
+    const watched = await watchList(page);
+
+    await page.evaluate(() => {
+      const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+      const grid = debug.getComponent(document.querySelector('app-users-grid')!);
+      document.querySelector<HTMLElement>('[aria-label="Next Page"]')!.click();
+      grid.settings.update({ density: 'compact' });
+    });
+
+    await expect.poll(async () => (await watched()).statusTexts).toContain('Loading users…');
+    await waitForLoaded(page);
+    await page.locator('.ag-row a').first().waitFor();
+    await expect.poll(() => firstRowHeight(page)).toBeCloseTo(48, 0);
+    await expect(pageNumber).toHaveValue('2');
   });
 
   test('shows the 2.5.7 note only while Draggable columns is on', async ({ page }) => {

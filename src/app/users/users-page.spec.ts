@@ -4,7 +4,7 @@ import { Router, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
 import { ApiError } from '../core/api/api-error';
 import { UsersGrid } from './users-grid';
-import UsersPage, { SEARCH_DEBOUNCE_MS } from './users-page';
+import UsersPage, { SEARCH_DEBOUNCE_MS, countLabel } from './users-page';
 
 @Component({
   selector: 'app-users-grid',
@@ -33,6 +33,23 @@ async function renderPage() {
   const settle = () => fixture.whenStable();
   return { fixture, element, grid, settle };
 }
+
+describe('countLabel', () => {
+  it('uses the singular only for exactly 1, with thousands separators', () => {
+    expect([0, 1, 2, 500_000].map((total) => countLabel(total, ''))).toEqual([
+      '0 users',
+      '1 user',
+      '2 users',
+      '500,000 users',
+    ]);
+    expect([0, 1, 2, 500_000].map((total) => countLabel(total, 'lamport'))).toEqual([
+      '0 users match',
+      '1 user matches',
+      '2 users match',
+      '500,000 users match',
+    ]);
+  });
+});
 
 describe('UsersPage', () => {
   it('shows the formatted total once a page loads', async () => {
@@ -173,6 +190,34 @@ describe('UsersPage', () => {
 
       expect(page.element.textContent).toContain('17,241 users match');
       expect(statusText(page.element)).toBe('17,241 users match');
+    });
+
+    it('shows and announces a single match in the singular', async () => {
+      const page = await renderPage();
+      await type(page, 'quartermaine');
+
+      page.grid.loaded.emit(1);
+      await page.settle();
+
+      expect(page.element.querySelector('h1 + p')?.textContent?.trim()).toBe('1 user matches');
+      expect(statusText(page.element)).toBe('1 user matches');
+    });
+
+    it('hides the announced result visually but keeps Loading users… visible', async () => {
+      const page = await renderPage();
+      const status = page.element.querySelector('[role="status"]')!;
+      await type(page, 'lamport');
+
+      page.grid.loadingChange.emit(true);
+      await page.settle();
+      expect(status.querySelector('.sr-only')).toBeNull();
+      expect(statusText(page.element)).toBe('Loading users…');
+
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(17_241);
+      await page.settle();
+      expect(status.querySelector('span.sr-only')?.textContent?.trim()).toBe('17,241 users match');
+      expect(status.classList).toContain('min-h-6');
     });
 
     it('keeps the total worded for the last loaded result until the search loads', async () => {

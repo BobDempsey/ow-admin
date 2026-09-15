@@ -87,7 +87,21 @@ test.describe('user list search', () => {
 
     await searchField(page).fill('quartermaine');
 
-    await expect(total(page)).toHaveText('1 users match');
+    await expect(total(page)).toHaveText('1 user matches');
+    await expect(listStatus(page)).toHaveText('1 user matches');
     await expect(page.locator('.ag-row a')).toHaveText(['Zelda Quartermaine']);
+  });
+
+  test('shows the match count beside the heading and hides the announcement', async ({ page }) => {
+    await openList(page);
+
+    await searchField(page).fill('lamport');
+
+    await expect(listStatus(page)).toContainText(/users match/);
+    await expect(total(page)).toContainText(/users match/);
+    const announcement = listStatus(page).locator('span');
+    expect(await announcement.evaluate((span) => getComputedStyle(span).clipPath)).toBe(
+      'inset(50%)',
+    );
   });
 });

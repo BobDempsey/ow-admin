@@ -92,4 +92,98 @@ describe('createUsersDatasource', () => {
     expect(params.successCallback).not.toHaveBeenCalled();
     expect(calls).toEqual(['loading:true', 'failed:500', 'loading:false']);
   });
+
+  it('reloads the same request quietly after quietNextLoad', async () => {
+    const loadPage = vi.fn(() => Promise.resolve({ items: [], total: 42 }));
+    const { calls, events } = trackEvents();
+    const datasource = createUsersDatasource(loadPage, events, () => 'lamport');
+    const sortModel: SortModelItem[] = [{ colId: 'email', sort: 'asc' }];
+    await datasource.getRows(rowsParams(25, 50, sortModel));
+    calls.length = 0;
+
+    datasource.quietNextLoad();
+    await datasource.getRows(rowsParams(25, 50, sortModel));
+
+    expect(loadPage).toHaveBeenCalledTimes(2);
+    expect(calls).toEqual(['loaded:42']);
+  });
+
+  it('still reports a quiet reload that fails', async () => {
+    let fail = false;
+    const loadPage = vi.fn(() =>
+      fail
+        ? Promise.reject(new ApiError(500, 'Server error'))
+        : Promise.resolve({ items: [], total: 42 }),
+    );
+    const { calls, events } = trackEvents();
+    const datasource = createUsersDatasource(loadPage, events);
+    await datasource.getRows(rowsParams(0, 25));
+    calls.length = 0;
+    fail = true;
+    const params = rowsParams(0, 25);
+
+    datasource.quietNextLoad();
+    await datasource.getRows(params);
+
+    expect(params.failCallback).toHaveBeenCalledOnce();
+    expect(calls).toEqual(['failed:500']);
+  });
+
+  it('reports loading when the request after quietNextLoad asks for something else', async () => {
+    const loadPage = vi.fn(() => Promise.resolve({ items: [], total: 42 }));
+    const { calls, events } = trackEvents();
+    let query = '';
+    const datasource = createUsersDatasource(loadPage, events, () => query);
+    await datasource.getRows(rowsParams(0, 25));
+    calls.length = 0;
+
+    // A page change merged into the debounced reload.
+    datasource.quietNextLoad();
+    await datasource.getRows(rowsParams(25, 50));
+    // A search merged into the debounced reload.
+    datasource.quietNextLoad();
+    query = 'lamport';
+    await datasource.getRows(rowsParams(25, 50));
+
+    expect(calls).toEqual([
+      'loading:true',
+      'loaded:42',
+      'loading:false',
+      'loading:true',
+      'loaded:42',
+      'loading:false',
+    ]);
+  });
+
+  it('does not carry quietNextLoad into a later request', async () => {
+    const loadPage = vi.fn(() => Promise.resolve({ items: [], total: 42 }));
+    const { calls, events } = trackEvents();
+    const datasource = createUsersDatasource(loadPage, events);
+    await datasource.getRows(rowsParams(0, 25));
+    calls.length = 0;
+
+    datasource.quietNextLoad();
+    await datasource.getRows(rowsParams(25, 50));
+    await datasource.getRows(rowsParams(0, 25));
+
+    expect(calls).toEqual([
+      'loading:true',
+      'loaded:42',
+      'loading:false',
+      'loading:true',
+      'loaded:42',
+      'loading:false',
+    ]);
+  });
+
+  it('reports loading when quietNextLoad comes before any request', async () => {
+    const loadPage = vi.fn(() => Promise.resolve({ items: [], total: 42 }));
+    const { calls, events } = trackEvents();
+    const datasource = createUsersDatasource(loadPage, events);
+
+    datasource.quietNextLoad();
+    await datasource.getRows(rowsParams(0, 25));
+
+    expect(calls).toEqual(['loading:true', 'loaded:42', 'loading:false']);
+  });
 });

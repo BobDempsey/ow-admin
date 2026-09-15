@@ -1,5 +1,13 @@
-import { DecimalPipe } from '@angular/common';
-import { Component, ElementRef, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
 import { UsersGrid } from './users-grid';
@@ -7,19 +15,26 @@ import { UsersGrid } from './users-grid';
 /** How long typing must pause before the search is sent. */
 export const SEARCH_DEBOUNCE_MS = 300;
 
+/** Words a user count, singular only for exactly 1: "1 user", "2 users", "1 user matches". */
+export function countLabel(total: number, query: string): string {
+  const count = total.toLocaleString('en-US');
+  if (total === 1) {
+    return query ? `${count} user matches` : `${count} user`;
+  }
+  return query ? `${count} users match` : `${count} users`;
+}
+
 /** The user list screen: the total, search, load status, and the paged user grid. */
 @Component({
   selector: 'app-users-page',
-  imports: [DecimalPipe, RouterLink, UsersGrid],
+  imports: [RouterLink, UsersGrid],
   template: `
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <h1 #heading tabindex="-1" class="text-2xl font-semibold text-ink focus:outline-none">
         Users
       </h1>
-      @if (total() !== undefined) {
-        <p class="text-ink-subtle">
-          {{ total() | number }} users{{ loadedQuery() ? ' match' : '' }}
-        </p>
+      @if (totalLabel(); as label) {
+        <p class="text-ink-subtle">{{ label }}</p>
       }
       <a
         routerLink="/users/new"
@@ -43,12 +58,9 @@ export const SEARCH_DEBOUNCE_MS = 300;
     <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">
       @if (loading()) {
         Loading users…
-      } @else if (announcement(); as result) {
-        @if (result.total === 0) {
-          No users match
-        } @else {
-          {{ result.total | number }} users{{ result.query ? ' match' : '' }}
-        }
+      } @else if (announcementText(); as text) {
+        <!-- The total beside the heading already shows the count, so only screen readers hear it here. -->
+        <span class="sr-only">{{ text }}</span>
       }
     </p>
     @if (error()) {
@@ -94,6 +106,18 @@ export default class UsersPage {
   /** The result count to announce after a search or a cleared search loads. */
   protected readonly announcement = signal<{ total: number; query: string } | undefined>(undefined);
   private announceNextLoad = false;
+
+  protected readonly totalLabel = computed(() => {
+    const total = this.total();
+    return total === undefined ? '' : countLabel(total, this.loadedQuery());
+  });
+  protected readonly announcementText = computed(() => {
+    const result = this.announcement();
+    if (!result) {
+      return '';
+    }
+    return result.total === 0 ? 'No users match' : countLabel(result.total, result.query);
+  });
 
   constructor() {
     effect((onCleanup) => {
