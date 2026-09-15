@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks, uncommitted (earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, accessibility work committed in `9b2563f`, not yet archived (earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -207,7 +207,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`4ab6e59` (user management screens and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
+`9b2563f` (accessibility suite, fixes, report and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -225,7 +225,8 @@ entry point" to `user-list`. `openspec validate --specs --strict` passes
 all six.
 
 One OpenSpec change is active: `openspec/changes/verify-wcag-accessibility/`,
-with all 14 tasks done on 2026-09-15 and **nothing committed yet**. It
+with all 14 tasks done on 2026-09-15, committed in `9b2563f` and not yet
+archived. It
 modifies the accessibility spec's keyboard scenario (password reset
 dropped) and adds six accessibility requirements. The "Published
 conformance report" requirement asks for automated and keyboard checks
@@ -261,7 +262,7 @@ only; it named a screen reader pass until 2026-09-15. What exists so far:
   `ng build` passed, `ng test --watch=false` 157 passed in 19 files,
   `npx prettier --check src e2e` clean, and `openspec validate
   verify-wcag-accessibility --strict` valid.
-- Remaining: commit, then archive, which merges the accessibility delta.
+- Remaining: archive, which merges the accessibility delta.
 
 ## Decisions made
 
@@ -489,8 +490,7 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- `verify-wcag-accessibility` is built and verified but not committed or
-  archived. NVDA steps 3 to 21 were never run and are not planned.
+- `verify-wcag-accessibility` is committed in `9b2563f` but not archived. NVDA steps 3 to 21 were never run and are not planned.
 - The user added tasks to `tasks.md` on 2026-09-15, none specified or
   built: check the app against everything the PDF requires; add an "About
   this app" page with a nav entry (today the nav has one working entry and
