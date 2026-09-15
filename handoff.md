@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, settings dialog committed in `05d0a93` (earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced (earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -212,9 +212,10 @@ workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code c
 `05d0a93` (settings dialog, table settings and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
-Seven capability specs are archived in `openspec/specs/`: `admin-navigation`,
+Nine capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`,
-`accessibility`, and `about-page` (51 requirements total). The change that created them is at
+`accessibility`, `about-page`, `theme-switcher` and `settings-dialog` (62
+requirements total). The change that created them is at
 `openspec/changes/archive/2026-09-10-establish-user-management-specs/`; the
 two 2026-09-13 archives added five requirements to `user-api-client` and
 five to `admin-navigation`, and widened "Placeholder nav entries"; the
@@ -228,10 +229,15 @@ rewrote the keyboard scenario in `accessibility` (password reset dropped,
 edit conflict added) and added six requirements there. The
 `add-about-page` archive created `about-page` with three requirements,
 exempted About in "Placeholder nav entries", and added an About scenario
-to "Current screen indicated". `openspec validate --specs --strict` passes
-all seven.
+to "Current screen indicated". The `add-theme-switcher` archive created
+`theme-switcher` with four requirements and added a both-themes scenario to
+`accessibility`'s "Sufficient color contrast". The `add-settings-dialog`
+archive created `settings-dialog` with seven requirements, exempted
+Settings in "Placeholder nav entries", and rewrote "No drag-only
+interactions" in `accessibility` for opt-in column dragging.
+`openspec validate --specs --strict` passes all nine.
 
-`openspec/changes/add-settings-dialog/` is active: all 15 tasks done, committed in `05d0a93`, not archived. It adds a `settings-dialog` capability, exempts Settings in `admin-navigation`'s "Placeholder nav entries", and rewrites `accessibility`'s "No drag-only interactions" to allow opt-in column dragging. What it built:
+No OpenSpec change is active. The settings dialog went through `openspec/changes/archive/2026-09-15-add-settings-dialog/` (all 15 tasks done, committed in `05d0a93`, archived 2026-09-15 with its deltas merged). It adds a `settings-dialog` capability, exempts Settings in `admin-navigation`'s "Placeholder nav entries", and rewrites `accessibility`'s "No drag-only interactions" to allow opt-in column dragging. What it built:
 
 - Settings in the nav is now a button with `aria-haspopup="dialog"` (`NavEntry` has an `action` kind) that emits itself; `App` renders `SettingsDialog` (`src/app/layout/settings-dialog.ts`) once after `<main>` and calls `show(opener)`. The dialog follows `ConflictDialog`'s native `<dialog>` pattern, focuses its `h2` on open, and returns focus to the opener on Close or Escape.
 - The dialog has Theme radios (named `settings-theme`, sharing `ThemeService` with the header control), and a Table section: Striped rows, Density (Comfortable 64 px, Compact 48 px) and Draggable columns.
@@ -241,7 +247,7 @@ all seven.
 - `docs/accessibility.md` lists 2.5.7 as a known gap only while Draggable columns is on, with 12 axe states (48 runs). `README.md` describes Settings.
 - Checks on 2026-09-15: `ng test` 197 passed, `ng build` passed, `npm run test:a11y` 153 passed, Prettier clean, `openspec validate add-settings-dialog --strict` valid; screenshots of the dialog with the note and the striped compact list looked right in both themes at 1280 and 320 px.
 
-`openspec/changes/add-theme-switcher/` is also active: all 14 tasks done, committed in `916c1cc`, not archived. It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
+The theme switcher went through `openspec/changes/archive/2026-09-15-add-theme-switcher/` (all 14 tasks done, committed in `916c1cc`, archived 2026-09-15 with its deltas merged). It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
 
 - Named color tokens in `src/styles.css` (`@theme`, 30 tokens such as `surface`, `ink`, `link`, `primary`, `danger-*`, `header-*`). Light values point at the palette variables the templates used before (`var(--color-slate-900)`), so light pixels did not change: six full-page light screenshots at 1280 px matched with zero differing pixels before and after the class mapping. `:root[data-theme='dark']` redefines every token and sets `color-scheme: dark`. No component uses a palette class any more; use token classes (`bg-surface`, `text-ink-muted`) for new UI.
 - The header stays dark in both themes (slate-900 in light, slate-950 in dark). In dark it gets a 1 px rule drawn with an inset shadow, so light layout does not shift.
@@ -634,8 +640,6 @@ All pre-implementation decisions are made.
   a fixed table header, which is not specified or built. The fixed header
   conflicts with the list's `domLayout: 'autoHeight'` (see the AG Grid
   gotchas).
-- `add-settings-dialog` is committed in `05d0a93` but not archived; archive it after `add-theme-switcher`.
-- `add-theme-switcher` is committed in `916c1cc` but not archived; archive it next.
 - The user added an optional mobile nav menu and drawer task to `tasks.md`
   on 2026-09-15, not specified or built. At 320 px the header now wraps to
   four rows (the wordmark, two rows of nav entries, then Theme), which

@@ -1,5 +1,7 @@
 # Remaining tasks
 
+- [x] Archive the theme switcher change
+- [x] Archive the settings dialog change
 - [x] (Optional) light, dark, system theme switcher
 - [x] (Optional) Add striped table rows as a setting
 - [ ] (Optional) Add fixed table header
