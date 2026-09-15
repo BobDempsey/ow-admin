@@ -38,6 +38,20 @@ test.describe('keyboard flows', () => {
     await expect(focused(page)).toHaveAttribute('aria-disabled', 'true');
   });
 
+  test('nav: About follows Settings and opens the About screen', async ({ page }) => {
+    await openList(page);
+
+    await pressUntilFocused(page, 'Settings (not available yet)');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAttribute('href', '/about');
+    await page.keyboard.press('Enter');
+
+    await expect(page).toHaveURL(/\/about$/);
+    await expect(focused(page)).toHaveRole('heading');
+    await expect(focused(page)).toHaveText('About this app');
+    await expect(page.getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page');
+  });
+
   test('list: the grid is one tab stop and Enter on a row opens the user', async ({ page }) => {
     await openList(page);
 

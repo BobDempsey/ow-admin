@@ -4,11 +4,11 @@ Orbweaver Admin targets WCAG 2.2 level AA. This report lists every level A and A
 
 ## Scope and setup
 
-The report covers every screen and state in the app: the top navigation and skip link, the user list at `/users` (AG Grid Community 36.1 with pagination), the create screen at `/users/new`, the view and edit screen at `/users/:id` with its loading, not found, load failure and save failure states, and the edit conflict dialog.
+The report covers every screen and state in the app: the top navigation and skip link, the user list at `/users` (AG Grid Community 36.1 with pagination), the create screen at `/users/new`, the view and edit screen at `/users/:id` with its loading, not found, load failure and save failure states, the edit conflict dialog, and the About screen at `/about`.
 
 We checked conformance four ways:
 
-- **Browser suite.** `npm run test:a11y` runs Playwright 1.63 with Chromium against the dev server. It runs axe-core 4.13 with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa` rule tags, color contrast included, on 9 states at 1280 and 320 CSS pixels wide. It also replays keyboard flows, checks that focus is never fully hidden, measures reflow and target sizes, and applies WCAG text spacing and 200 percent zoom. Test files live in `e2e/`.
+- **Browser suite.** `npm run test:a11y` runs Playwright 1.63 with Chromium against the dev server. It runs axe-core 4.13 with the `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa` rule tags, color contrast included, on 10 states at 1280 and 320 CSS pixels wide. It also replays keyboard flows, checks that focus is never fully hidden, measures reflow and target sizes, and applies WCAG text spacing and 200 percent zoom. Test files live in `e2e/`.
 - **Unit tests.** `ng test` runs axe in jsdom, color contrast excluded, on each component and state, and tests labels, error association, status messages and focus movement.
 - **Manual review.** We reviewed markup, ARIA and design against criteria automation cannot judge, and looked at screenshots taken under text spacing and zoom.
 - **Screen reader (partial).** A person ran steps 1 and 2 of the NVDA script at the end of this report with Chrome on Windows. Steps 3 to 21 were not run. The PDF does not require a screen reader pass.
@@ -53,9 +53,9 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 2.2.2 Pause, Stop, Hide | A | Not applicable | No moving, blinking or auto-updating content. |
 | 2.3.1 Three Flashes or Below Threshold | A | Passes | Nothing flashes. |
 | 2.4.1 Bypass Blocks | A | Passes | "Skip to main content" is the first Tab stop and moves focus to `main` without changing the URL (`e2e/keyboard.e2e.ts`). |
-| 2.4.2 Page Titled | A | Passes | Titles are "Users", "New user", the user's name, or "User not found", each followed by "Orbweaver Admin" (`e2e/titles.e2e.ts`, `user-detail-page.spec.ts`). The detail title named only "User" before this audit. |
+| 2.4.2 Page Titled | A | Passes | Titles are "Users", "New user", the user's name, "User not found", or "About", each followed by "Orbweaver Admin" (`e2e/titles.e2e.ts`, `user-detail-page.spec.ts`, `app.routes.spec.ts`). The detail title named only "User" before this audit. |
 | 2.4.3 Focus Order | A | Passes | After navigation focus moves to the screen's `h1`; after a failed submit to the first invalid field; after the dialog closes to Save; after Try again to the heading (`e2e/keyboard.e2e.ts`, unit tests). |
-| 2.4.4 Link Purpose (In Context) | A | Passes | Links are "Back to users", "New user", "Users", and each user's name. |
+| 2.4.4 Link Purpose (In Context) | A | Passes | Links are "Back to users", "New user", "Users", "About", each user's name, and on the About screen "Go to users" and "Create a user" (`about-page.spec.ts`). |
 | 2.4.5 Multiple Ways | AA | Passes | The user list is reached from the nav and the wordmark, and every screen has a direct URL. A user's detail screen is the result of choosing that user from the list, which the criterion exempts. |
 | 2.4.6 Headings and Labels | AA | Passes | Headings name each screen or user; form labels are Name, Email, Role and Status; the dialog heading is "This user changed". |
 | 2.4.7 Focus Visible | AA | Passes | Every control shows a solid 2 px outline; grid cells and headers show a solid 3 px sky-700 ring. |

@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, app checked against every PDF requirement (earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, About page built through `add-about-page` (all 8 tasks), uncommitted and not archived (earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -13,17 +13,17 @@ distilled from `Admin_User_Management_Take-Home.pdf`.
 
 The Angular workspace is scaffolded at the repo root (2026-09-13). It holds
 the client-side API layer, the app shell with the top nav, the user list
-at `/users`, the create screen at `/users/new`, and the view and edit screen
-at `/users/:id`. It was generated with `@angular/cli@22.1.8`:
+at `/users`, the create screen at `/users/new`, the view and edit screen
+at `/users/:id`, and the About screen at `/about`. It was generated with `@angular/cli@22.1.8`:
 `ng new orbweaver-admin --directory . --style tailwind --skip-git
 --package-manager npm --ssr false --zoneless --ai-config none
 --test-runner vitest --defaults`. That gives Angular 22.1, TypeScript 6.0,
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (157 tests in 19 files),
-`npm run test:a11y` passes (68 Playwright tests, 2026-09-15), and
-`npx prettier --check src` is clean.
+`ng build` and `ng test --watch=false` both pass (166 tests in 20 files),
+`npm run test:a11y` passes (76 Playwright tests, 2026-09-15), and
+`npx prettier --check src e2e` is clean.
 
 The app shell and nav were built through the OpenSpec change
 `openspec/changes/archive/2026-09-13-add-top-navigation/` (all 12 tasks
@@ -226,7 +226,35 @@ rewrote the keyboard scenario in `accessibility` (password reset dropped,
 edit conflict added) and added six requirements there. `openspec validate
 --specs --strict` passes all six.
 
-No OpenSpec change is active. WCAG 2.2 verification went through
+One OpenSpec change is active: `openspec/changes/add-about-page/`, with all
+8 tasks done on 2026-09-15 and **nothing committed yet**. Its
+`admin-navigation` delta lets About be a working entry beside Users (the
+PDF only says other entries *can* be placeholders) and adds an About
+scenario to "Current screen indicated"; its new `about-page` capability
+covers `/about`, five sections, and a two-sentence limit per section.
+What it built:
+
+- `src/app/about/about-page.ts`, a static lazy screen titled `About`, with
+  `h1` "About this app" and sections What it does (links Go to users and
+  Create a user), How the data works, Try an edit conflict, Accessibility,
+  and Development. Development is a list of the tooling, including OpenSpec
+  and the AI tools (Claude Code, Angular CLI MCP server, Playwright MCP
+  server). Puppeteer MCP is left out because nothing records using it.
+- An About entry after Settings in `NAV_ENTRIES`; the three placeholders
+  are unchanged.
+- Tests: `about-page.spec.ts` (headings, links, data and conflict copy,
+  tooling names, a sentence count per paragraph, axe), About cases in
+  `top-nav.spec.ts` and `app.routes.spec.ts`, and `openAbout` in the axe,
+  layout, titles and keyboard e2e files. `docs/accessibility.md` now lists
+  the About screen in scope, 2.4.2 and 2.4.4, and 10 axe states.
+- Checks on 2026-09-15: `ng test` 166 passed, `ng build` passed (About
+  chunk 3.7 kB), `npm run test:a11y` 76 passed, Prettier clean,
+  `openspec validate add-about-page --strict` valid. Screenshots at 1280
+  and 320 px show About after Settings with the active underline, and the
+  nav wrapping to two rows at 320 px.
+- Remaining: commit, then archive.
+
+WCAG 2.2 verification went through
 `openspec/changes/archive/2026-09-15-verify-wcag-accessibility/` (all 14
 tasks done, committed in `9b2563f`, archived 2026-09-15 with its delta
 merged into `openspec/specs/accessibility/`). The "Published conformance
@@ -302,6 +330,14 @@ CLI template apart from the accessibility section, so it does not explain
 the app, the API layer or how to see the conflict flow.
 
 ## Decisions made
+
+- About page (decided 2026-09-15): a fifth nav entry after Settings, not
+  right-aligned and not replacing a placeholder; copy kept short like a
+  product landing page and written to the user's prose rules; a
+  Development section lists the tooling, and the user chose to name the AI
+  tools there even though commits and PRs never mention them. The
+  accessibility report is named as `docs/accessibility.md`, not linked,
+  because the app does not serve repo files.
 
 - Git commits use Conventional Commits, one sentence each, with no AI
   attribution or tooling references.
@@ -529,10 +565,10 @@ All pre-implementation decisions are made.
 
 - NVDA steps 3 to 21 of the screen reader script were never run and are
   not planned; `docs/accessibility.md` marks them "Not run".
-- The user added tasks to `tasks.md` on 2026-09-15, none specified or
-  built: add an "About this app" page with a nav entry (today the nav has one working entry and
-  three placeholders); and, optional, a UI setting for table density and
-  draggable columns with information about WCAG.
+- `add-about-page` is built and verified but not committed or archived.
+- The user added an optional task to `tasks.md` on 2026-09-15, not
+  specified or built: a UI setting for table density and draggable columns
+  with information about WCAG.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
 - `README.md` does not describe the app, its API layer, or the conflict

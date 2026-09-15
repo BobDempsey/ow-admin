@@ -3,7 +3,8 @@
 - [x] Finish WCAG 2.2 verification
 - [x] Archive the accessibility change
 - [x] Check that we've done everything required from the PDF
-- [ ] Add an about this app page and navbar item
+- [x] Add an about this app page and navbar item
+- [ ] Archive the About page change
 
 # Optional
 

@@ -4,6 +4,7 @@ import {
   forceDetailLoadFailure,
   forceListFailure,
   forceSaveFailure,
+  openAbout,
   openConflictDialog,
   openDetail,
   openList,
@@ -23,6 +24,7 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user load failure (forced through ng.getComponent)', open: forceDetailLoadFailure },
   { name: 'user save failure (forced through ng.getComponent)', open: forceSaveFailure },
   { name: 'conflict dialog', open: openConflictDialog },
+  { name: 'about', open: openAbout },
 ];
 
 for (const viewport of VIEWPORTS) {

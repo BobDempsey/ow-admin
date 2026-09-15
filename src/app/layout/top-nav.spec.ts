@@ -31,6 +31,21 @@ describe('TopNav', () => {
     expect(usersLink?.getAttribute('aria-current')).toBe('page');
   });
 
+  it('links About to /about after the placeholders and marks only it current there', async () => {
+    const { element } = await renderOn('/about');
+    const entries = Array.from(element.querySelectorAll('ul li')).map((item) =>
+      item.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    const aboutLink = element.querySelector<HTMLAnchorElement>('ul a[href="/about"]');
+    const current = element.querySelectorAll('[aria-current]');
+
+    expect(entries.at(-1)).toBe('About');
+    expect(entries.at(-2)).toBe('Settings (not available yet)');
+    expect(aboutLink?.textContent?.trim()).toBe('About');
+    expect(current).toHaveLength(1);
+    expect(current[0]).toBe(aboutLink);
+  });
+
   it('renders Dashboard, Reports and Settings as unavailable placeholders', async () => {
     const { element } = await renderOn('/users');
     const placeholders = Array.from(element.querySelectorAll('ul button'));

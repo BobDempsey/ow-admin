@@ -1,6 +1,7 @@
 import { Page, expect, test } from '@playwright/test';
 import {
   VIEWPORTS,
+  openAbout,
   openConflictDialog,
   openDetail,
   openList,
@@ -23,6 +24,7 @@ const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void>
   { name: 'user detail', slug: 'detail', open: openDetail },
   { name: 'user not found', slug: 'not-found', open: openMissingUser },
   { name: 'conflict dialog', slug: 'dialog', open: openConflictDialog },
+  { name: 'about', slug: 'about', open: openAbout },
 ];
 
 const shot = (page: Page, name: string) =>

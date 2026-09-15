@@ -30,6 +30,11 @@ export async function openMissingUser(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: 'User not found' })).toBeVisible();
 }
 
+export async function openAbout(page: Page): Promise<void> {
+  await page.goto('/about');
+  await expect(page.getByRole('heading', { level: 1, name: 'About this app' })).toBeVisible();
+}
+
 /** Simulates another admin's edit and saves, which opens the conflict dialog. */
 export async function openConflictDialog(page: Page): Promise<void> {
   await openDetail(page);

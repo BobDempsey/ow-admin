@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openDetail, openList, openMissingUser, openNewUser } from './support/app';
+import { openAbout, openDetail, openList, openMissingUser, openNewUser } from './support/app';
 
 test.describe('page titles (2.4.2)', () => {
   test('user list', async ({ page }) => {
@@ -19,6 +19,12 @@ test.describe('page titles (2.4.2)', () => {
     const name = await page.getByRole('heading', { level: 1 }).innerText();
 
     await expect(page).toHaveTitle(`${name} | Orbweaver Admin`);
+  });
+
+  test('about', async ({ page }) => {
+    await openAbout(page);
+
+    await expect(page).toHaveTitle('About | Orbweaver Admin');
   });
 
   test('user not found', async ({ page }) => {

@@ -12,6 +12,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
   { label: 'Users', path: '/users' },
   { label: 'Reports' },
   { label: 'Settings' },
+  { label: 'About', path: '/about' },
 ];
 
 @Component({

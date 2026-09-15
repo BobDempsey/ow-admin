@@ -43,6 +43,16 @@ describe('routes', () => {
     expect(TestBed.inject(Title).getTitle()).toBe('User | Orbweaver Admin');
   });
 
+  it('shows and titles the About screen', async () => {
+    const harness = await RouterTestingHarness.create('/about');
+
+    expect(TestBed.inject(Router).url).toBe('/about');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      'About this app',
+    );
+    expect(TestBed.inject(Title).getTitle()).toBe('About | Orbweaver Admin');
+  });
+
   it('shows and titles the new user screen', async () => {
     const harness = await RouterTestingHarness.create('/users/new');
 
