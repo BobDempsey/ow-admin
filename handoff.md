@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, accessibility work committed in `9b2563f`, not yet archived (earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, `verify-wcag-accessibility` archived with its delta synced (earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -212,7 +212,7 @@ each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`, and
-`accessibility` (42 requirements total). The change that created them is at
+`accessibility` (48 requirements total). The change that created them is at
 `openspec/changes/archive/2026-09-10-establish-user-management-specs/`; the
 two 2026-09-13 archives added five requirements to `user-api-client` and
 five to `admin-navigation`, and widened "Placeholder nav entries"; the
@@ -221,16 +221,17 @@ widened "Server-side paginated list" and "Navigate to user detail". The
 merged text is hard-wrapped to match the existing main specs.
 The `build-user-management` archive rewrote the four existing
 `user-management` requirements, added four more there, and added "New user
-entry point" to `user-list`. `openspec validate --specs --strict` passes
-all six.
+entry point" to `user-list`. The `verify-wcag-accessibility` archive
+rewrote the keyboard scenario in `accessibility` (password reset dropped,
+edit conflict added) and added six requirements there. `openspec validate
+--specs --strict` passes all six.
 
-One OpenSpec change is active: `openspec/changes/verify-wcag-accessibility/`,
-with all 14 tasks done on 2026-09-15, committed in `9b2563f` and not yet
-archived. It
-modifies the accessibility spec's keyboard scenario (password reset
-dropped) and adds six accessibility requirements. The "Published
-conformance report" requirement asks for automated and keyboard checks
-only; it named a screen reader pass until 2026-09-15. What exists so far:
+No OpenSpec change is active. WCAG 2.2 verification went through
+`openspec/changes/archive/2026-09-15-verify-wcag-accessibility/` (all 14
+tasks done, committed in `9b2563f`, archived 2026-09-15 with its delta
+merged into `openspec/specs/accessibility/`). The "Published conformance
+report" requirement asks for automated and keyboard checks only; it named
+a screen reader pass until 2026-09-15. What it built:
 
 - A Playwright browser suite: `playwright.config.ts` at the root, tests in
   `e2e/*.e2e.ts` (named so Vitest never picks them up), its own
@@ -243,7 +244,7 @@ only; it named a screen reader pass until 2026-09-15. What exists so far:
   (reflow, focus not obscured, 24 px targets, text spacing, CSS zoom,
   clipped text) and screen openers. `e2e/support.e2e.ts` proves each helper
   fails on a broken fixture page.
-- `openspec/changes/verify-wcag-accessibility/audit-findings.md` records
+- `audit-findings.md` in the archived change records
   what the first run found before fixes: drag-only column move and resize
   (2.5.7), focus landing off-screen on AG Grid's Page Size (2.4.11), grid
   cells cut off with an ellipsis under text spacing and zoom (1.4.12,
@@ -262,8 +263,6 @@ only; it named a screen reader pass until 2026-09-15. What exists so far:
   `ng build` passed, `ng test --watch=false` 157 passed in 19 files,
   `npx prettier --check src e2e` clean, and `openspec validate
   verify-wcag-accessibility --strict` valid.
-- Remaining: archive, which merges the accessibility delta.
-
 ## Decisions made
 
 - Git commits use Conventional Commits, one sentence each, with no AI
@@ -490,7 +489,8 @@ All pre-implementation decisions are made.
 
 ## Not done
 
-- `verify-wcag-accessibility` is committed in `9b2563f` but not archived. NVDA steps 3 to 21 were never run and are not planned.
+- NVDA steps 3 to 21 of the screen reader script were never run and are
+  not planned; `docs/accessibility.md` marks them "Not run".
 - The user added tasks to `tasks.md` on 2026-09-15, none specified or
   built: check the app against everything the PDF requires; add an "About
   this app" page with a nav entry (today the nav has one working entry and

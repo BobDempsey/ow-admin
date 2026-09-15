@@ -39,7 +39,7 @@ Results use three values. **Passes** means the app meets the criterion. **Not ap
 | 1.4.5 Images of Text | AA | Not applicable | No images of text. |
 | 1.4.10 Reflow | AA | Passes | No page-level sideways scroll at 320 px on any screen or the dialog (`e2e/layout.e2e.ts`). The grid scrolls sideways inside its own box, which the criterion allows for data tables. |
 | 1.4.11 Non-text Contrast | AA | Passes | Input borders (slate-500) are 4.8:1 on white. Focus rings are sky-700 on white (5.9:1) and sky-400 on the slate-900 header (8.2:1). Secondary buttons have a light border but are identified by their text, which meets 1.4.3. Disabled paging buttons are exempt. |
-| 1.4.12 Text Spacing | AA | Passes | With WCAG spacing applied at 320 px no text is clipped on any screen or the dialog (`e2e/layout.e2e.ts`). This failed on the grid before cells wrapped; see `openspec/changes/verify-wcag-accessibility/audit-findings.md`. |
+| 1.4.12 Text Spacing | AA | Passes | With WCAG spacing applied at 320 px no text is clipped on any screen or the dialog (`e2e/layout.e2e.ts`). This failed on the grid before cells wrapped; see `openspec/changes/archive/2026-09-15-verify-wcag-accessibility/audit-findings.md`. |
 | 1.4.13 Content on Hover or Focus | AA | Not applicable | No tooltips or content that appears on hover or focus. |
 
 ## Operable

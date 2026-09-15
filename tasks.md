@@ -1,7 +1,7 @@
 # Remaining tasks
 
 - [x] Finish WCAG 2.2 verification
-- [ ] Archive the accessibility change
+- [x] Archive the accessibility change
 - [ ] Check that we've done everything required from the PDF
 - [ ] Add an about this app page and navbar item
 
