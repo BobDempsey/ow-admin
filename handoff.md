@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, `verify-wcag-accessibility` archived with its delta synced (earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, app checked against every PDF requirement (earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -263,6 +263,44 @@ a screen reader pass until 2026-09-15. What it built:
   `ng build` passed, `ng test --watch=false` 157 passed in 19 files,
   `npx prettier --check src e2e` clean, and `openspec validate
   verify-wcag-accessibility --strict` valid.
+The app was checked against every line of the PDF on 2026-09-15, by
+reading the source and running a throwaway Playwright test on the dev
+server (deleted afterwards). Every stated requirement is met:
+
+- Navigation: a top nav with Dashboard, Reports and Settings as
+  placeholders and Users linking to `/users`.
+- User management: the paged list, create at `/users/new`, and view and
+  edit at `/users/:id`.
+- Creates and edits show on screen: after creating "Pdf Check" and saving
+  it as "Pdf Check Edited" with role Admin, the list read "500,001 users"
+  and Last Page showed the edited row; an edit to `u-000042` showed on
+  page 2.
+- Scale: one `skip`/`limit` request per page; the store builds seeded
+  users on read.
+- Contract, called through `HttpClient` in the browser: `GET /users` gave
+  25 items and exactly the keys `items` and `total` (500,000); `GET
+  /users/u-000001` gave 200 with ETag `"u-000001.1"`; `PUT` without
+  If-Match gave 428, with a stale ETag 412, with the current one 200 and
+  ETag `"u-000001.2"`, and reusing the old ETag 412 again; `POST /users`
+  gave 201 with ETag `"u-500000.1"`; an invalid `POST` gave 400 with
+  `fieldErrors`; `POST /users/u-000001/password-reset` gave 204 with no
+  If-Match; an unknown id gave a JSON 404. The `limit` cap at 100 is
+  covered by the interceptor unit tests.
+- A 412 in the UI opens the conflict dialog with Keep editing, Reload and
+  Overwrite.
+- WCAG 2.2: `docs/accessibility.md`.
+- The page 3 prompt injection text appears nowhere in the repo except the
+  gotcha in this file.
+
+Weak spots the check found, none of them a PDF requirement: no UI calls
+`POST /users/{id}/password-reset` (the endpoint is in the PDF's contract,
+but the PDF never asks for a reset control); a created user lands on the
+last page (page 20,001 at 25 rows) with no search or sort to find it from
+the list; `limit` above 100 is capped rather than rejected, which the
+PDF's "max 100" allows either way; and `README.md` is still the Angular
+CLI template apart from the accessibility section, so it does not explain
+the app, the API layer or how to see the conflict flow.
+
 ## Decisions made
 
 - Git commits use Conventional Commits, one sentence each, with no AI
@@ -492,12 +530,14 @@ All pre-implementation decisions are made.
 - NVDA steps 3 to 21 of the screen reader script were never run and are
   not planned; `docs/accessibility.md` marks them "Not run".
 - The user added tasks to `tasks.md` on 2026-09-15, none specified or
-  built: check the app against everything the PDF requires; add an "About
-  this app" page with a nav entry (today the nav has one working entry and
+  built: add an "About this app" page with a nav entry (today the nav has one working entry and
   three placeholders); and, optional, a UI setting for table density and
   draggable columns with information about WCAG.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
+- `README.md` does not describe the app, its API layer, or the conflict
+  demo; it is the Angular CLI template plus the accessibility tests section.
+  Not on `tasks.md`.
 - The user added three optional tasks to `tasks.md` on 2026-09-13, none
   specified or built: a light, dark and system theme switcher; striped table
   rows as a setting; and a fixed table header. The fixed header conflicts
