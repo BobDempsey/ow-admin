@@ -29,7 +29,7 @@ test.describe('theme control', () => {
 
   test('keeps Dark after a reload, applied before the app renders', async ({ page }) => {
     await openAbout(page);
-    await page.locator('label', { hasText: 'Dark' }).click();
+    await page.locator('header label', { hasText: 'Dark' }).click();
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
 
     // Records the theme at the moment the parser inserts <app-root>, before Angular's module
@@ -77,7 +77,7 @@ test.describe('theme control', () => {
     });
     await openAbout(page);
 
-    await page.locator('label', { hasText: 'Dark' }).click();
+    await page.locator('header label', { hasText: 'Dark' }).click();
 
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
     expect(errors).toEqual([]);

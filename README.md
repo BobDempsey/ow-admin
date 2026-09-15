@@ -26,6 +26,8 @@ Dashboard, Reports and Settings in the navigation are placeholders and do nothin
 
 The Theme control in the header switches between Light, Dark and System. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
 
+Settings in the navigation opens a dialog with the same theme choice and three settings for the user list: Striped rows, Density (Comfortable or Compact) and Draggable columns. Changes apply at once and are remembered in this browser. Draggable columns is off by default because dragging is then the only way to move a column, which fails WCAG 2.5.7; the dialog says so when you turn it on.
+
 ## How the API layer works
 
 The typed client is `UsersApi` in `src/app/core/api/`. It calls `HttpClient`, and `inMemoryApiInterceptor` answers every request under `/api` with a real `HttpResponse` or `HttpErrorResponse`, including status codes and headers.

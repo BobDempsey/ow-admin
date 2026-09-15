@@ -9,6 +9,7 @@ import {
   openMissingUser,
   openNewUser,
   showNewUserErrors,
+  showSettingsWcagNote,
 } from './support/app';
 import {
   applyTextSpacing,
@@ -26,6 +27,7 @@ const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void>
   { name: 'user not found', slug: 'not-found', open: openMissingUser },
   { name: 'conflict dialog', slug: 'dialog', open: openConflictDialog },
   { name: 'about', slug: 'about', open: openAbout },
+  { name: 'settings dialog with WCAG note', slug: 'settings', open: showSettingsWcagNote },
 ];
 
 const shot = (page: Page, name: string) =>

@@ -1,5 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
-import { openList } from './support/app';
+import { openList, storeTableSettings } from './support/app';
+import { applyTextSpacing, clippedText, waitForLoaded } from './support/layout';
 
 const headerNames = (page: Page) =>
   page
@@ -27,18 +28,55 @@ test.describe('user grid', () => {
     expect(await headerNames(page)).toEqual(['Name', 'Email', 'Role', 'Status']);
   });
 
-  test('columns cannot be resized by dragging a header edge (2.5.7)', async ({ page }) => {
+  test('columns can be reordered by dragging after turning on Draggable columns', async ({
+    page,
+  }) => {
+    await storeTableSettings(page, { movableColumns: true });
     await openList(page);
-    const role = page.getByRole('columnheader', { name: 'Role' });
-    const before = (await role.boundingBox())!;
+    const email = page.getByRole('columnheader', { name: 'Email' });
+    const name = page.getByRole('columnheader', { name: 'Name' });
 
-    await page.mouse.move(before.x + before.width - 2, before.y + before.height / 2);
+    await email.hover();
     await page.mouse.down();
-    await page.mouse.move(before.x + before.width + 120, before.y + before.height / 2, {
-      steps: 10,
-    });
+    const target = (await name.boundingBox())!;
+    await page.mouse.move(target.x + 10, target.y + target.height / 2, { steps: 20 });
     await page.mouse.up();
 
-    expect((await role.boundingBox())!.width).toBeCloseTo(before.width, 0);
+    await expect.poll(() => headerNames(page)).toEqual(['Email', 'Name', 'Role', 'Status']);
   });
+
+  test('compact rows keep cell text whole under text spacing at 320px (1.4.12)', async ({
+    page,
+  }) => {
+    await storeTableSettings(page, { density: 'compact' });
+    await page.setViewportSize({ width: 320, height: 800 });
+    await openList(page);
+    await applyTextSpacing(page);
+    await waitForLoaded(page);
+    await page.locator('.ag-row a').first().waitFor();
+
+    const row = page.locator('.ag-row a').first().locator('xpath=ancestor::div[@role="row"]');
+    expect((await row.boundingBox())!.height).toBeCloseTo(48, 0);
+    expect(await clippedText(page)).toEqual([]);
+  });
+
+  for (const movableColumns of [false, true]) {
+    test(`columns cannot be resized by dragging a header edge with Draggable columns ${movableColumns ? 'on' : 'off'} (2.5.7)`, async ({
+      page,
+    }) => {
+      await storeTableSettings(page, { movableColumns });
+      await openList(page);
+      const role = page.getByRole('columnheader', { name: 'Role' });
+      const before = (await role.boundingBox())!;
+
+      await page.mouse.move(before.x + before.width - 2, before.y + before.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(before.x + before.width + 120, before.y + before.height / 2, {
+        steps: 10,
+      });
+      await page.mouse.up();
+
+      expect((await role.boundingBox())!.width).toBeCloseTo(before.width, 0);
+    });
+  }
 });

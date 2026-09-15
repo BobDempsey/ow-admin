@@ -38,6 +38,30 @@ export async function openAbout(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: 'About this app' })).toBeVisible();
 }
 
+/** Opens the Settings dialog from the nav on the user list. */
+export async function openSettingsDialog(page: Page): Promise<void> {
+  await openList(page);
+  await page.getByRole('navigation').getByRole('button', { name: 'Settings' }).click();
+  await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible();
+}
+
+/** Opens Settings and turns on Draggable columns, which shows the WCAG 2.5.7 note. */
+export async function showSettingsWcagNote(page: Page): Promise<void> {
+  await openSettingsDialog(page);
+  await page.getByRole('checkbox', { name: 'Draggable columns' }).check();
+  await expect(page.getByText('Fails WCAG 2.5.7 Dragging Movements.')).toBeVisible();
+}
+
+/** Stores table settings before the app loads, as if the admin had chosen them earlier. */
+export async function storeTableSettings(
+  page: Page,
+  settings: { striped?: boolean; density?: 'comfortable' | 'compact'; movableColumns?: boolean },
+): Promise<void> {
+  await page.addInitScript((value) => {
+    localStorage.setItem('orbweaver-admin-table-settings', value);
+  }, JSON.stringify(settings));
+}
+
 /** Simulates another admin's edit and saves, which opens the conflict dialog. */
 export async function openConflictDialog(page: Page): Promise<void> {
   await openDetail(page);

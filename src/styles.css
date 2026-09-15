@@ -41,6 +41,7 @@
   --color-header-accent: var(--color-sky-400);
   --color-header-line: transparent;
   --color-backdrop: var(--color-slate-900);
+  --color-row-stripe: var(--color-slate-100);
 }
 
 :root {
@@ -81,6 +82,12 @@
   --color-header-accent: var(--color-sky-400);
   --color-header-line: var(--color-slate-700);
   --color-backdrop: var(--color-black);
+  --color-row-stripe: var(--color-slate-800);
+}
+
+/* Striped rows setting: TableSettingsService puts the `striped` class on the grid host. */
+app-users-grid.striped .ag-row-odd {
+  background-color: var(--color-row-stripe);
 }
 
 /* AG Grid's pagination panel is one fixed-height row that clips at narrow widths; let it wrap. */

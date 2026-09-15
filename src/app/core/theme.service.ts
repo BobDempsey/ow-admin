@@ -1,4 +1,5 @@
 import { DOCUMENT, DestroyRef, Service, computed, effect, inject, signal } from '@angular/core';
+import { storageOf } from './browser-storage';
 
 export const THEME_PREFERENCES = ['light', 'dark', 'system'] as const;
 export type ThemePreference = (typeof THEME_PREFERENCES)[number];
@@ -53,15 +54,6 @@ export class ThemeService {
     } catch {
       // Storage can be disabled or full; the theme still applies.
     }
-  }
-}
-
-function storageOf(view: Window | null): Storage | undefined {
-  try {
-    return view?.localStorage;
-  } catch {
-    // Reading localStorage itself throws when site data is blocked.
-    return undefined;
   }
 }
 

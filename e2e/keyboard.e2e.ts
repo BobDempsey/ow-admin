@@ -41,7 +41,7 @@ test.describe('keyboard flows', () => {
   test('nav: About follows Settings and opens the About screen', async ({ page }) => {
     await openList(page);
 
-    await pressUntilFocused(page, 'Settings (not available yet)');
+    await pressUntilFocused(page, 'Settings');
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAttribute('href', '/about');
     await page.keyboard.press('Enter');

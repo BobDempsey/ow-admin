@@ -11,7 +11,9 @@ import {
   openList,
   openMissingUser,
   openNewUser,
+  openSettingsDialog,
   showNewUserErrors,
+  showSettingsWcagNote,
 } from './support/app';
 import { expectNoAxeViolations } from './support/axe';
 
@@ -26,6 +28,8 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user save failure (forced through ng.getComponent)', open: forceSaveFailure },
   { name: 'conflict dialog', open: openConflictDialog },
   { name: 'about', open: openAbout },
+  { name: 'settings dialog', open: openSettingsDialog },
+  { name: 'settings dialog with WCAG note', open: showSettingsWcagNote },
 ];
 
 // With no stored choice the app follows System, so the emulated OS scheme picks the theme.

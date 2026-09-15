@@ -1,4 +1,4 @@
-import { Component, inject, isDevMode, output } from '@angular/core';
+import { Component, computed, effect, inject, isDevMode, output, untracked } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   CellKeyDownEvent,
@@ -16,6 +16,7 @@ import {
 } from 'ag-grid-community';
 import { ApiError } from '../core/api/api-error';
 import { User } from '../core/api/user.model';
+import { ROW_HEIGHTS, TableSettingsService } from '../core/table-settings.service';
 import { UserNameCell } from './user-name-cell';
 import { createUsersDatasource } from './users-datasource';
 import { UsersService } from './users.service';
@@ -43,9 +44,6 @@ const usersGridTheme = themeQuartz
     accentColor: '#0369a1',
     // Quartz tints the focus ring to half opacity, which drops below 3:1 on the header.
     focusShadow: { radius: 0, spread: 3, color: '#0369a1' },
-    // Tall enough for two wrapped lines under WCAG text spacing; the Infinite Row Model cannot
-    // size rows to their content.
-    rowHeight: 64,
     headerHeight: 44,
   })
   .withParams(
@@ -67,11 +65,12 @@ const usersGridTheme = themeQuartz
 @Component({
   selector: 'app-users-grid',
   imports: [AgGridAngular],
-  host: { '(focusin)': 'revealFocus($event)' },
+  host: { '(focusin)': 'revealFocus($event)', '[class.striped]': 'settings.striped()' },
   template: `
     <ag-grid-angular
       class="block w-full"
       [theme]="theme"
+      [rowHeight]="initialRowHeight"
       rowModelType="infinite"
       [datasource]="datasource"
       [columnDefs]="columnDefs"
@@ -84,7 +83,8 @@ const usersGridTheme = themeQuartz
       [blockLoadDebounceMillis]="50"
       domLayout="autoHeight"
       [ensureDomOrder]="true"
-      [suppressMovableColumns]="true"
+      [suppressMovableColumns]="!settings.movableColumns()"
+      [suppressDragLeaveHidesColumns]="true"
       [tabToNextCell]="leaveGridOnTab"
       [tabToNextHeader]="leaveGridOnTab"
       (gridReady)="onGridReady($event)"
@@ -96,7 +96,28 @@ const usersGridTheme = themeQuartz
 })
 export class UsersGrid {
   private readonly users = inject(UsersService);
+  protected readonly settings = inject(TableSettingsService);
   private api: GridApi<User> | undefined;
+
+  /**
+   * Rows have a fixed height per density, tall enough for two wrapped lines under WCAG text
+   * spacing; the Infinite Row Model cannot size rows to their content.
+   */
+  private readonly rowHeight = computed(() => ROW_HEIGHTS[this.settings.density()]);
+  protected readonly initialRowHeight = untracked(this.rowHeight);
+
+  constructor() {
+    // A density change re-lays the current page. `resetRowHeights` needs an Enterprise module,
+    // so the page is requested again at the new height instead.
+    effect(() => {
+      const height = this.rowHeight();
+      const api = this.api;
+      if (api && api.getGridOption('rowHeight') !== height) {
+        api.setGridOption('rowHeight', height);
+        api.refreshInfiniteCache();
+      }
+    });
+  }
 
   readonly loadingChange = output<boolean>();
   readonly loaded = output<number>();
