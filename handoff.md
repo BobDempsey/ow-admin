@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, About page built through `add-about-page` (all 8 tasks), uncommitted and not archived (earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
+Last updated: 2026-09-15, About page committed in `ae56a1f`, `add-about-page` not yet archived (earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10)
 
 ## What this is
 
@@ -207,7 +207,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`9b2563f` (accessibility suite, fixes, report and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
+`ae56a1f` (About page, nav entry and their OpenSpec change). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Six capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -227,7 +227,7 @@ edit conflict added) and added six requirements there. `openspec validate
 --specs --strict` passes all six.
 
 One OpenSpec change is active: `openspec/changes/add-about-page/`, with all
-8 tasks done on 2026-09-15 and **nothing committed yet**. Its
+8 tasks done on 2026-09-15, committed in `ae56a1f` and not yet archived. Its
 `admin-navigation` delta lets About be a working entry beside Users (the
 PDF only says other entries *can* be placeholders) and adds an About
 scenario to "Current screen indicated"; its new `about-page` capability
@@ -252,7 +252,7 @@ What it built:
   `openspec validate add-about-page --strict` valid. Screenshots at 1280
   and 320 px show About after Settings with the active underline, and the
   nav wrapping to two rows at 320 px.
-- Remaining: commit, then archive.
+- Remaining: archive, which merges both deltas.
 
 WCAG 2.2 verification went through
 `openspec/changes/archive/2026-09-15-verify-wcag-accessibility/` (all 14
@@ -565,7 +565,7 @@ All pre-implementation decisions are made.
 
 - NVDA steps 3 to 21 of the screen reader script were never run and are
   not planned; `docs/accessibility.md` marks them "Not run".
-- `add-about-page` is built and verified but not committed or archived.
+- `add-about-page` is committed in `ae56a1f` but not archived.
 - The user added an optional task to `tasks.md` on 2026-09-15, not
   specified or built: a UI setting for table density and draggable columns
   with information about WCAG.
