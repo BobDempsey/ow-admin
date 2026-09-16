@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, the table settings dialog built and committed in `86c2e2e` (earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
+Last updated: 2026-09-15, role and status filters built and committed in `72a894c` (earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -209,7 +209,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`86c2e2e` (the table settings dialog). Commit `handoff.md` and `tasks.md` edits after
+`72a894c` (the role and status filters). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Nine capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -245,7 +245,7 @@ Five OpenSpec changes are active, drafted on 2026-09-15 and all valid under `ope
 
 1. `fix-search-match-count` (9 of 9 tasks done, committed in `65c0800`, not archived). Singular count wording through `countLabel`, the status line's result text inside an `sr-only` span with "Loading users…" still visible, and a density reload that does not announce loading.
 2. `polish-settings-dialog` (16 of 17 tasks done, committed in `86c2e2e`, not archived; task 7.3 rewrites the capability's Purpose after archive). The Settings nav entry is a disabled placeholder again and `TableSettingsDialog` (`src/app/users/table-settings-dialog.ts`) opens from a "Table settings" button across from the list's search field, with no Theme group. Density defaults to Compact, the radios and checkboxes are drawn with `appearance-none` and tokens, and Resizable columns (a second 2.5.7 gap) and Fixed header are in. Checks on 2026-09-15: `ng test` 241 passed, `ng build` passed, `npm run test:a11y` 209 passed, Prettier clean.
-3. `add-list-role-status-filters` (13 tasks). `role` and `status` on `GET /users`, and Role and Status dropdowns beside search.
+3. `add-list-role-status-filters` (all 13 tasks done, committed in `72a894c`, not archived). `role` and `status` on `GET /users`, and Role and Status dropdowns beside search. `UserFilter { q?, role?, status? }` lives in `user.model.ts` and `PageRequest` extends it; `UserStore.list` takes that filter and its old `search` is now a cached `scan` keyed on writes, sort, q, role and status; `ListQuery`, `EMPTY_LIST_QUERY` and `sameListQuery` live in `users-datasource.ts`. `countLabel`'s second parameter is now a `matching` boolean, since the match wording follows any filter. Checks on 2026-09-15: `ng test` 265 passed, `ng build` passed, `npm run test:a11y` 228 passed, Prettier clean.
 4. `add-theme-menu` (8 tasks). The header's three theme radios become a "Theme" menu button following the ARIA menu button pattern with `menuitemradio` items, built in-house.
 5. `add-mobile-nav-drawer` (8 tasks). Below 768 px the nav entries move into a modal `<dialog>` drawer behind a Menu button; the wordmark and theme control stay in the bar.
 
@@ -674,6 +674,30 @@ All pre-implementation decisions are made.
   - AG Grid's `api.resetRowHeights()` logs error #200 on the Infinite Row Model because it needs the Enterprise `ServerSideRowModelApiModule`. `setGridOption('rowHeight', …)` then `refreshInfiniteCache()` re-lays the page and keeps the page number.
   - The closed Settings dialog stays in the DOM, so a test locator such as `page.locator('label', { hasText: 'Dark' })` matches its labels too. Scope header queries to `header`, or use role queries, which skip the closed dialog.
   - Slate-50 stripes on white were close to invisible in screenshots; the light stripe is slate-100.
+- Facts found while building `add-list-role-status-filters` on 2026-09-15:
+  - Scan times over 500,000 users (Vitest, Node 24, fresh store): a role
+    filter 226 to 295 ms, a role plus `q=hopper` 252 to 306 ms, and
+    `q=hopper` alone 506 to 560 ms. A filter beats a bare search because the
+    role equality check rejects 19 users in 20 before any text scan. Treat
+    the handoff's earlier 423 ms search figure as the low end, not a
+    ceiling.
+  - Playwright's `selectOption` leaves a native `<select>` unfocused in
+    Chromium. Call `.focus()` first when a test asserts focus after a load.
+  - Two loads that both end in "users match" let
+    `toContainText(/users match/)` pass on the earlier result. Poll the
+    recorded request, or assert text only one result can produce.
+  - `UsersGrid` can be unit tested with
+    `TestBed.overrideComponent(UsersGrid, { set: { template: '' } })` and a
+    stub `GridApi` passed to `onGridReady`; see `users-grid.spec.ts`.
+  - `git stash` and `git checkout --` rewrite the working copy with CRLF on
+    this machine, and Prettier's `endOfLine: lf` then fails every touched
+    file. `npx prettier --write src e2e` puts it back.
+  - `README.md`, `docs/accessibility.md` and the `openspec/changes`
+    markdown are not Prettier-clean at HEAD. Do not run `prettier --write`
+    on them: it realigns every table and buries the real diff. The gate is
+    `npx prettier --check src e2e`.
+  - Tab order on the list is New user, Search users, Role, Status, Table
+    settings, the grid, then the pagination controls.
 - Facts found while building `polish-settings-dialog` on 2026-09-15:
   - In the dark theme a native radio renders unchecked as a filled grey
     disc and a native checkbox as a filled grey square, which was the
@@ -756,8 +780,12 @@ All pre-implementation decisions are made.
   on 2026-09-15, specced in `add-mobile-nav-drawer` but not built. At 320 px
   the header still wraps to four rows (the wordmark, two rows of nav
   entries, then Theme), which that change would end.
-- A list filter and a theme menu are specced in
-  `add-list-role-status-filters` and `add-theme-menu`, neither built.
+- The list's result announcement uses one boolean flag, so two filter or
+  search changes inside one load leave the announcement on the earlier
+  count while the visible total is right. Reproduced only from a script,
+  about 5 ms apart. Fixing it means tagging each `loaded` emission with the
+  request it belongs to.
+- The theme menu is specced in `add-theme-menu`, not built.
 - "improve ui styling to a modern look" is the only task in `tasks.md` with
   no spec behind it.
 
