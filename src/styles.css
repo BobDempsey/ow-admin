@@ -51,8 +51,6 @@
  * variable that does not exist in light.
  */
 @theme static {
-  /* The page behind the cards: light gray in light, the same as surface in dark. */
-  --color-canvas: var(--color-slate-50);
   --color-surface: var(--color-white);
   --color-surface-muted: var(--color-slate-100);
   --color-ink: var(--color-slate-900);
@@ -134,7 +132,6 @@
 /* Contrast for each text, border and focus pair is recorded in docs/accessibility.md. */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-canvas: var(--color-slate-900);
   --color-surface: var(--color-slate-900);
   --color-surface-muted: var(--color-slate-800);
   --color-ink: var(--color-slate-100);

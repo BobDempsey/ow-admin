@@ -9,7 +9,7 @@ import { TopNav } from './layout/top-nav';
 @Component({
   selector: 'app-root',
   imports: [AiChatDrawer, RouterOutlet, ThemeSwitcher, TopNav],
-  host: { class: 'block min-h-screen bg-canvas text-ink' },
+  host: { class: 'block min-h-screen bg-surface text-ink' },
   template: `
     <a
       href="#main"
