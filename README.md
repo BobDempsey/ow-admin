@@ -1,6 +1,6 @@
-# Orbweaver Admin
+# OW Admin
 
-Orbweaver Admin is an admin UI for managing users. It has a top navigation bar, a paged list of 500,000 users, screens to create, view and edit a user, and an About page. The app runs entirely in the browser: a client-side API layer answers HTTP requests from an in-memory store, so there is no backend to start. The app shows its name as "OW Admin" in the header and the browser tab.
+OW Admin is an admin UI for managing users. It has a top navigation bar, a paged list of 500,000 users, screens to create, view and edit a user, and an About page. The app runs entirely in the browser: a client-side API layer answers HTTP requests from an in-memory store, so there is no backend to start. The app shows its name as "OW Admin" in the header and the browser tab.
 
 It uses Angular 22 (standalone components, signals, Signal Forms, zoneless), Tailwind CSS 4, and AG Grid Community for the list.
 
@@ -37,22 +37,22 @@ The AI assistant button opens a demo drawer from the right with a fixed sample c
 
 The app uses Inter as its typeface, served from the app itself (`@fontsource-variable/inter`), with tabular numbers for the user count and paging.
 
-Table settings, an icon button at the top-right of the table card across from Search users, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on. The X button beside the dialog's heading closes it, and so does Escape.
+Table settings, an icon button at the top-right of the table card across from Search users, opens a dialog with five settings for the user table: Striped rows (on by default), Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on. The X button beside the dialog's heading closes it, and so does Escape.
 
 ## How the API layer works
 
 The typed client is `UsersApi` in `src/app/core/api/`. It calls `HttpClient`, and `inMemoryApiInterceptor` answers every request under `/api` with a real `HttpResponse` or `HttpErrorResponse`, including status codes and headers.
 
-| Method and path                       | Result                                                                                                                                                                                                |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET /api/users?skip&limit`           | 200 with `items` and `total`. `limit` defaults to 25 and is capped at 100.                                                                                                                            |
-| `GET /api/users?sort=name:asc`        | Added beyond the PDF contract. Sorts by `name`, `email`, `role` or `status`, `asc` or `desc`, ignoring case, ties by id. 400 for any other value.                                                     |
-| `GET /api/users?q=text`               | Added beyond the PDF contract. Only users whose name or email contains the text, ignoring case, with `total` counting the matches. Combines with `sort`, `skip` and `limit`. 400 over 100 characters. |
+| Method and path                           | Result                                                                                                                                                                                                                                      |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/users?skip&limit`               | 200 with `items` and `total`. `limit` defaults to 25 and is capped at 100.                                                                                                                                                                  |
+| `GET /api/users?sort=name:asc`            | Added beyond the PDF contract. Sorts by `name`, `email`, `role` or `status`, `asc` or `desc`, ignoring case, ties by id. 400 for any other value.                                                                                           |
+| `GET /api/users?q=text`                   | Added beyond the PDF contract. Only users whose name or email contains the text, ignoring case, with `total` counting the matches. Combines with `sort`, `skip` and `limit`. 400 over 100 characters.                                       |
 | `GET /api/users?role=Admin&status=active` | Added beyond the PDF contract. Only users with that exact role or status, with `total` counting them. Values are case-sensitive and an empty value filters nothing. Combines with `q`, `sort`, `skip` and `limit`. 400 for any other value. |
-| `GET /api/users/{id}`                 | 200 with an `ETag`, or 404.                                                                                                                                                                           |
-| `POST /api/users`                     | 201 with `ETag` and `Location`, or 400 with `fieldErrors`.                                                                                                                                            |
-| `PUT /api/users/{id}`                 | 200 with a new `ETag`. 428 without `If-Match`, 412 when the `If-Match` ETag is stale, 400 on invalid fields.                                                                                          |
-| `POST /api/users/{id}/password-reset` | 204. The detail screen's Reset password button calls it.                                                                                                                                              |
+| `GET /api/users/{id}`                     | 200 with an `ETag`, or 404.                                                                                                                                                                                                                 |
+| `POST /api/users`                         | 201 with `ETag` and `Location`, or 400 with `fieldErrors`.                                                                                                                                                                                  |
+| `PUT /api/users/{id}`                     | 200 with a new `ETag`. 428 without `If-Match`, 412 when the `If-Match` ETag is stale, 400 on invalid fields.                                                                                                                                |
+| `POST /api/users/{id}/password-reset`     | 204. The detail screen's Reset password button calls it.                                                                                                                                                                                    |
 
 Other methods on a known path return 405 with an `Allow` header.
 

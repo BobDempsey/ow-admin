@@ -42,7 +42,7 @@ focus SHALL return to the Table settings button.
 ### Requirement: Table settings
 
 The dialog SHALL offer five settings for the user table: "Striped rows"
-(on or off, off by default), "Density" (Comfortable or Compact, Compact
+(on or off, on by default), "Density" (Comfortable or Compact, Compact
 by default), "Draggable columns" (on or off, off by default), "Resizable
 columns" (on or off, off by default) and "Fixed header" (on or off, off by
 default). Striped rows SHALL give alternate rows a different background in
@@ -60,7 +60,7 @@ SHALL grow to show every row of the page and scroll with the screen.
 #### Scenario: Defaults
 - **WHEN** an admin opens Table settings in a browser with no remembered
   settings
-- **THEN** Striped rows is off, Density is Compact, and Draggable
+- **THEN** Striped rows is on, Density is Compact, and Draggable
   columns, Resizable columns and Fixed header are off
 
 #### Scenario: Remembered Comfortable kept
