@@ -118,9 +118,13 @@ inside it and the content behind it SHALL NOT be reachable by pointer or
 Tab. Opening SHALL move focus into the drawer; activating an entry that
 navigates SHALL close the drawer and leave focus handling to the new
 screen; Escape, the drawer's Close button and a pointer click outside the
-drawer SHALL close it and return focus to the Menu button. At 768 CSS
-pixels and wider, the entries SHALL be shown in the bar and no Menu button
-SHALL be present.
+drawer SHALL close it and return focus to the Menu button. Activating the
+entry for the screen already shown SHALL also close the drawer and return
+focus to the Menu button, without reloading the screen. If the viewport
+reaches 768 CSS pixels or wider while the drawer is open, the drawer SHALL
+close and focus SHALL move to the wordmark link. At 768 CSS pixels and
+wider, the entries SHALL be shown in the bar and no Menu button SHALL be
+present.
 
 #### Scenario: Menu button replaces the entries
 - **WHEN** an admin loads any screen at 320 CSS pixels wide
@@ -148,6 +152,18 @@ SHALL be present.
   Close, or clicks outside it
 - **THEN** the drawer closes, the screen does not change, and focus is on
   the Menu button
+
+#### Scenario: Choosing the current screen
+- **WHEN** an admin on the user list opens the drawer and activates the
+  Users entry with a pointer or with Enter
+- **THEN** the drawer closes, the user list stays as it was, and focus is
+  on the Menu button
+
+#### Scenario: Viewport widens while the drawer is open
+- **WHEN** the drawer is open at 320 CSS pixels wide and the viewport
+  widens to 1024 CSS pixels
+- **THEN** the drawer closes, the entries show in the bar, focus is on the
+  wordmark link, and the controls on the screen respond to the pointer
 
 #### Scenario: Focus stays in the open drawer
 - **WHEN** the drawer is open and an admin presses Tab repeatedly
