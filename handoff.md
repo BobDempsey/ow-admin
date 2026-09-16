@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-16, the UI styling update built in 14 group commits plus fixes and archived (earlier 2026-09-16, the console warning fix and guard built in `7225214` and archived, and the small and medium UI styling changes decided; earlier 2026-09-16, UI bug fixes built in `5a2c8f0` and archived; earlier 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived; earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
+Last updated: 2026-09-16, stale claims corrected after sync and the avatar task recorded (earlier 2026-09-16, the UI styling update built in 14 group commits plus fixes and archived (earlier 2026-09-16, the console warning fix and guard built in `7225214` and archived, and the small and medium UI styling changes decided; earlier 2026-09-16, UI bug fixes built in `5a2c8f0` and archived; earlier 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived; earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -21,8 +21,8 @@ at `/users/:id`, and the About screen at `/about`. It was generated with `@angul
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (230 tests in 24 files),
-`npm run test:a11y` passes (186 Playwright tests, 2026-09-15), and
+`ng build` and `ng test --watch=false` both pass (432 tests in 34 files),
+`npm run test:a11y` passes (450 Playwright tests, 2026-09-16), and
 `npx prettier --check src e2e` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -43,8 +43,10 @@ How it works:
   link with `routerLinkActive` and `aria-current="page"`, and Dashboard,
   Reports and Settings as `aria-disabled` buttons with hidden
   "(not available yet)" text. Those three labels are invented. The active
-  style is bold plus a sky-400 bottom border, driven by
-  `aria-[current=page]:` Tailwind variants.
+  style is semibold plus a `nav-current` bottom border, driven by
+  `aria-[current=page]:` Tailwind variants. Since `c5c1075` the header is
+  light (`bg-surface` with a `line-subtle` bottom rule); the slate-900
+  figures in the 2026-09-13 check below describe the old dark header.
 - Routes: `''` and `**` redirect to `users`; `users` lazy-loads
   `src/app/users/users-page.ts`, `users/new` lazy-loads
   `src/app/users/new-user-page.ts`, `users/:id` lazy-loads
@@ -295,7 +297,7 @@ List sort and search went through `openspec/changes/archive/2026-09-15-add-list-
 
 The settings dialog went through `openspec/changes/archive/2026-09-15-add-settings-dialog/` (all 15 tasks done, committed in `05d0a93`, archived 2026-09-15 with its deltas merged). It adds a `settings-dialog` capability, exempts Settings in `admin-navigation`'s "Placeholder nav entries", and rewrites `accessibility`'s "No drag-only interactions" to allow opt-in column dragging. What it built:
 
-- Settings in the nav is now a button with `aria-haspopup="dialog"` (`NavEntry` has an `action` kind) that emits itself; `App` renders `SettingsDialog` (`src/app/layout/settings-dialog.ts`) once after `<main>` and calls `show(opener)`. The dialog follows `ConflictDialog`'s native `<dialog>` pattern, focuses its `h2` on open, and returns focus to the opener on Close or Escape.
+- Superseded by `polish-settings-dialog`: the dialog is now `TableSettingsDialog` in `src/app/users/table-settings-dialog.ts`, opened from the list, and `src/app/layout/settings-dialog.ts` is gone. As first built, Settings in the nav was a button with `aria-haspopup="dialog"` (`NavEntry` has an `action` kind) that emits itself; `App` renders `SettingsDialog` (`src/app/layout/settings-dialog.ts`) once after `<main>` and calls `show(opener)`. The dialog follows `ConflictDialog`'s native `<dialog>` pattern, focuses its `h2` on open, and returns focus to the opener on Close or Escape.
 - The dialog has Theme radios (named `settings-theme`, sharing `ThemeService` with the header control), and a Table section: Striped rows, Density (Comfortable 64 px, Compact 48 px) and Draggable columns. Since `4e09f2c`, Draggable columns always carries the hint "Drag a column header to reorder the columns. Column widths stay the same." (`settings-movable-columns-hint`), and `aria-describedby` lists the hint plus the WCAG note while the setting is on.
 - `TableSettingsService` (`src/app/core/table-settings.service.ts`) stores all three as one JSON value under `orbweaver-admin-table-settings`, writing only on change. `storageOf` moved to `src/app/core/browser-storage.ts` and both services use it.
 - WCAG notes are data: `WCAG_FAILURES` in `settings-dialog.ts` maps a setting value to the criterion it fails. Only Draggable columns on has one (2.5.7), shown beside the checkbox and tied to it with `aria-describedby`. Add an entry there for any future setting that breaks a criterion.
@@ -306,10 +308,10 @@ The settings dialog went through `openspec/changes/archive/2026-09-15-add-settin
 The theme switcher went through `openspec/changes/archive/2026-09-15-add-theme-switcher/` (all 14 tasks done, committed in `916c1cc`, archived 2026-09-15 with its deltas merged). It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
 
 - Named color tokens in `src/styles.css` (`@theme`, 30 tokens such as `surface`, `ink`, `link`, `primary`, `danger-*`, `header-*`). Light values point at the palette variables the templates used before (`var(--color-slate-900)`), so light pixels did not change: six full-page light screenshots at 1280 px matched with zero differing pixels before and after the class mapping. `:root[data-theme='dark']` redefines every token and sets `color-scheme: dark`. No component uses a palette class any more; use token classes (`bg-surface`, `text-ink-muted`) for new UI.
-- The header stays dark in both themes (slate-900 in light, slate-950 in dark). In dark it gets a 1 px rule drawn with an inset shadow, so light layout does not shift.
+- As first built, the header stayed dark in both themes; `c5c1075` (`modernize-ui-styling`) made it light and removed the `header-*` tokens.
 - `ThemeService` (`src/app/core/theme.service.ts`) holds the preference, follows `matchMedia` under System, and writes `data-theme` and `data-ag-theme-mode` on `<html>`. It writes `localStorage['orbweaver-admin-theme']` only when the admin chooses, so a first visit stores nothing.
 - An inline script in `src/index.html` applies the stored theme before Angular loads. Keep its key and values in step with the service.
-- `ThemeSwitcher` (`src/app/layout/theme-switcher.ts`) is a `fieldset` with legend "Theme" and three visually hidden native radios whose labels carry the underline, bold and focus ring. `App`'s header now wraps `TopNav` and the switcher in one `max-w-7xl` row, so `TopNav`'s `<nav>` lost its own container classes. At 320 px the switcher wraps to its own row under the nav.
+- `ThemeSwitcher` (`src/app/layout/theme-switcher.ts`) is now a menu button (see `add-theme-menu`). As first built it was a `fieldset` with legend "Theme" and three visually hidden native radios whose labels carry the underline, bold and focus ring. `App`'s header now wraps `TopNav` and the switcher in one `max-w-7xl` row, so `TopNav`'s `<nav>` lost its own container classes. At 320 px the switcher wraps to its own row under the nav.
 - AG Grid gets dark params through `.withParams({...}, 'dark')` in `users-grid.ts`.
 - `e2e/axe.e2e.ts` and `e2e/layout.e2e.ts` loop over `COLOR_SCHEMES` (in `e2e/support/app.ts`) with `test.use({ colorScheme })`; with nothing stored the app follows System, so the emulated scheme picks the theme. `e2e/theme.e2e.ts` covers first visit, arrow keys, reload, OS change and blocked storage.
 - `docs/accessibility.md` has a "Theme colors" table of 24 measured pairs in both themes (lowest text pair 5.9:1, lowest non-text 4.8:1) and updated rows for 1.3.1, 1.4.1, 1.4.3, 1.4.11, 2.1.1, 2.4.7, 3.2.2 and 4.1.2. `README.md` mentions the control.
@@ -544,12 +546,12 @@ All pre-implementation decisions are made.
   one-off MCP runs; the user runs a scripted NVDA pass rather than skipping
   screen reader testing; and password reset is dropped from the
   accessibility keyboard scenario because the reset UI is optional.
-- Grid columns cannot be moved or resized (decided 2026-09-15). AG Grid
+- Grid columns cannot be moved or resized (decided 2026-09-15, superseded the same day: both are now opt-in table settings with a 2.5.7 note, see Column resizing above). AG Grid
   Community offers only dragging for both, which fails WCAG 2.5.7, and the
   list does not need either. The user's optional "draggable columns"
   setting would have to bring a non-drag alternative or stay a documented
   gap.
-- Grid rows are a fixed 64 px with wrapping cell text (decided 2026-09-15),
+- Grid rows are a fixed height with wrapping cell text (decided 2026-09-15; the height is now 64 px Comfortable or 48 px Compact, the default, through `ROW_HEIGHTS` in `table-settings.service.ts`),
   chosen over wider minimum columns or accepting truncation as a gap. AG
   Grid does not allow variable row height with the Infinite Row Model.
 - Enter on a grid row keeps opening the user (decided 2026-09-15): arrow
@@ -639,7 +641,8 @@ All pre-implementation decisions are made.
     `.ag-paging-panel-content`, not `.ag-paging-panel`.
   - `domLayout: 'autoHeight'` renders every row of the page with no inner
     scroll box, so the column header scrolls off-screen on long pages. The
-    optional fixed table header task has to change that.
+    Fixed header setting (built in `polish-settings-dialog`) switches to
+    `domLayout: 'normal'` while on.
   - AG Grid in jsdom is not exercised; page tests stub `UsersGrid` with the
     same selector and outputs.
 - `git mv` of a directory under `openspec/changes/` failed with
@@ -907,7 +910,7 @@ All pre-implementation decisions are made.
   setting for table density and draggable columns with information about
   WCAG; built 2026-09-15 in `add-settings-dialog`.
 - The user added "improve ui styling to a modern look" to `tasks.md` on
-  2026-09-15, not specified or built.
+  2026-09-15; built and archived 2026-09-16 in `modernize-ui-styling`.
 - While `add-settings-dialog` was being built, the user added four
   follow-ups to `tasks.md`: Compact as the default density (not built); a
   Draggable columns label that says it reorders rather than resizes (built
@@ -937,6 +940,10 @@ All pre-implementation decisions are made.
 - The user added "add a mock ai chatbot that links back to my ai
   storefront" to `tasks.md` on 2026-09-16 and asked to hold it; it has no
   spec.
+- The user added "avatar should also go on user detail page" to `tasks.md`
+  on 2026-09-16; not built. `UserAvatar` helpers (`initialsOf`,
+  `avatarColorIndex`, `AVATAR_COLOR_CLASSES` in `src/app/users/user-avatar.ts`)
+  are used only by `user-name-cell.ts` so far, and there is no spec for it.
 - `e2e/filter.e2e.ts` "choosing a status filters from the first page and
   shows only those rows" failed once on 2026-09-16 because an extra
   `skip: 25` request was recorded before the filter, then passed on every
