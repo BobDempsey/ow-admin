@@ -28,9 +28,19 @@ On the page, `UsersPage` holds `searchText`, a debounced `query`, and `loadedQue
 
 **Match wording follows any active filter.** `loadedQuery` becomes the loaded `ListQuery`, and the page's "is this a match count" check becomes "has `q`, `role` or `status`". The announcement flag set on a search change is set on a filter change too. The no-rows template reads "No users match your search or filters."
 
+## Measured scan times
+
+Measured in Vitest on Node 24, each run on a fresh `UserStore` over 500,000 users, two samples per case across two runs:
+
+- `role=Admin` alone: 279, 295, 248 and 226 ms.
+- `role=Admin` with `q=hopper`: 306, 272, 252 and 259 ms.
+- `q=hopper` alone, as a baseline: 560 and 506 ms.
+
+Both filtered cases stay under the budget of 423 ms plus 20 percent, which is 508 ms. They beat the search-only baseline because the role equality check rejects 19 users in 20 before either lower-cased text scan runs. The search-only figure on this machine is above the 423 ms the handoff records, so treat 423 ms as the low end of that measurement rather than a ceiling.
+
 ## Risks / Trade-offs
 
-- [A filter change on the unfiltered, unsorted list now scans 500,000 users] → the same cost a search pays, measured at up to 423 ms; the cache makes paging within a filter O(limit).
+- [A filter change on the unfiltered, unsorted list now scans 500,000 users] → the same cost a search pays, measured at 226 to 306 ms for a role filter; the cache makes paging within a filter O(limit).
 - [Three changes edit `users-page.ts`] → apply after `fix-search-match-count` and `polish-settings-dialog`, and build on their count wording and search row.
 - [At 320 px the search row now holds four controls] → they wrap to their own rows; the layout e2e checks reflow and target size with a filter chosen.
 - [e2e assertions that read "your search." break] → update them in the same task as the no-rows template.
