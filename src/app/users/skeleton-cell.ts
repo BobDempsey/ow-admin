@@ -1,12 +1,7 @@
 import { Component, Signal, computed, signal } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
-
-/** What `UsersGrid` passes to every cell through AG Grid's `context`. */
-export interface UsersGridContext {
-  /** True while a page request that shows loading is in flight. */
-  loading: Signal<boolean>;
-}
+import { UsersGridContext } from './users-grid-context';
 
 /** The placeholder drawn for a column: a circle and a bar, a wide bar, a short pill, or nothing. */
 export type SkeletonShape = 'name' | 'wide' | 'pill' | 'none';

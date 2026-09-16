@@ -3,10 +3,15 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
 import { stubDialogMethods } from '../../testing/dialog';
+import { API_LATENCY_MS } from '../core/api/api-config';
 import { ApiError } from '../core/api/api-error';
+import { seedUser } from '../core/api/in-memory/user-seed';
+import { provideUsersApi } from '../core/api/provide-users-api';
+import { User } from '../core/api/user.model';
 import { EMPTY_LIST_QUERY, ListQuery } from './users-datasource';
-import { UsersGrid } from './users-grid';
+import { UserRowTarget, UsersGrid } from './users-grid';
 import UsersPage, { SEARCH_DEBOUNCE_MS, countLabel } from './users-page';
+import { UsersService } from './users.service';
 
 @Component({
   selector: 'app-users-grid',
@@ -18,7 +23,9 @@ class StubUsersGrid {
   readonly loaded = output<number>();
   readonly failed = output<ApiError>();
   readonly openUser = output<string>();
+  readonly resetPassword = output<UserRowTarget>();
   readonly refresh = vi.fn();
+  readonly focusActionsCell = vi.fn((_rowIndex: number, _userId?: string) => true);
   /** Every query the grid has been given, one entry per change the grid would see. */
   readonly queries: ListQuery[] = [];
 
@@ -28,7 +35,9 @@ class StubUsersGrid {
 }
 
 async function renderPage() {
-  TestBed.configureTestingModule({ providers: [provideRouter([])] });
+  TestBed.configureTestingModule({
+    providers: [provideRouter([]), provideUsersApi(), { provide: API_LATENCY_MS, useValue: 0 }],
+  });
   TestBed.overrideComponent(UsersPage, {
     remove: { imports: [UsersGrid] },
     add: { imports: [StubUsersGrid] },
@@ -675,6 +684,167 @@ describe('UsersPage', () => {
       await page.settle();
 
       expect(emptyState(page.element)).toBeNull();
+    });
+  });
+
+  describe('password reset from a row', () => {
+    const radia: User = { ...seedUser(42), name: 'Radia Lamport', email: 'radia@example.com' };
+    const target: UserRowTarget = { user: radia, rowIndex: 27 };
+
+    /** A reset request the test answers when it chooses. ES2022 has no Promise.withResolvers. */
+    function deferred() {
+      let resolve: () => void = () => undefined;
+      const promise = new Promise<void>((settle) => (resolve = settle));
+      return { promise, resolve: () => resolve() };
+    }
+
+    async function renderWithReset() {
+      const dialogs = stubDialogMethods();
+      const page = await renderPage();
+      const resetPassword = vi.spyOn(TestBed.inject(UsersService), 'resetPassword');
+      const dialog = page.element.querySelector<HTMLDialogElement>(
+        'app-reset-password-dialog dialog',
+      )!;
+      const dialogButton = (name: string) =>
+        Array.from(dialog.querySelectorAll('button')).find(
+          (button) => button.textContent?.trim() === name,
+        )!;
+      const alert = () => page.element.querySelector('[role="alert"]');
+      const choose = async () => {
+        page.grid.resetPassword.emit(target);
+        await page.settle();
+      };
+      const flush = async () => {
+        await new Promise((resolve) => setTimeout(resolve));
+        await page.settle();
+      };
+      return { ...page, ...dialogs, resetPassword, dialog, dialogButton, alert, choose, flush };
+    }
+    type ResetPage = Awaited<ReturnType<typeof renderWithReset>>;
+
+    it('asks first, naming the user and email, with focus on Cancel and nothing sent', async () => {
+      const page = await renderWithReset();
+
+      await page.choose();
+
+      expect(page.dialog.open).toBe(true);
+      expect(page.dialog.textContent).toContain('Radia Lamport');
+      expect(page.dialog.textContent).toContain('radia@example.com');
+      expect(document.activeElement).toBe(page.dialogButton('Cancel'));
+      expect(page.resetPassword).not.toHaveBeenCalled();
+    });
+
+    it('sends the reset on confirm, returns focus to the row and says it was sent', async () => {
+      const page = await renderWithReset();
+      page.resetPassword.mockResolvedValue(undefined);
+      const queries = page.grid.queries.length;
+
+      await page.choose();
+      page.dialogButton('Send reset email').click();
+      await page.flush();
+
+      expect(page.resetPassword).toHaveBeenCalledExactlyOnceWith(radia.id);
+      expect(page.grid.focusActionsCell).toHaveBeenCalledWith(27, radia.id);
+      expect(statusText(page.element)).toBe('Password reset email sent to Radia Lamport.');
+      expect(page.grid.refresh).not.toHaveBeenCalled();
+      expect(page.grid.queries).toHaveLength(queries);
+    });
+
+    const dismissals: [string, (page: ResetPage) => void][] = [
+      ['Cancel', (page) => page.dialogButton('Cancel').click()],
+      ['Escape', (page) => page.dialog.dispatchEvent(new Event('cancel', { cancelable: true }))],
+    ];
+    it.each(dismissals)('sends nothing on %s and returns focus to the row', async (_, dismiss) => {
+      const page = await renderWithReset();
+
+      await page.choose();
+      dismiss(page);
+      await page.flush();
+
+      expect(page.dialog.open).toBe(false);
+      expect(page.resetPassword).not.toHaveBeenCalled();
+      expect(page.grid.focusActionsCell).toHaveBeenCalledWith(27, radia.id);
+    });
+
+    it('focuses the heading when the row is no longer shown', async () => {
+      const page = await renderWithReset();
+      page.grid.focusActionsCell.mockReturnValue(false);
+
+      await page.choose();
+      page.dialogButton('Cancel').click();
+      await page.flush();
+
+      expect(document.activeElement).toBe(page.element.querySelector('h1'));
+    });
+
+    it('says the email is on its way and ignores another choice while it runs', async () => {
+      const page = await renderWithReset();
+      const request = deferred();
+      page.resetPassword.mockReturnValue(request.promise);
+
+      await page.choose();
+      page.dialogButton('Send reset email').click();
+      await page.flush();
+      expect(statusText(page.element)).toBe('Sending password reset email to Radia Lamport…');
+
+      page.showModal.mockClear();
+      await page.choose();
+      expect(page.showModal).not.toHaveBeenCalled();
+      expect(page.resetPassword).toHaveBeenCalledOnce();
+
+      request.resolve();
+      await page.flush();
+      expect(statusText(page.element)).toBe('Password reset email sent to Radia Lamport.');
+    });
+
+    it('shows an alert on failure, and Try again resends without asking', async () => {
+      const page = await renderWithReset();
+      page.resetPassword.mockRejectedValueOnce(new ApiError(500, 'Server error'));
+
+      await page.choose();
+      page.dialogButton('Send reset email').click();
+      await page.flush();
+      expect(page.alert()?.textContent).toContain(
+        'The password reset email to Radia Lamport could not be sent.',
+      );
+
+      page.showModal.mockClear();
+      page.grid.focusActionsCell.mockClear();
+      page.resetPassword.mockResolvedValueOnce(undefined);
+      Array.from(page.alert()!.querySelectorAll('button'))
+        .find((button) => button.textContent?.trim() === 'Try again')!
+        .click();
+      await page.flush();
+
+      expect(page.showModal).not.toHaveBeenCalled();
+      expect(page.resetPassword).toHaveBeenCalledTimes(2);
+      expect(page.grid.focusActionsCell).toHaveBeenCalledWith(27, radia.id);
+      expect(page.alert()).toBeNull();
+      expect(statusText(page.element)).toBe('Password reset email sent to Radia Lamport.');
+    });
+
+    it('clears the sent message when a list load starts', async () => {
+      const page = await renderWithReset();
+      page.resetPassword.mockResolvedValue(undefined);
+      await page.choose();
+      page.dialogButton('Send reset email').click();
+      await page.flush();
+
+      page.grid.loadingChange.emit(true);
+      page.grid.loadingChange.emit(false);
+      await page.settle();
+
+      expect(statusText(page.element)).toBe('');
+    });
+
+    it('has no axe violations with the failure alert', async () => {
+      const page = await renderWithReset();
+      page.resetPassword.mockRejectedValueOnce(new ApiError(500, 'Server error'));
+      await page.choose();
+      page.dialogButton('Send reset email').click();
+      await page.flush();
+
+      await expectNoAxeViolations(page.element);
     });
   });
 

@@ -246,6 +246,36 @@ export async function forceListFailure(page: Page): Promise<void> {
   await expect(page.getByRole('alert')).toContainText('Users could not be loaded.');
 }
 
+/** The first user row's name, as the Actions button and menu name it. */
+export const FIRST_ROW_NAME = 'Ada Allen';
+
+/** A row's Actions button, found by the user it belongs to. */
+export const actionsButton = (page: Page, name = FIRST_ROW_NAME) =>
+  page.getByRole('button', { name: `Actions for ${name}`, exact: true });
+
+/** An open row Actions menu. */
+export const rowMenu = (page: Page, name = FIRST_ROW_NAME) =>
+  page.getByRole('menu', { name: `Actions for ${name}`, exact: true });
+
+/** Opens a row's Actions menu by pointer and waits for focus to reach View. */
+export async function openRowMenu(page: Page, name = FIRST_ROW_NAME): Promise<void> {
+  await actionsButton(page, name).click();
+  await expect(rowMenu(page, name).getByRole('menuitem', { name: 'View' })).toBeFocused();
+}
+
+/** Opens the list with the first row's Actions menu open. */
+export async function showRowMenu(page: Page): Promise<void> {
+  await openList(page);
+  await openRowMenu(page);
+}
+
+/** Opens the list and chooses Reset password in the first row, waiting for focus on Cancel. */
+export async function showListResetDialog(page: Page): Promise<void> {
+  await showRowMenu(page);
+  await rowMenu(page).getByRole('menuitem', { name: 'Reset password' }).click();
+  await expect(resetPasswordDialog(page).getByRole('button', { name: 'Cancel' })).toBeFocused();
+}
+
 /**
  * Opens the list, holds every later page request until `releaseListLoad`, and moves to the next
  * page, so the grid shows skeleton rows and the status line says users are loading.

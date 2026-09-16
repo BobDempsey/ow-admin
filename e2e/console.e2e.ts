@@ -4,7 +4,11 @@ import {
   filterChip,
   listStatus,
   openList,
+  openRowMenu,
+  resetPasswordDialog,
+  rowMenu,
   showChipsList,
+  showListResetDialog,
   showNoSearchResults,
   statusFilter,
 } from './support/app';
@@ -52,6 +56,32 @@ test.describe('operating the list logs nothing', () => {
 
     await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
     await expect(listStatus(page)).toHaveText('500,000 users');
+    await page.waitForTimeout(SETTLE_MS);
+  });
+
+  test('opening a row Actions menu, closing it, and following View', async ({ page }) => {
+    await openList(page);
+    await openRowMenu(page);
+    await page.keyboard.press('Escape');
+    await expect(rowMenu(page)).toBeHidden();
+
+    await openRowMenu(page);
+    await rowMenu(page).getByRole('menuitem', { name: 'View' }).click();
+
+    await expect(page).toHaveURL(/\/users\/u-\d{6}$/);
+    await page.waitForTimeout(SETTLE_MS);
+  });
+
+  test('sending and cancelling a password reset from a row', async ({ page }) => {
+    await showListResetDialog(page);
+    await page.keyboard.press('Escape');
+    await expect(resetPasswordDialog(page)).toBeHidden();
+
+    await openRowMenu(page);
+    await rowMenu(page).getByRole('menuitem', { name: 'Reset password' }).click();
+    await resetPasswordDialog(page).getByRole('button', { name: 'Send reset email' }).click();
+
+    await expect(listStatus(page)).toContainText('Password reset email sent to');
     await page.waitForTimeout(SETTLE_MS);
   });
 

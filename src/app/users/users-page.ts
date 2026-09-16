@@ -12,12 +12,14 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
-import { USER_ROLES, USER_STATUSES, UserRole, UserStatus } from '../core/api/user.model';
+import { USER_ROLES, USER_STATUSES, User, UserRole, UserStatus } from '../core/api/user.model';
 import { EmptyUsersOverlay } from './empty-users-overlay';
 import { FilterChip, FilterChipRemoval, FilterChips } from './filter-chips';
+import { ResetPasswordDialog } from './reset-password-dialog';
 import { TableSettingsDialog } from './table-settings-dialog';
 import { EMPTY_LIST_QUERY, ListQuery } from './users-datasource';
-import { UsersGrid } from './users-grid';
+import { UserRowTarget, UsersGrid } from './users-grid';
+import { UsersService } from './users.service';
 
 /** How long typing must pause before the search is sent. */
 export const SEARCH_DEBOUNCE_MS = 300;
@@ -42,7 +44,14 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
  */
 @Component({
   selector: 'app-users-page',
-  imports: [EmptyUsersOverlay, FilterChips, RouterLink, TableSettingsDialog, UsersGrid],
+  imports: [
+    EmptyUsersOverlay,
+    FilterChips,
+    ResetPasswordDialog,
+    RouterLink,
+    TableSettingsDialog,
+    UsersGrid,
+  ],
   template: `
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <h1 #heading tabindex="-1" class="text-2xl font-semibold text-ink focus:outline-none">
@@ -125,12 +134,16 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
         (clearAll)="clearAll()"
       />
       <!--
-        Skeleton rows show a load and the total beside the heading shows the count, so both
-        messages are for screen readers only.
+        Skeleton rows show a load and the total beside the heading shows the count, so those
+        messages are for screen readers only. A password reset from a row is shown as well.
       -->
       <p role="status" class="px-4 text-sm text-ink-subtle">
         @if (loading()) {
           <span class="sr-only">Loading users…</span>
+        } @else if (resetting(); as user) {
+          <span class="block pb-2">Sending password reset email to {{ user.name }}…</span>
+        } @else if (resetSent(); as user) {
+          <span class="block pb-2">Password reset email sent to {{ user.name }}.</span>
         } @else if (announcementText(); as text) {
           <span class="sr-only">{{ text }}</span>
         }
@@ -150,6 +163,23 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
           </button>
         </div>
       }
+      @if (resetFailed(); as failed) {
+        <div
+          role="alert"
+          class="mx-4 mb-4 flex flex-wrap items-center gap-3 rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+        >
+          <span class="break-words"
+            >The password reset email to {{ failed.user.name }} could not be sent.</span
+          >
+          <button
+            type="button"
+            (click)="retryReset(grid, failed)"
+            class="min-h-11 rounded border border-danger-line-strong bg-surface px-4 font-medium text-danger-ink hover:bg-danger-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Try again
+          </button>
+        </div>
+      }
       <app-users-grid
         #grid
         class="block border-t border-line-subtle"
@@ -158,6 +188,7 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
         (loaded)="onLoaded($event)"
         (failed)="error.set($event)"
         (openUser)="openUser($event)"
+        (resetPassword)="openResetDialog($event)"
       />
       @if (empty()) {
         <app-empty-users-overlay
@@ -168,6 +199,11 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
       }
     </div>
     <app-table-settings-dialog #tableSettings />
+    <app-reset-password-dialog
+      [name]="resetTarget()?.user?.name ?? ''"
+      [email]="resetTarget()?.user?.email ?? ''"
+      (confirmed)="resolveReset(grid, $event)"
+    />
   `,
 })
 export default class UsersPage {
@@ -176,10 +212,19 @@ export default class UsersPage {
   private readonly heading = viewChild.required<ElementRef<HTMLElement>>('heading');
   private readonly searchField = viewChild.required<ElementRef<HTMLInputElement>>('searchField');
   private readonly filterChips = viewChild.required(FilterChips);
+  private readonly resetDialog = viewChild.required(ResetPasswordDialog);
+  private readonly users = inject(UsersService);
 
   protected readonly total = signal<number | undefined>(undefined);
   protected readonly loading = signal(false);
   protected readonly error = signal<ApiError | undefined>(undefined);
+
+  /** The row a password reset was last asked for, which the confirmation names. */
+  protected readonly resetTarget = signal<UserRowTarget | undefined>(undefined);
+  /** The user whose reset email is on its way. Only one reset runs at a time. */
+  protected readonly resetting = signal<User | undefined>(undefined);
+  protected readonly resetSent = signal<User | undefined>(undefined);
+  protected readonly resetFailed = signal<UserRowTarget | undefined>(undefined);
 
   protected readonly roles = USER_ROLES;
   protected readonly statuses = USER_STATUSES;
@@ -314,7 +359,46 @@ export default class UsersPage {
     this.loading.set(inFlight);
     if (inFlight) {
       this.announcement.set(undefined);
+      this.resetSent.set(undefined);
     }
+  }
+
+  /**
+   * Asks before sending a reset from a row's Actions menu. While one reset runs, another is not
+   * started; the status line already says an email is on its way.
+   */
+  protected openResetDialog(target: UserRowTarget): void {
+    if (this.resetting()) {
+      return;
+    }
+    this.resetTarget.set(target);
+    this.resetDialog().show();
+  }
+
+  protected async resolveReset(
+    grid: Pick<UsersGrid, 'focusActionsCell'>,
+    confirmed: boolean,
+  ): Promise<void> {
+    const target = this.resetTarget();
+    if (!target) {
+      return;
+    }
+    this.returnFocusToRow(grid, target);
+    if (confirmed) {
+      await this.sendReset(target);
+    }
+  }
+
+  /**
+   * Try again leaves the DOM with the alert, so focus goes back to the row first. The admin
+   * already confirmed this reset, so it goes out without the dialog.
+   */
+  protected async retryReset(
+    grid: Pick<UsersGrid, 'focusActionsCell'>,
+    target: UserRowTarget,
+  ): Promise<void> {
+    this.returnFocusToRow(grid, target);
+    await this.sendReset(target);
   }
 
   protected onLoaded(total: number): void {
@@ -337,5 +421,33 @@ export default class UsersPage {
 
   protected openUser(id: string): void {
     void this.router.navigate(['/users', id]);
+  }
+
+  /** Focuses the row's Actions cell, or the heading when the row is no longer shown. */
+  private returnFocusToRow(
+    grid: Pick<UsersGrid, 'focusActionsCell'>,
+    { user, rowIndex }: UserRowTarget,
+  ): void {
+    if (!grid.focusActionsCell(rowIndex, user.id)) {
+      this.heading().nativeElement.focus();
+    }
+  }
+
+  /** Sends the reset email. It never reloads the list or changes its page, sort or filters. */
+  private async sendReset(target: UserRowTarget): Promise<void> {
+    if (this.resetting()) {
+      return;
+    }
+    this.resetting.set(target.user);
+    this.resetSent.set(undefined);
+    this.resetFailed.set(undefined);
+    try {
+      await this.users.resetPassword(target.user.id);
+      this.resetSent.set(target.user);
+    } catch {
+      this.resetFailed.set(target);
+    } finally {
+      this.resetting.set(undefined);
+    }
   }
 }

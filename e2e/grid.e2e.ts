@@ -22,7 +22,7 @@ test.describe('user grid', () => {
     const grid = page.getByRole('treegrid').or(page.getByRole('grid')).first();
 
     await expect(grid).toBeVisible();
-    expect(await headerNames(page)).toEqual(['Name', 'Email', 'Role', 'Status']);
+    expect(await headerNames(page)).toEqual(['Name', 'Email', 'Role', 'Status', 'Actions']);
     // aria-rowcount counts the header row as well as every user.
     await expect(grid).toHaveAttribute('aria-rowcount', '500001');
   });
@@ -34,7 +34,7 @@ test.describe('user grid', () => {
 
     await email.dragTo(name);
 
-    expect(await headerNames(page)).toEqual(['Name', 'Email', 'Role', 'Status']);
+    expect(await headerNames(page)).toEqual(['Name', 'Email', 'Role', 'Status', 'Actions']);
   });
 
   test('columns can be reordered by dragging after turning on Draggable columns', async ({
@@ -51,7 +51,9 @@ test.describe('user grid', () => {
     await page.mouse.move(target.x + 10, target.y + target.height / 2, { steps: 20 });
     await page.mouse.up();
 
-    await expect.poll(() => headerNames(page)).toEqual(['Email', 'Name', 'Role', 'Status']);
+    await expect
+      .poll(() => headerNames(page))
+      .toEqual(['Email', 'Name', 'Role', 'Status', 'Actions']);
   });
 
   test('compact rows keep cell text whole under text spacing at 320px (1.4.12)', async ({

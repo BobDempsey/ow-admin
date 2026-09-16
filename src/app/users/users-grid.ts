@@ -29,7 +29,9 @@ import {
 import { ApiError } from '../core/api/api-error';
 import { User } from '../core/api/user.model';
 import { ROW_HEIGHTS, TableSettingsService } from '../core/table-settings.service';
-import { SkeletonCell, UsersGridContext } from './skeleton-cell';
+import { RowActionsMenu, RowActionsMenuClose } from './row-actions-menu';
+import { SkeletonCell } from './skeleton-cell';
+import { UserActionsCell } from './user-actions-cell';
 import { UserNameCell } from './user-name-cell';
 import { UserPillCell, UserPillCellParams } from './user-pill-cell';
 import {
@@ -38,6 +40,7 @@ import {
   createUsersDatasource,
   sameListQuery,
 } from './users-datasource';
+import { UsersGridContext } from './users-grid-context';
 import { UsersService } from './users.service';
 
 // Registered here, not in app.config.ts, so AG Grid ships only in the lazy /users chunk.
@@ -48,6 +51,17 @@ ModuleRegistry.registerModules([
 ]);
 
 const DEFAULT_PAGE_SIZE = 25;
+
+/** A user row, found by where it sits in the whole list. */
+export interface UserRowTarget {
+  user: User;
+  rowIndex: number;
+}
+
+/** The open Actions menu: its row and the button it belongs to. */
+interface OpenActions extends UserRowTarget {
+  anchor: HTMLElement;
+}
 
 /**
  * The space the heading, description, the card's filter row and status line, and the page padding
@@ -94,7 +108,7 @@ const usersGridTheme = themeQuartz
  */
 @Component({
   selector: 'app-users-grid',
-  imports: [AgGridAngular],
+  imports: [AgGridAngular, RowActionsMenu],
   host: {
     '(focusin)': 'revealFocus($event)',
     '[class.striped]': 'settings.striped()',
@@ -130,6 +144,14 @@ const usersGridTheme = themeQuartz
       (rowClicked)="onRowClicked($event)"
       (cellKeyDown)="onCellKeyDown($event)"
     />
+    @if (actions(); as open) {
+      <app-row-actions-menu
+        [user]="open.user"
+        [anchor]="open.anchor"
+        (resetPassword)="resetPassword.emit({ user: open.user, rowIndex: open.rowIndex })"
+        (closed)="closeActions(open, $event)"
+      />
+    }
   `,
 })
 export class UsersGrid {
@@ -207,6 +229,8 @@ export class UsersGrid {
   readonly loaded = output<number>();
   readonly failed = output<ApiError>();
   readonly openUser = output<string>();
+  /** Reset password was chosen in a row's Actions menu. */
+  readonly resetPassword = output<UserRowTarget>();
 
   protected readonly theme = usersGridTheme;
   protected readonly defaultPageSize = DEFAULT_PAGE_SIZE;
@@ -231,6 +255,17 @@ export class UsersGrid {
       cellRendererParams: { kind: 'status' } satisfies UserPillCellParams,
       width: 140,
       minWidth: 140,
+    },
+    // Locked last, so Draggable columns never moves it; its button opens the row's Actions menu.
+    {
+      colId: 'actions',
+      headerName: 'Actions',
+      cellRenderer: UserActionsCell,
+      width: 104,
+      minWidth: 104,
+      sortable: false,
+      resizable: false,
+      lockPosition: 'right',
     },
   ];
   /**
@@ -259,7 +294,8 @@ export class UsersGrid {
    * view (WCAG 2.4.11). `nearest` leaves an already visible element where it is.
    */
   protected revealFocus(event: FocusEvent): void {
-    if (event.target instanceof HTMLElement) {
+    // The Actions menu is fixed on screen already, and scrolling would close it.
+    if (event.target instanceof HTMLElement && !event.target.closest('app-row-actions-menu')) {
       event.target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
   }
@@ -270,7 +306,17 @@ export class UsersGrid {
   protected readonly leaveGridOnTab = () => false as const;
   /** Whether a request that shows loading is in flight; skeleton cells read it. */
   private readonly loading = signal(false);
-  protected readonly context: UsersGridContext = { loading: this.loading.asReadonly() };
+  /** The row whose Actions menu is open. The menu is rendered after the grid, not in the row. */
+  protected readonly actions = signal<OpenActions | undefined>(undefined);
+  protected readonly context: UsersGridContext = {
+    loading: this.loading.asReadonly(),
+    actionsOpenFor: computed(() => this.actions()?.user.id),
+    toggleActions: (user, anchor, rowIndex) => {
+      this.actions.set(
+        this.actions()?.user.id === user.id ? undefined : { user, anchor, rowIndex },
+      );
+    },
+  };
   protected readonly datasource = createUsersDatasource(
     (request) => this.users.loadPage(request),
     {
@@ -299,11 +345,47 @@ export class UsersGrid {
     this.api?.refreshInfiniteCache();
   }
 
+  /**
+   * Moves focus to a row's Actions cell. Returns false when that row is not on the current page, or
+   * no longer holds the given user, so the caller can put focus somewhere else.
+   */
+  focusActionsCell(rowIndex: number, userId?: string): boolean {
+    const api = this.api;
+    if (!api) {
+      return false;
+    }
+    const pageSize = api.paginationGetPageSize();
+    const firstRow = api.paginationGetCurrentPage() * pageSize;
+    const data = api.getDisplayedRowAtIndex(rowIndex)?.data;
+    if (rowIndex < firstRow || rowIndex >= firstRow + pageSize || !data) {
+      return false;
+    }
+    if (userId && data.id !== userId) {
+      return false;
+    }
+    api.ensureIndexVisible(rowIndex);
+    api.setFocusedCell(rowIndex, 'actions');
+    return true;
+  }
+
+  protected closeActions(open: OpenActions, { returnFocus }: RowActionsMenuClose): void {
+    if (this.actions() !== open) {
+      return;
+    }
+    this.actions.set(undefined);
+    if (returnFocus) {
+      this.focusActionsCell(open.rowIndex, open.user.id);
+    }
+  }
+
   protected onGridReady(event: GridReadyEvent<User>): void {
     this.api = event.api;
   }
 
   protected onPaginationChanged(event: PaginationChangedEvent<User>): void {
+    if (event.newPage) {
+      this.actions.set(undefined);
+    }
     const api = this.api;
     if (!event.newPageSize || !api) {
       return;
@@ -316,17 +398,38 @@ export class UsersGrid {
 
   protected onRowClicked(event: RowClickedEvent<User>): void {
     const target = event.event?.target;
-    // The name link navigates by itself, which keeps modifier and middle clicks working.
-    if (!event.data || (target instanceof Element && target.closest('a'))) {
+    // The name link navigates by itself, which keeps modifier and middle clicks working, and the
+    // Actions button opens its menu instead of the user.
+    if (!event.data || (target instanceof Element && target.closest('a, button'))) {
       return;
     }
     this.openUser.emit(event.data.id);
   }
 
+  /**
+   * Enter opens the user from any cell but Actions. On the Actions cell, Enter and Space open the
+   * row's menu, which is how the keyboard reaches a button that is not a Tab stop.
+   */
   protected onCellKeyDown(event: CellKeyDownEvent<User> | FullWidthCellKeyDownEvent<User>): void {
     const keyboardEvent = event.event;
-    if (event.data && keyboardEvent instanceof KeyboardEvent && keyboardEvent.key === 'Enter') {
-      this.openUser.emit(event.data.id);
+    if (!event.data || !(keyboardEvent instanceof KeyboardEvent)) {
+      return;
+    }
+    const onActions = 'column' in event && event.column.getColId() === 'actions';
+    if (!onActions) {
+      if (keyboardEvent.key === 'Enter') {
+        this.openUser.emit(event.data.id);
+      }
+      return;
+    }
+    if (keyboardEvent.key !== 'Enter' && keyboardEvent.key !== ' ') {
+      return;
+    }
+    keyboardEvent.preventDefault();
+    const cell = keyboardEvent.target instanceof Element ? keyboardEvent.target : null;
+    const button = cell?.closest('.ag-cell')?.querySelector('button');
+    if (button && event.rowIndex !== null) {
+      this.actions.set({ user: event.data, anchor: button, rowIndex: event.rowIndex });
     }
   }
 }

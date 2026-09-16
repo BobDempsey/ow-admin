@@ -1,7 +1,8 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Column, ICellRendererParams } from 'ag-grid-community';
-import { SkeletonCell, UsersGridContext } from './skeleton-cell';
+import { SkeletonCell } from './skeleton-cell';
+import { UsersGridContext } from './users-grid-context';
 
 async function renderCell(colId: string, loading = signal(true)) {
   const fixture = TestBed.createComponent(SkeletonCell);

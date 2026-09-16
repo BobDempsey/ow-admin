@@ -5,6 +5,7 @@ import {
   VIEWPORTS,
   choosePageSize,
   filterChip,
+  listStatus,
   openDetail,
   openList,
   openMissingUser,
@@ -222,6 +223,38 @@ test.describe('keyboard flows', () => {
     await expect(page.getByLabel('Search users')).toHaveValue('');
     await expect(page.getByRole('button', { name: 'Clear filters' })).toBeHidden();
     await page.locator('.ag-row a').first().waitFor();
+  });
+
+  test('list: the row Actions menu sends a reset by keyboard while the grid stays one Tab stop', async ({
+    page,
+  }) => {
+    await openList(page);
+
+    await pressUntilFocused(page, 'Table settings');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAttribute('role', 'columnheader');
+    await page.keyboard.press('ArrowDown');
+    for (let press = 0; press < 4; press++) {
+      await page.keyboard.press('ArrowRight');
+    }
+    await expect(focused(page)).toHaveAttribute('col-id', 'actions');
+    await page.keyboard.press('Enter');
+    await expect(focused(page)).toHaveText('View');
+    await page.keyboard.press('ArrowDown');
+    await expect(focused(page)).toHaveText('Reset password');
+    await page.keyboard.press('Enter');
+
+    await expect(resetPasswordDialog(page).getByRole('button', { name: 'Cancel' })).toBeFocused();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(listStatus(page)).toContainText('Password reset email sent to');
+    await expect(focused(page)).toHaveAttribute('col-id', 'actions');
+
+    await page.keyboard.press('Tab');
+    const inPaging = await page.evaluate(
+      () => !!document.activeElement?.closest('.ag-paging-panel'),
+    );
+    expect(inPaging).toBe(true);
   });
 
   test('list: a fixed header never hides the focused cell while arrowing a 100-row page', async ({
