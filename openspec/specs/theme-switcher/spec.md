@@ -9,15 +9,20 @@ the same browser.
 
 ### Requirement: Theme control in the header
 
-Every admin screen SHALL show a button in the header with the accessible
-name "Theme" that opens a menu of three choices, Light, Dark and System, of
-which exactly one is selected. The button SHALL be exposed to assistive
-technology as opening a menu and SHALL report whether the menu is open.
-The choices SHALL be exposed as checkable menu items named Light, Dark and
-System, with the selected one marked as checked. The selected choice SHALL
-be shown in the open menu by a check mark or other shape, not by color
-alone. Each choice's accessible name SHALL stay its text name even if its
-visible label is later shown as an icon.
+Every admin screen SHALL show an icon-only button in the header whose icon
+shows the current choice and whose accessible name is "Theme: " followed
+by the current choice, given by visually hidden text: "Theme: Light",
+"Theme: Dark" or "Theme: System". The button SHALL show a tooltip with the
+same words, SHALL hide its icon from assistive technology, and SHALL be at
+least 44 by 44 CSS pixels. The button SHALL open a menu named "Theme" of
+three choices, Light, Dark and System, of which exactly one is selected.
+The button SHALL be exposed to assistive technology as opening a menu and
+SHALL report whether the menu is open. The choices SHALL be exposed as
+checkable menu items named Light, Dark and System, with the selected one
+marked as checked. The selected choice SHALL be shown in the open menu by
+a check mark or other shape, not by color alone. Each choice's accessible
+name SHALL stay its text name even if its visible label is later shown as
+an icon.
 
 #### Scenario: Control present on every screen
 - **WHEN** an admin opens the user list, the new user screen, a user's
@@ -33,10 +38,15 @@ visible label is later shown as an icon.
 
 #### Scenario: Selected choice announced
 - **WHEN** an assistive technology inspects the Theme button and its open
-  menu
-- **THEN** it reports a button named "Theme" that opens a menu and is
-  expanded, and a menu containing three checkable items, with the selected
-  one marked as checked
+  menu while System is selected
+- **THEN** it reports a button named "Theme: System" that opens a menu and
+  is expanded, and a menu named "Theme" containing three checkable items,
+  with System marked as checked
+
+#### Scenario: Name follows the choice
+- **WHEN** an admin chooses Dark from the Theme menu
+- **THEN** the Theme button's accessible name and tooltip both read
+  "Theme: Dark"
 
 #### Scenario: Collapsed state announced
 - **WHEN** an assistive technology inspects the Theme button while its menu
