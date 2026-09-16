@@ -997,9 +997,13 @@ All pre-implementation decisions are made.
   were not rerun.
 - `e2e/settings.e2e.ts` "odd rows are shaded and their text meets 4.5:1"
   failed once in the light theme during that run and passed on rerun.
-- The full `npm run test:a11y` suite has not run since striped rows became
-  the default and the drawer heading changed; only six browser files were
-  rerun then (see above).
+- The full `npm run test:a11y` suite ran again on 2026-09-16 after striped
+  rows became the default and the drawer heading changed: 470 of 471
+  passed in 15.5 minutes. The one failure, the light 320 px axe run on the
+  Table settings dialog with its WCAG note, was the dev server refusing a
+  connection (`ERR_CONNECTION_REFUSED` on a Vite dependency, caught by the
+  console guard) and passed on rerun. That refusal has now flaked three
+  different tests in full runs.
 - A second read of the PDF on 2026-09-16 found every requirement met. It
   has no delivery or submission instructions. The API sits under `/api`
   (`/api/users`) rather than the bare `/users` paths the PDF lists.

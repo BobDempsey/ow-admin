@@ -1,1 +1,0 @@
-- [ ] Run the full browser suite after the striped rows default and drawer heading change
