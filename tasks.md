@@ -1,2 +1,0 @@
-- [ ] nav drawer should say OW Admin instead of Menu at top
-- [ ] check if striped table rows is defaulted to true. If not, change to striped rows by default.
