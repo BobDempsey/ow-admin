@@ -87,13 +87,16 @@ describe('TopNav', () => {
   it('hides the entry list below the md breakpoint and the Menu button from it up', async () => {
     const { element } = await renderOn('/users');
     const list = element.querySelector<HTMLUListElement>('nav > ul')!;
-    const menu = element.querySelector<HTMLButtonElement>('nav > button')!;
+    const menu = element.querySelector<HTMLButtonElement>('button[aria-haspopup="dialog"]')!;
 
     expect(list.className).toContain('hidden');
     expect(list.className).toContain('md:flex');
     expect(menu.textContent?.trim()).toBe('Menu');
     expect(menu.getAttribute('aria-haspopup')).toBe('dialog');
     expect(menu.className).toContain('md:hidden');
+    expect(menu.title).toBe('Menu');
+    // Menu sits after the nav, so the projected header controls fall between the two.
+    expect(menu.closest('nav')).toBeNull();
   });
 
   it('gives the drawer the same entries the bar shows', async () => {
@@ -105,7 +108,7 @@ describe('TopNav', () => {
   it('opens the drawer from the Menu button and closes it back onto the button', async () => {
     stubDialogMethods();
     const { element, fixture } = await renderOn('/users');
-    const menu = element.querySelector<HTMLButtonElement>('nav > button')!;
+    const menu = element.querySelector<HTMLButtonElement>('button[aria-haspopup="dialog"]')!;
     const dialog = element.querySelector('dialog')!;
 
     menu.click();

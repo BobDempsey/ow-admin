@@ -3,6 +3,7 @@ import {
   ElementRef,
   Injector,
   afterNextRender,
+  computed,
   inject,
   input,
   signal,
@@ -61,8 +62,10 @@ export class ThemeIcon {
 /**
  * The header's Light, Dark and System choice, built as a menu button following the WAI-ARIA menu
  * button pattern: a "Theme" button opens a `menu` of `menuitemradio` items, the chosen one marked
- * with a check mark. The button shows the chosen item's icon, and its name stays "Theme" through
- * hidden text; the menu's checked item tells assistive technology the choice. A closed menu is not rendered, so it is out of the accessibility tree. Focus
+ * with a check mark. The button shows the chosen item's icon, and its hidden text and `title` name
+ * it with the current choice, such as "Theme: Dark", so the choice is known before the menu opens.
+ * The menu itself stays named "Theme". A closed menu is not rendered, so it is out of the
+ * accessibility tree. Focus
  * moves through the items with a roving `tabindex`, and choosing applies the theme, closes the
  * menu and returns focus to the button.
  */
@@ -83,10 +86,11 @@ export class ThemeIcon {
       [attr.aria-controls]="open() ? menuId : null"
       (click)="toggle()"
       (keydown)="onButtonKeydown($event)"
+      [title]="buttonName()"
       class="inline-flex size-11 items-center justify-center rounded-lg text-header-muted hover:bg-header-hover hover:text-header-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus aria-expanded:bg-header-hover aria-expanded:text-header-ink motion-safe:transition-colors"
     >
       <app-theme-icon [preference]="theme.preference()" class="size-5" />
-      <span class="sr-only">Theme</span>
+      <span class="sr-only">{{ buttonName() }}</span>
     </button>
     @if (open()) {
       <div
@@ -142,6 +146,11 @@ export class ThemeSwitcher {
   protected readonly menuId = 'theme-menu';
   protected readonly open = signal(false);
   protected readonly focusedIndex = signal(0);
+  protected readonly buttonName = computed(() => {
+    const preference = this.theme.preference();
+    const label = OPTIONS.find((option) => option.value === preference)?.label ?? preference;
+    return `Theme: ${label}`;
+  });
 
   protected toggle(): void {
     if (this.open()) {

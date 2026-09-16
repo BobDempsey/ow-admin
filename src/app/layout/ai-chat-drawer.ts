@@ -10,7 +10,10 @@ interface ChatMessage {
 
 /** A fixed conversation that shows what an assistant in this app could look like. */
 const DEMO_MESSAGES: readonly ChatMessage[] = [
-  { from: 'assistant', text: 'Hi! I can help you find users, change roles or send password resets.' },
+  {
+    from: 'assistant',
+    text: 'Hi! I can help you find users, change roles or send password resets.',
+  },
   { from: 'admin', text: 'Which admins were invited but never signed in?' },
   {
     from: 'assistant',
@@ -134,7 +137,9 @@ const DEMO_MESSAGES: readonly ChatMessage[] = [
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+              <path
+                d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
+              />
             </svg>
             <span class="sr-only">(opens in a new tab)</span>
           </a>

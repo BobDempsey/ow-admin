@@ -44,7 +44,8 @@ describe('App', () => {
     const nav = header!.querySelector('nav')!;
     const button = header!.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
 
-    expect(button.textContent?.trim()).toBe('Theme');
+    expect(button.textContent?.trim()).toBe('Theme: System');
+    expect(button.title).toBe('Theme: System');
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(nav.compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });

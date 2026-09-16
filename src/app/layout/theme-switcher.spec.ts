@@ -43,7 +43,8 @@ describe('ThemeSwitcher', () => {
   it('shows a Theme button that reports its menu as closed', async () => {
     const { button, menu } = await renderSwitcher();
 
-    expect(button.textContent?.trim()).toBe('Theme');
+    expect(button.textContent?.trim()).toBe('Theme: System');
+    expect(button.title).toBe('Theme: System');
     expect(button.getAttribute('aria-haspopup')).toBe('menu');
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(menu()).toBeNull();
@@ -74,8 +75,10 @@ describe('ThemeSwitcher', () => {
 
     expect(item('Dark').getAttribute('aria-checked')).toBe('true');
     expect(item('System').getAttribute('aria-checked')).toBe('false');
-    expect(items().filter((entry) => entry.querySelector('svg')).length).toBe(1);
-    expect(item('Dark').querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    // Every item shows its theme icon; only the checked one also shows the check mark.
+    const checkMark = (entry: HTMLElement) => entry.querySelector('span.text-link svg');
+    expect(items().filter((entry) => checkMark(entry)).length).toBe(1);
+    expect(checkMark(item('Dark'))?.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('applies and remembers the item the admin clicks, then closes', async () => {
@@ -90,6 +93,20 @@ describe('ThemeSwitcher', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('light');
     expect(menu()).toBeNull();
     expect(document.activeElement).toBe(button);
+    expect(button.textContent?.trim()).toBe('Theme: Light');
+    expect(button.title).toBe('Theme: Light');
+  });
+
+  it('names the button with the current choice while the menu keeps the name Theme', async () => {
+    const { fixture, button, menu, openMenu, service } = await renderSwitcher();
+
+    service.choose('dark');
+    await fixture.whenStable();
+    await openMenu();
+
+    expect(button.textContent?.trim()).toBe('Theme: Dark');
+    expect(button.title).toBe('Theme: Dark');
+    expect(menu()?.getAttribute('aria-label')).toBe('Theme');
   });
 
   it('has no axe violations with the menu open', async () => {

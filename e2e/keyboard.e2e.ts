@@ -103,7 +103,7 @@ test.describe('keyboard flows', () => {
 
     await pressUntilFocused(page, 'About');
     await page.keyboard.press('Tab');
-    await expect(focused(page)).toHaveAccessibleName('Theme');
+    await expect(focused(page)).toHaveAccessibleName('Theme: System');
 
     await page.keyboard.press('Enter');
     await expect(focused(page)).toHaveText('System');

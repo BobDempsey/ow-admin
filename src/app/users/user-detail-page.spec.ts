@@ -8,6 +8,7 @@ import { API_LATENCY_MS } from '../core/api/api-config';
 import { ApiError } from '../core/api/api-error';
 import { seedUser } from '../core/api/in-memory/user-seed';
 import { provideUsersApi } from '../core/api/provide-users-api';
+import { AVATAR_COLOR_CLASSES, avatarColorIndex, initialsOf } from './user-avatar';
 import UserDetailPage from './user-detail-page';
 import { UsersService } from './users.service';
 
@@ -186,6 +187,26 @@ describe('UserDetailPage', () => {
       );
       expect(element.querySelector('form')).toBeNull();
       expect(element.querySelector('[role="alert"]')).toBeNull();
+    });
+
+    it('shows the user initials in a colored circle beside the heading, hidden from assistive tech', async () => {
+      const { heading } = await renderPage();
+      const avatar = heading()?.previousElementSibling as HTMLElement | null;
+
+      expect(avatar?.tagName).toBe('SPAN');
+      expect(avatar?.textContent?.trim()).toBe(initialsOf(seeded.name));
+      expect(avatar?.getAttribute('aria-hidden')).toBe('true');
+      expect(avatar?.classList).toContain('rounded-full');
+      for (const name of AVATAR_COLOR_CLASSES[avatarColorIndex(ID)].split(' ')) {
+        expect(avatar?.classList).toContain(name);
+      }
+    });
+
+    it('shows no avatar for a user that does not exist', async () => {
+      const { element, heading } = await renderPage({ id: 'u-999999' });
+
+      expect(heading()?.previousElementSibling).toBeNull();
+      expect(element.querySelector('span.rounded-full[aria-hidden="true"]')).toBeNull();
     });
 
     it('shows an alert when loading fails, and Try again loads the user', async () => {

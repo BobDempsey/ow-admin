@@ -37,7 +37,7 @@ test.describe('theme control', () => {
 
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
     await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
-    await expect(focused(page)).toHaveText('Theme');
+    await expect(focused(page)).toHaveAccessibleName('Theme: Dark');
     await openThemeMenu(page);
     await expect(choice(page, 'Dark')).toHaveAttribute('aria-checked', 'true');
   });
@@ -54,7 +54,7 @@ test.describe('theme control', () => {
 
     await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
     await expect(root(page)).toHaveAttribute('data-theme', 'light');
-    await expect(focused(page)).toHaveText('Theme');
+    await expect(focused(page)).toHaveAccessibleName('Theme: System');
   });
 
   test('a click outside closes the menu without changing the choice', async ({ page }) => {

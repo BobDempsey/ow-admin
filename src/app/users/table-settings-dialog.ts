@@ -181,7 +181,6 @@ const CHECKBOX_CLASSES = `${CONTROL_CLASSES} rounded-sm checked:border-primary c
       <p class="pl-8 text-sm text-ink-subtle">
         Keep the column header in view while scrolling through a page of users.
       </p>
-
     </dialog>
   `,
 })

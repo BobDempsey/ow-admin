@@ -233,7 +233,9 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" />
+                <path
+                  d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"
+                />
               </svg>
               Simulate an edit by another admin
             </button>
@@ -311,7 +313,10 @@ export default class UserDetailPage {
   protected readonly avatar = computed(() => {
     const user = this.notFound() ? undefined : this.loaded()?.data;
     return user
-      ? { initials: initialsOf(user.name), classes: AVATAR_COLOR_CLASSES[avatarColorIndex(user.id)] }
+      ? {
+          initials: initialsOf(user.name),
+          classes: AVATAR_COLOR_CLASSES[avatarColorIndex(user.id)],
+        }
       : undefined;
   });
   protected readonly status = computed(() => {

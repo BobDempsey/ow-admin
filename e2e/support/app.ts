@@ -145,8 +145,11 @@ export async function showNavDrawer(page: Page): Promise<void> {
   await openNavDrawer(page);
 }
 
-/** The header's Theme button, which opens the menu of Light, Dark and System. */
-export const themeButton = (page: Page) => page.getByRole('button', { name: 'Theme' });
+/**
+ * The header's Theme button, which opens the menu of Light, Dark and System. Its name carries the
+ * current choice, such as "Theme: Dark".
+ */
+export const themeButton = (page: Page) => page.getByRole('button', { name: /^Theme/ });
 
 /** The open Theme menu. */
 export const themeMenu = (page: Page) => page.getByRole('menu', { name: 'Theme' });
