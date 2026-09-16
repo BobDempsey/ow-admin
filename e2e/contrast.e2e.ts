@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
 import { COLOR_SCHEMES, openAbout } from './support/app';
-import { tokenContrast } from './support/contrast';
+import { contrast, tokenContrast } from './support/contrast';
 
 /** A foreground and background token pair and the ratio it must reach (WCAG 1.4.3, 1.4.11). */
 interface TokenPair {
@@ -79,6 +79,56 @@ for (const colorScheme of COLOR_SCHEMES) {
         expect(ratio).toBeGreaterThanOrEqual(pair.minimum);
       });
     }
+  });
+}
+
+/** The colors the header draws, read from its rendered elements. */
+async function headerColors(page: Page) {
+  const header = page.locator('header');
+  const users = header.getByRole('link', { name: 'Users', exact: true });
+  const placeholder = header.getByRole('button', { name: 'Reports (not available yet)' });
+  const style = (locator: typeof users, property: string) =>
+    locator.evaluate((element, name) => getComputedStyle(element).getPropertyValue(name), property);
+  await expect(users).toHaveAttribute('aria-current', 'page');
+
+  const surface = await style(header, 'background-color');
+  const text = await style(users, 'color');
+  const underline = await style(users, 'border-bottom-color');
+  const placeholderText = await style(placeholder, 'color');
+  await users.hover();
+  const hover = await style(users, 'background-color');
+  await page.mouse.move(0, 400);
+  await users.focus();
+  const focusRing = await style(users, 'outline-color');
+  return { surface, text, underline, placeholderText, hover, focusRing };
+}
+
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`header contrast, ${colorScheme} theme at 1280px`, () => {
+    test.use({ colorScheme, viewport: { width: 1280, height: 900 } });
+
+    test('text, placeholders, focus ring and underline meet their minimums', async ({ page }) => {
+      await page.goto('/users');
+      await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme);
+      const colors = await headerColors(page);
+      const ratios = {
+        text: await contrast(page, colors.text, colors.surface),
+        textOnHover: await contrast(page, colors.text, colors.hover),
+        placeholder: await contrast(page, colors.placeholderText, colors.surface),
+        focusRing: await contrast(page, colors.focusRing, colors.surface),
+        underline: await contrast(page, colors.underline, colors.surface),
+        underlineOnHover: await contrast(page, colors.underline, colors.hover),
+      };
+      console.log(`${colorScheme} header: ${JSON.stringify(ratios)}`);
+
+      expect(colors.hover).not.toBe(colors.surface);
+      expect(ratios.text).toBeGreaterThanOrEqual(TEXT);
+      expect(ratios.textOnHover).toBeGreaterThanOrEqual(TEXT);
+      expect(ratios.placeholder).toBeGreaterThanOrEqual(TEXT);
+      expect(ratios.focusRing).toBeGreaterThanOrEqual(NON_TEXT);
+      expect(ratios.underline).toBeGreaterThanOrEqual(NON_TEXT);
+      expect(ratios.underlineOnHover).toBeGreaterThanOrEqual(NON_TEXT);
+    });
   });
 }
 

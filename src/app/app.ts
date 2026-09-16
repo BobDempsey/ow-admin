@@ -17,7 +17,7 @@ import { TopNav } from './layout/top-nav';
     >
       Skip to main content
     </a>
-    <header class="bg-header shadow-[inset_0_-1px_0_var(--color-header-line)]">
+    <header class="border-b border-line-subtle bg-surface">
       <div
         class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-2 gap-y-1 px-4 py-1 md:gap-x-6"
       >

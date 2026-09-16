@@ -24,7 +24,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
       <a
         #wordmark
         routerLink="/users"
-        class="inline-flex min-h-11 items-center font-bold text-header-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus md:text-lg"
+        class="inline-flex min-h-11 items-center font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:text-lg"
       >
         Orbweaver Admin
       </a>
@@ -36,7 +36,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
                 [routerLink]="entry.path"
                 routerLinkActive
                 ariaCurrentWhenActive="page"
-                class="inline-flex min-h-11 items-center border-b-3 border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
+                class="inline-flex min-h-11 items-center border-b-3 border-transparent px-3 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-[current=page]:border-nav-current aria-[current=page]:font-semibold"
               >
                 {{ entry.label }}
               </a>
@@ -44,7 +44,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
               <button
                 type="button"
                 aria-disabled="true"
-                class="inline-flex min-h-11 cursor-not-allowed items-center border-b-3 border-transparent px-3 text-sm text-header-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
+                class="inline-flex min-h-11 cursor-not-allowed items-center border-b-3 border-transparent px-3 text-sm text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 {{ entry.label }}<span class="sr-only"> (not available yet)</span>
               </button>
@@ -57,7 +57,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
         type="button"
         aria-haspopup="dialog"
         (click)="openDrawer()"
-        class="inline-flex min-h-11 items-center px-2 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus md:hidden"
+        class="inline-flex min-h-11 items-center px-2 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:hidden"
       >
         Menu
       </button>

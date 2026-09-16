@@ -40,7 +40,7 @@ export interface NavEntry {
       aria-labelledby="nav-drawer-heading"
       (cancel)="onCancel($event)"
       (click)="onClick($event)"
-      class="fixed top-0 left-0 m-0 h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-header p-0 text-header-ink shadow-xl backdrop:bg-backdrop/60"
+      class="fixed top-0 left-0 m-0 h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-surface p-0 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
       <!-- Everything sits in this wrapper, so only a backdrop click has the dialog as its target. -->
       <div class="flex h-full flex-col overflow-y-auto p-4">
@@ -56,7 +56,7 @@ export interface NavEntry {
           <button
             type="button"
             (click)="close()"
-            class="min-h-11 rounded border border-header-muted px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-header-focus"
+            class="min-h-11 rounded border border-line px-3 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
           >
             Close
           </button>
@@ -69,7 +69,7 @@ export interface NavEntry {
                   [routerLink]="entry.path"
                   routerLinkActive
                   ariaCurrentWhenActive="page"
-                  class="flex min-h-11 items-center border-l-4 border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
+                  class="flex min-h-11 items-center border-l-4 border-transparent px-3 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus aria-[current=page]:border-nav-current aria-[current=page]:font-semibold"
                 >
                   {{ entry.label }}
                 </a>
@@ -77,7 +77,7 @@ export interface NavEntry {
                 <button
                   type="button"
                   aria-disabled="true"
-                  class="flex min-h-11 w-full cursor-not-allowed items-center border-l-4 border-transparent px-3 text-left text-sm text-header-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-header-focus"
+                  class="flex min-h-11 w-full cursor-not-allowed items-center border-l-4 border-transparent px-3 text-left text-sm text-ink-subtle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
                 >
                   {{ entry.label }}<span class="sr-only"> (not available yet)</span>
                 </button>

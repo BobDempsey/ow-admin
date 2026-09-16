@@ -39,7 +39,7 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
       [attr.aria-controls]="open() ? menuId : null"
       (click)="toggle()"
       (keydown)="onButtonKeydown($event)"
-      class="inline-flex min-h-11 items-center px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
+      class="inline-flex min-h-11 items-center px-3 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       Theme
     </button>
