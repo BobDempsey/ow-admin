@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
 import { openNewUser } from './support/app';
 
-const detailStatus = (page: Page) => page.locator('app-user-detail-page p[role="status"]');
+const detailStatus = (page: Page) => page.locator('app-user-detail-page > p[role="status"]');
 
 /**
  * Records every text the detail screen's status line shows, from the first render of each
@@ -16,7 +16,7 @@ async function recordDetailStatuses(page: Page): Promise<{
     const record = window as unknown as { detailStatuses: string[] };
     record.detailStatuses = [];
     new MutationObserver(() => {
-      const status = document.querySelector('app-user-detail-page p[role="status"]');
+      const status = document.querySelector('app-user-detail-page > p[role="status"]');
       const text = status?.textContent?.trim();
       if (text && record.detailStatuses.at(-1) !== text) {
         record.detailStatuses.push(text);

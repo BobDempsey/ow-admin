@@ -196,6 +196,19 @@
   }
 }
 
+/* `tall:` applies on viewports tall enough for the detail screen's save bar to stay in view. */
+@custom-variant tall (@media (min-height: 30rem));
+
+/*
+ * While the save bar is stuck to the viewport bottom, the browser keeps focused controls clear of
+ * it when it scrolls them into view (WCAG 2.4.11).
+ */
+@media (min-height: 30rem) {
+  html:has([data-save-bar-stuck]) {
+    scroll-padding-bottom: 6rem;
+  }
+}
+
 /* A dialog's width on any screen: the full width less a 1rem margin on each side. */
 @utility w-dialog {
   width: calc(100% - 2rem);

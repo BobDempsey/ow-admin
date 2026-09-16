@@ -438,6 +438,115 @@ describe('UserDetailPage', () => {
     });
   });
 
+  describe('layout and save bar', () => {
+    const barStatus = (element: HTMLElement) => element.querySelector('#save-bar-status');
+    const bar = (element: HTMLElement) => barStatus(element)?.parentElement;
+    const otherStatus =
+      seeded.status === 'active' ? 'invited' : seeded.status === 'invited' ? 'active' : 'invited';
+
+    it('puts the form first, then the Password and Demo cards in a side column', async () => {
+      const { element } = await renderPage();
+      const details = element.querySelector('section[aria-labelledby="details-heading"]')!;
+      const password = element.querySelector('section[aria-labelledby="password-heading"]')!;
+      const demo = element.querySelector('section[aria-labelledby="demo-heading"]')!;
+      const layout = details.parentElement!;
+
+      expect(layout.classList).toContain('lg:grid-cols-3');
+      expect(details.classList).toContain('lg:col-span-2');
+      expect(password.parentElement).toBe(demo.parentElement);
+      expect(password.parentElement?.parentElement).toBe(layout);
+      expect(details.compareDocumentPosition(password)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(password.compareDocumentPosition(demo)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it('keeps Save and Cancel in a bar at the end of the form, Save described by its status', async () => {
+      const { element, button } = await renderPage();
+      const form = element.querySelector('form')!;
+
+      expect(form.lastElementChild).toBe(bar(element));
+      expect(bar(element)?.contains(button('Save')!)).toBe(true);
+      expect(button('Save')?.getAttribute('aria-describedby')).toBe('save-bar-status');
+      expect(barStatus(element)?.getAttribute('role')).toBe('status');
+    });
+
+    it('shows no bar text and does not stick without edits', async () => {
+      const { element } = await renderPage();
+
+      expect(barStatus(element)?.textContent?.trim()).toBe('');
+      expect(bar(element)?.hasAttribute('data-save-bar-stuck')).toBe(false);
+      expect(bar(element)?.classList).not.toContain('tall:sticky');
+    });
+
+    it('says Unsaved changes and sticks once a value differs, and the text stays while typing', async () => {
+      const page = await renderPage();
+
+      await page.type('Name', `${seeded.name}x`);
+      const status = barStatus(page.element)!;
+      expect(status.textContent?.trim()).toBe('Unsaved changes');
+      expect(bar(page.element)?.hasAttribute('data-save-bar-stuck')).toBe(true);
+      expect(bar(page.element)?.classList).toContain('tall:sticky');
+      expect(bar(page.element)?.classList).toContain('tall:bottom-0');
+
+      const changes: string[] = [];
+      const observer = new MutationObserver(() => changes.push(status.textContent ?? ''));
+      observer.observe(status, { childList: true, characterData: true, subtree: true });
+      await page.type('Name', `${seeded.name}xy`);
+      await page.type('Name', `${seeded.name}xyz`);
+      observer.disconnect();
+      expect(changes).toEqual([]);
+      expect(status.textContent?.trim()).toBe('Unsaved changes');
+    });
+
+    it('clears the text after a save', async () => {
+      const page = await renderPage();
+      await page.type('Name', 'Grace Hopper');
+
+      await page.saveForm();
+
+      expect(page.status()).toBe('User saved.');
+      expect(barStatus(page.element)?.textContent?.trim()).toBe('');
+      expect(bar(page.element)?.hasAttribute('data-save-bar-stuck')).toBe(false);
+    });
+
+    it('clears the text after Reload in the conflict dialog', async () => {
+      const page = await renderPage();
+      await page.click('Simulate an edit by another admin');
+      await page.type('Name', 'Grace Hopper');
+      await page.saveForm();
+      expect(barStatus(page.element)?.textContent?.trim()).toBe('Unsaved changes');
+
+      await page.click('Reload');
+
+      expect(barStatus(page.element)?.textContent?.trim()).toBe('');
+    });
+
+    it('clears the text when an edit is set back to the loaded value', async () => {
+      const page = await renderPage();
+      const status = page.control('Status')!;
+
+      status.value = otherStatus;
+      status.dispatchEvent(new Event('input'));
+      await page.fixture.whenStable();
+      expect(barStatus(page.element)?.textContent?.trim()).toBe('Unsaved changes');
+
+      status.value = seeded.status;
+      status.dispatchEvent(new Event('input'));
+      await page.fixture.whenStable();
+      expect(barStatus(page.element)?.textContent?.trim()).toBe('');
+    });
+
+    it('scrolls a focused field into view with block nearest', async () => {
+      const { control } = await renderPage();
+      const field = control('Email')!;
+      const scrollIntoView = vi.fn();
+      field.scrollIntoView = scrollIntoView;
+
+      field.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' });
+    });
+  });
+
   describe('password reset', () => {
     it('shows a Password section with Reset password between the form and Demo', async () => {
       const page = await renderPage();

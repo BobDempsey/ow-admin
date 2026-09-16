@@ -70,91 +70,114 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
         </button>
       </div>
     } @else if (user.hasValue()) {
-      <section
-        aria-labelledby="details-heading"
-        class="mt-4 rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6"
-      >
-        <h2 id="details-heading" class="font-semibold text-ink">Details</h2>
-        <p class="text-sm text-ink-subtle tabular-nums">ID {{ user.value().data.id }}</p>
-        <form novalidate (submit)="save($event)" class="mt-4 grid gap-6">
-          <app-user-form-fields [fields]="fields" />
-          @if (saveFailed()) {
-            <div
-              role="alert"
-              class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
-            >
-              The user could not be saved. Try again.
-            </div>
-          }
-          <div class="flex flex-wrap items-center gap-3">
-            <button
-              #saveButton
-              type="submit"
-              class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >
-              Save
-            </button>
-            <!-- Leaving the screen discards the draft, the same as Cancel on the create screen. -->
-            <a
-              routerLink="/users"
-              class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-              >Cancel</a
-            >
-          </div>
-        </form>
-      </section>
-
-      <section
-        aria-labelledby="password-heading"
-        class="mt-6 max-w-md rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6"
-      >
-        <h2 id="password-heading" class="font-semibold text-ink">Password</h2>
-        <p class="mt-1 text-sm text-ink-muted">
-          Send this user an email with a link to choose a new password.
-        </p>
-        <!-- Never disabled: a disabled button would drop focus and leave the Tab order. -->
-        <button
-          #resetButton
-          type="button"
-          (click)="openResetDialog()"
-          class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      <!-- Two columns from lg up. DOM order is form, Password, Demo, so Tab order never changes. -->
+      <div class="mt-4 grid gap-6 lg:grid-cols-3">
+        <section
+          aria-labelledby="details-heading"
+          class="rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6 lg:col-span-2"
         >
-          Reset password
-        </button>
-        @if (resetFailed()) {
-          <div
-            role="alert"
-            class="mt-3 flex flex-wrap items-center gap-3 rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+          <h2 id="details-heading" class="font-semibold text-ink">Details</h2>
+          <p class="text-sm text-ink-subtle tabular-nums">ID {{ user.value().data.id }}</p>
+          <form
+            novalidate
+            (submit)="save($event)"
+            (focusin)="revealFocus($event)"
+            class="mt-4 grid gap-6"
           >
-            <span>The password reset email could not be sent.</span>
+            <app-user-form-fields [fields]="fields" />
+            @if (saveFailed()) {
+              <div
+                role="alert"
+                class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+              >
+                The user could not be saved. Try again.
+              </div>
+            }
+            <!--
+              The save bar. While the values differ from the loaded ones it sticks to the bottom
+              of the viewport, inside the form's box, on viewports at least 30rem tall.
+            -->
+            <div
+              [attr.data-save-bar-stuck]="unsaved() ? '' : null"
+              class="flex flex-wrap items-center gap-3"
+              [class]="unsaved() ? stuckBarClasses : ''"
+            >
+              <button
+                #saveButton
+                type="submit"
+                aria-describedby="save-bar-status"
+                class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >
+                Save
+              </button>
+              <!-- Leaving the screen discards the draft, the same as Cancel on the create screen. -->
+              <a
+                routerLink="/users"
+                class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                >Cancel</a
+              >
+              <!-- Always present, so the text is announced once when it appears. -->
+              <p id="save-bar-status" role="status" class="text-sm text-ink-muted">
+                {{ unsaved() ? 'Unsaved changes' : '' }}
+              </p>
+            </div>
+          </form>
+        </section>
+
+        <div class="grid content-start gap-6">
+          <section
+            aria-labelledby="password-heading"
+            class="rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6"
+          >
+            <h2 id="password-heading" class="font-semibold text-ink">Password</h2>
+            <p class="mt-1 text-sm text-ink-muted">
+              Send this user an email with a link to choose a new password.
+            </p>
+            <!-- Never disabled: a disabled button would drop focus and leave the Tab order. -->
+            <button
+              #resetButton
+              type="button"
+              (click)="openResetDialog()"
+              class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              Reset password
+            </button>
+            @if (resetFailed()) {
+              <div
+                role="alert"
+                class="mt-3 flex flex-wrap items-center gap-3 rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+              >
+                <span>The password reset email could not be sent.</span>
+                <button
+                  type="button"
+                  (click)="retryReset()"
+                  class="min-h-11 rounded border border-danger-line-strong bg-surface px-4 font-medium text-danger-ink hover:bg-danger-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                >
+                  Try again
+                </button>
+              </div>
+            }
+          </section>
+
+          <section
+            aria-labelledby="demo-heading"
+            class="rounded-card border border-dashed border-line-strong bg-surface p-4 shadow-card sm:p-6"
+          >
+            <h2 id="demo-heading" class="font-semibold text-ink">Demo</h2>
+            <p class="mt-1 text-sm text-ink-muted">
+              Changes this user's status the way another admin would, without updating this screen,
+              so the next Save shows the edit conflict.
+            </p>
             <button
               type="button"
-              (click)="retryReset()"
-              class="min-h-11 rounded border border-danger-line-strong bg-surface px-4 font-medium text-danger-ink hover:bg-danger-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              (click)="simulate()"
+              class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
-              Try again
+              Simulate an edit by another admin
             </button>
-          </div>
-        }
-      </section>
-
-      <section
-        aria-labelledby="demo-heading"
-        class="mt-6 max-w-md rounded-card border border-dashed border-line-strong bg-surface p-4 shadow-card sm:p-6"
-      >
-        <h2 id="demo-heading" class="font-semibold text-ink">Demo</h2>
-        <p class="mt-1 text-sm text-ink-muted">
-          Changes this user's status the way another admin would, without updating this screen, so
-          the next Save shows the edit conflict.
-        </p>
-        <button
-          type="button"
-          (click)="simulate()"
-          class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >
-          Simulate an edit by another admin
-        </button>
-      </section>
+          </section>
+        </div>
+      </div>
     }
 
     <app-conflict-dialog (choice)="resolveConflict($event)" />
@@ -190,6 +213,22 @@ export default class UserDetailPage {
   /** The form's values. Every load, reload or save replaces them with the server's. */
   protected readonly draft = linkedSignal(() => toDraft(this.loaded()));
   protected readonly fields = form(this.draft, userDraftSchema);
+
+  /**
+   * Whether the form holds values other than the ones last loaded or saved. Values are compared,
+   * so an edit typed back to the loaded value counts as saved, and a save or reload, which resets
+   * the draft, clears it.
+   */
+  protected readonly unsaved = computed(() => {
+    const loaded = this.loaded();
+    return !!loaded && !sameDraft(this.draft(), toDraft(loaded));
+  });
+  /**
+   * The save bar's look while there are unsaved edits: stuck to the viewport bottom on viewports at
+   * least 30rem tall, stretched to the card's edges. Complete strings, so Tailwind finds them.
+   */
+  protected readonly stuckBarClasses =
+    'tall:sticky tall:bottom-0 tall:z-10 -mx-4 border-t border-line-subtle bg-surface px-4 py-3 shadow-card sm:-mx-6 sm:px-6';
 
   protected readonly saveFailed = signal(false);
   protected readonly resetFailed = signal(false);
@@ -229,6 +268,17 @@ export default class UserDetailPage {
         title.setTitle(`${this.heading()} | ${APP_NAME}`);
       }
     });
+  }
+
+  /**
+   * Scroll padding keeps focused controls clear of the stuck save bar, and this backs it up for a
+   * browser that does not apply the padding when focus moves (WCAG 2.4.11). `nearest` leaves a
+   * control that is already in view where it is.
+   */
+  protected revealFocus(event: FocusEvent): void {
+    if (event.target instanceof HTMLElement) {
+      event.target.scrollIntoView?.({ block: 'nearest' });
+    }
   }
 
   protected retry(): void {
@@ -380,6 +430,10 @@ function toDraft(loaded: Versioned<User> | undefined): UserDraft {
   }
   const { id: _id, ...draft } = loaded.data;
   return draft;
+}
+
+function sameDraft(a: UserDraft, b: UserDraft): boolean {
+  return a.name === b.name && a.email === b.email && a.role === b.role && a.status === b.status;
 }
 
 function createdNotice(state: unknown): string {

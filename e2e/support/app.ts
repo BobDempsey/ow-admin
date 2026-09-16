@@ -38,6 +38,23 @@ export async function openAbout(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { level: 1, name: 'About this app' })).toBeVisible();
 }
 
+/**
+ * The detail screen's status line under its heading. The save bar holds a second status region,
+ * so a bare `getByRole('status')` matches two elements there.
+ */
+export const detailStatus = (page: Page) => page.locator('app-user-detail-page > p[role="status"]');
+
+/** The detail screen's save bar, which holds Save, Cancel and its own status text. */
+export const saveBar = (page: Page) =>
+  page.locator('app-user-detail-page form > div:has(#save-bar-status)');
+
+/** Opens a user and changes the Name field, so the save bar says there are unsaved changes. */
+export async function showUnsavedEdits(page: Page): Promise<void> {
+  await openDetail(page);
+  await page.getByLabel('Name').fill('Grace Hopper Edited');
+  await expect(page.locator('#save-bar-status')).toHaveText('Unsaved changes');
+}
+
 /** The user list's own status line (loading text and search result announcements). */
 export const listStatus = (page: Page) => page.locator('app-users-page p[role="status"]');
 
@@ -204,7 +221,7 @@ export async function choosePageSize(page: Page, size: number): Promise<void> {
 export async function openConflictDialog(page: Page): Promise<void> {
   await openDetail(page);
   await page.getByRole('button', { name: 'Simulate an edit by another admin' }).click();
-  await expect(page.getByRole('status')).toContainText('Another admin changed this user.');
+  await expect(detailStatus(page)).toContainText('Another admin changed this user.');
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByRole('dialog', { name: 'This user changed' })).toBeVisible();
 }
@@ -228,7 +245,7 @@ export async function openResetDialog(page: Page): Promise<void> {
 export async function showResetSent(page: Page): Promise<void> {
   await openResetDialog(page);
   await resetPasswordDialog(page).getByRole('button', { name: 'Send reset email' }).click();
-  await expect(page.getByRole('status')).toHaveText('Password reset email sent.');
+  await expect(detailStatus(page)).toHaveText('Password reset email sent.');
 }
 
 // The in-memory API has no network to intercept, so failures are forced by replacing a service

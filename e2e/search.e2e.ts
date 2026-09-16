@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
-import { listStatus, openList, recordListRequests } from './support/app';
+import { detailStatus, listStatus, openList, recordListRequests } from './support/app';
 
 const searchField = (page: Page) => page.getByLabel('Search users');
 const total = (page: Page) => page.locator('app-users-page h1 + p');
@@ -86,7 +86,7 @@ test.describe('user list search', () => {
     await page.getByLabel('Name').fill('Zelda Quartermaine');
     await page.getByLabel('Email').fill('zelda@example.com');
     await page.getByRole('button', { name: 'Create user' }).click();
-    await expect(page.getByRole('status')).toContainText('User created.');
+    await expect(detailStatus(page)).toContainText('User created.');
     await page.getByRole('link', { name: 'Back to users' }).click();
     await page.locator('.ag-row a').first().waitFor();
 

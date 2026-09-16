@@ -1,6 +1,7 @@
 import { expect, test } from './support/test';
 import {
   clearAllButton,
+  detailStatus,
   filterChip,
   listStatus,
   openList,
@@ -10,6 +11,7 @@ import {
   showChipsList,
   showListResetDialog,
   showNoSearchResults,
+  showUnsavedEdits,
   statusFilter,
 } from './support/app';
 
@@ -92,6 +94,18 @@ test.describe('operating the list logs nothing', () => {
 
     await expect(listStatus(page)).toHaveText('500,000 users');
     await page.locator('.ag-row a').first().waitFor();
+    await page.waitForTimeout(SETTLE_MS);
+  });
+});
+
+test.describe('the detail screen logs nothing', () => {
+  test('editing into the save bar, then saving', async ({ page }) => {
+    await showUnsavedEdits(page);
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(detailStatus(page)).toHaveText('User saved.');
+    await expect(page.locator('#save-bar-status')).toHaveText('');
     await page.waitForTimeout(SETTLE_MS);
   });
 });

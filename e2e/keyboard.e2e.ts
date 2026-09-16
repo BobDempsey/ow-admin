@@ -16,6 +16,7 @@ import {
   showChipsList,
   showFixedHeader,
   showNoSearchResults,
+  detailStatus,
 } from './support/app';
 import { obscuredFocusStops } from './support/layout';
 
@@ -295,7 +296,7 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('Enter');
 
     await expect(page).toHaveURL(/\/users\/u-500000$/);
-    await expect(page.getByRole('status')).toHaveText('User created.');
+    await expect(detailStatus(page)).toHaveText('User created.');
     await expect(focused(page)).toHaveText('Grace Hopper');
   });
 
@@ -308,7 +309,7 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('End');
     await page.keyboard.type(' Jr');
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('status')).toHaveText('User saved.');
+    await expect(detailStatus(page)).toHaveText('User saved.');
 
     await name.focus();
     await page.keyboard.type(' III');
@@ -334,7 +335,7 @@ test.describe('keyboard flows', () => {
     const simulate = async () => {
       await pressUntilFocused(page, 'Simulate an edit by another admin');
       await page.keyboard.press('Enter');
-      await expect(page.getByRole('status')).toContainText('Another admin changed this user.');
+      await expect(detailStatus(page)).toContainText('Another admin changed this user.');
     };
     const save = async () => {
       await pressUntilFocused(page, 'Save', 'Shift+Tab');
@@ -386,7 +387,7 @@ test.describe('keyboard flows', () => {
     await save();
     await pressUntilFocused(page, 'Overwrite');
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('status')).toHaveText('User saved.');
+    await expect(detailStatus(page)).toHaveText('User saved.');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/ overwritten\s*$/);
   });
 
@@ -420,7 +421,7 @@ test.describe('keyboard flows', () => {
     await expect(dialog).toBeHidden();
     await expect(focused(page)).toHaveText('Reset password');
     expect(await resetRequests()).toEqual([]);
-    await expect(page.getByRole('status')).toHaveText('');
+    await expect(detailStatus(page)).toHaveText('');
 
     await page.keyboard.press('Enter');
     await expect(dialog).toBeVisible();
@@ -429,7 +430,7 @@ test.describe('keyboard flows', () => {
     await expect(focused(page)).toHaveText('Send reset email');
     await page.keyboard.press('Enter');
 
-    await expect(page.getByRole('status')).toHaveText('Password reset email sent.');
+    await expect(detailStatus(page)).toHaveText('Password reset email sent.');
     await expect(dialog).toBeHidden();
     await expect(focused(page)).toHaveText('Reset password');
     expect(await resetRequests()).toEqual([USER_ID]);

@@ -28,6 +28,7 @@ import {
   showSearchResults,
   showSettingsWcagNote,
   showThemeMenu,
+  showUnsavedEdits,
 } from './support/app';
 import { expectNoAxeViolations } from './support/axe';
 
@@ -45,6 +46,7 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'new user', open: openNewUser },
   { name: 'new user with errors', open: showNewUserErrors },
   { name: 'user detail', open: openDetail },
+  { name: 'user detail with unsaved edits', open: showUnsavedEdits },
   { name: 'user not found', open: openMissingUser },
   { name: 'user load failure (forced through ng.getComponent)', open: forceDetailLoadFailure },
   { name: 'user save failure (forced through ng.getComponent)', open: forceSaveFailure },
