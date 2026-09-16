@@ -15,7 +15,27 @@ import { Component, ElementRef, input, output, viewChild } from '@angular/core';
       (cancel)="onCancel($event)"
       class="m-auto w-dialog max-w-lg rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
-      <h2 id="reset-password-dialog-heading" class="text-xl font-semibold">Reset password?</h2>
+      <div class="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          class="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-muted text-ink-muted"
+        >
+          <svg
+            aria-hidden="true"
+            class="size-5 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="7.5" cy="15.5" r="4.5" />
+            <path d="m10.7 12.3 9.8-9.8M17 6l3 3M14 9l2 2" />
+          </svg>
+        </span>
+        <h2 id="reset-password-dialog-heading" class="text-xl font-semibold">Reset password?</h2>
+      </div>
       <p id="reset-password-dialog-description" class="mt-3 break-words text-ink-muted">
         Send {{ name() }} an email at {{ email() }} with a link to choose a new password?
       </p>
@@ -24,15 +44,40 @@ import { Component, ElementRef, input, output, viewChild } from '@angular/core';
           #cancelButton
           type="button"
           (click)="answer(false)"
-          class="min-h-11 rounded border border-line px-4 font-medium hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="inline-flex min-h-11 items-center gap-2 rounded border border-line pr-4 pl-3 font-medium hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
+          <svg
+            aria-hidden="true"
+            class="size-5 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
           Cancel
         </button>
         <button
           type="button"
           (click)="answer(true)"
-          class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="inline-flex min-h-11 items-center gap-2 rounded bg-primary pr-4 pl-3 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
+          <svg
+            aria-hidden="true"
+            class="size-5 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="m22 7-10 6L2 7" />
+          </svg>
           Send reset email
         </button>
       </div>
