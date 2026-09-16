@@ -86,8 +86,8 @@ describe('NavDrawer', () => {
 
     expect(dialogMethods.showModal).toHaveBeenCalledTimes(1);
     expect(dialog.hasAttribute('open')).toBe(true);
-    expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)).toBe(heading);
-    expect(heading.textContent?.trim()).toBe('Menu');
+    expect(dialog.getAttribute('aria-label')).toBe('Menu');
+    expect(heading.textContent?.trim()).toBe('OW Admin');
     expect(document.activeElement).toBe(heading);
   });
 

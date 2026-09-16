@@ -25,7 +25,7 @@ export interface TableSettings {
 }
 
 export const DEFAULT_TABLE_SETTINGS: TableSettings = {
-  striped: false,
+  striped: true,
   density: 'compact',
   movableColumns: false,
   resizableColumns: false,

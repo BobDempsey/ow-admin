@@ -15,11 +15,11 @@ describe('TableSettingsService', () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => vi.restoreAllMocks());
 
-  it('starts with striping off, compact rows and fixed columns, and stores nothing', () => {
+  it('starts with striping on, compact rows and fixed columns, and stores nothing', () => {
     const service = TestBed.inject(TableSettingsService);
 
     expect(values(service)).toEqual({
-      striped: false,
+      striped: true,
       density: 'compact',
       movableColumns: false,
       resizableColumns: false,

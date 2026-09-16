@@ -37,7 +37,7 @@ export interface NavEntry {
   template: `
     <dialog
       #dialog
-      aria-labelledby="nav-drawer-heading"
+      aria-label="Menu"
       (cancel)="onCancel($event)"
       (click)="onClick($event)"
       class="fixed top-0 left-0 m-0 h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-surface p-0 text-ink shadow-xl backdrop:bg-backdrop/60"
@@ -45,14 +45,8 @@ export interface NavEntry {
       <!-- Everything sits in this wrapper, so only a backdrop click has the dialog as its target. -->
       <div class="flex h-full flex-col overflow-y-auto p-4">
         <div class="flex items-center justify-between gap-3">
-          <h2
-            #heading
-            id="nav-drawer-heading"
-            tabindex="-1"
-            class="text-lg font-semibold focus:outline-none"
-          >
-            Menu
-          </h2>
+          <!-- The dialog is named Menu after the button that opens it; the heading shows the app name. -->
+          <h2 #heading tabindex="-1" class="text-lg font-semibold focus:outline-none">OW Admin</h2>
           <button
             type="button"
             title="Close"

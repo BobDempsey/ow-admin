@@ -187,16 +187,16 @@ test.describe('table settings dialog', () => {
 
   test('settings survive a reload', async ({ page }) => {
     await openSettingsDialog(page);
-    await dialog(page).getByRole('checkbox', { name: 'Striped rows' }).check();
+    await dialog(page).getByRole('checkbox', { name: 'Striped rows' }).uncheck();
     await dialog(page).getByRole('radio', { name: 'Comfortable' }).check();
     await dialog(page).getByRole('button', { name: 'Close' }).click();
 
     await page.reload();
     await openSettingsDialog(page);
 
-    await expect(dialog(page).getByRole('checkbox', { name: 'Striped rows' })).toBeChecked();
+    await expect(dialog(page).getByRole('checkbox', { name: 'Striped rows' })).not.toBeChecked();
     await expect(dialog(page).getByRole('radio', { name: 'Comfortable' })).toBeChecked();
-    await expect(page.locator('app-users-grid')).toHaveClass(/striped/);
+    await expect(page.locator('app-users-grid')).not.toHaveClass(/striped/);
     expect(await firstRowHeight(page)).toBeCloseTo(64, 0);
   });
 
@@ -210,9 +210,9 @@ test.describe('table settings dialog', () => {
     });
     await openSettingsDialog(page);
 
-    await dialog(page).getByRole('checkbox', { name: 'Striped rows' }).check();
+    await dialog(page).getByRole('checkbox', { name: 'Striped rows' }).uncheck();
 
-    await expect(page.locator('app-users-grid')).toHaveClass(/striped/);
+    await expect(page.locator('app-users-grid')).not.toHaveClass(/striped/);
     expect(errors).toEqual([]);
   });
 

@@ -503,7 +503,7 @@ test.describe('the nav drawer at 320px', () => {
     await pressUntilFocused(page, 'Menu');
     await page.keyboard.press('Enter');
     await expect(navDrawer(page)).toBeVisible();
-    await expect(focused(page)).toHaveText('Menu');
+    await expect(focused(page)).toHaveText('OW Admin');
     await expect(focused(page)).toHaveRole('heading');
 
     const stops: string[] = [];

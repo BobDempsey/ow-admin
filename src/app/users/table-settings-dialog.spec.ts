@@ -84,7 +84,7 @@ describe('TableSettingsDialog', () => {
 
   it('applies every setting and shows the defaults', async () => {
     const { fixture, control, table } = await openDialog();
-    expect(control('Striped rows').checked).toBe(false);
+    expect(control('Striped rows').checked).toBe(true);
     expect(control('Compact').checked).toBe(true);
     expect(control('Draggable columns').checked).toBe(false);
     expect(control('Resizable columns').checked).toBe(false);
@@ -97,7 +97,7 @@ describe('TableSettingsDialog', () => {
     control('Fixed header').click();
     await fixture.whenStable();
 
-    expect(table.striped()).toBe(true);
+    expect(table.striped()).toBe(false);
     expect(table.density()).toBe('comfortable');
     expect(table.movableColumns()).toBe(true);
     expect(table.resizableColumns()).toBe(true);
