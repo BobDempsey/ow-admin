@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/test';
 import { axeViolations } from './support/axe';
 import {
   applyTextSpacing,

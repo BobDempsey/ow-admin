@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -119,6 +120,7 @@ const usersGridTheme = themeQuartz
 })
 export class UsersGrid {
   private readonly users = inject(UsersService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly settings = inject(TableSettingsService);
   private api: GridApi<User> | undefined;
 
@@ -233,12 +235,22 @@ export class UsersGrid {
   protected readonly datasource = createUsersDatasource(
     (request) => this.users.loadPage(request),
     {
-      loading: (inFlight) => this.loadingChange.emit(inFlight),
-      loaded: (total) => this.loaded.emit(total),
-      failed: (error) => this.failed.emit(error),
+      loading: (inFlight) => this.emitWhileActive(() => this.loadingChange.emit(inFlight)),
+      loaded: (total) => this.emitWhileActive(() => this.loaded.emit(total)),
+      failed: (error) => this.emitWhileActive(() => this.failed.emit(error)),
     },
     () => untracked(this.query),
   );
+
+  /**
+   * A page request can settle after the admin leaves the list, and emitting on a destroyed output
+   * logs NG0953 in dev builds, so a settled load reports nothing once the grid is gone.
+   */
+  private emitWhileActive(emit: () => void): void {
+    if (!this.destroyRef.destroyed) {
+      emit();
+    }
+  }
 
   /** Requests the current page again, for example after a failed load. */
   refresh(): void {

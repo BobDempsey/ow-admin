@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent, IGetRowsParams } from 'ag-grid-community';
 import { API_LATENCY_MS } from '../core/api/api-config';
 import { provideUsersApi } from '../core/api/provide-users-api';
-import { User } from '../core/api/user.model';
-import { ListQuery } from './users-datasource';
+import { User, UserPage } from '../core/api/user.model';
+import { ListQuery, UsersDatasource } from './users-datasource';
 import { UsersGrid } from './users-grid';
+import { UsersService } from './users.service';
 
 /** The grid API calls the component makes outside the template. */
 function stubGridApi() {
@@ -42,7 +43,7 @@ async function renderGrid(query: ListQuery) {
     fixture.componentRef.setInput('query', next);
     await fixture.whenStable();
   };
-  return { api, setQuery };
+  return { api, fixture, setQuery };
 }
 
 describe('UsersGrid', () => {
@@ -64,5 +65,38 @@ describe('UsersGrid', () => {
 
     expect(api.purgeInfiniteCache).toHaveBeenCalledTimes(3);
     expect(api.paginationGoToFirstPage).toHaveBeenCalledTimes(3);
+  });
+
+  it('reports nothing when a page request settles after the grid is destroyed', async () => {
+    const { fixture } = await renderGrid({ q: '' });
+    let resolve: (page: UserPage) => void = () => undefined;
+    vi.spyOn(TestBed.inject(UsersService), 'loadPage').mockReturnValue(
+      new Promise((settle) => (resolve = settle)),
+    );
+    const warn = vi.spyOn(console, 'warn');
+    const grid = fixture.componentInstance;
+    const emitted = vi.fn();
+    grid.loadingChange.subscribe(emitted);
+    grid.loaded.subscribe(emitted);
+    grid.failed.subscribe(emitted);
+    const datasource = (grid as unknown as { datasource: UsersDatasource }).datasource;
+    const params = {
+      startRow: 0,
+      endRow: 25,
+      sortModel: [],
+      filterModel: {},
+      successCallback: vi.fn(),
+      failCallback: vi.fn(),
+    } as unknown as IGetRowsParams;
+
+    const load = datasource.getRows(params);
+    expect(emitted).toHaveBeenCalledWith(true);
+    emitted.mockClear();
+    fixture.destroy();
+    resolve({ items: [], total: 0 });
+    await load;
+
+    expect(emitted).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
   });
 });

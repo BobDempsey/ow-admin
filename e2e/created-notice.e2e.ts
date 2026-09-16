@@ -1,4 +1,5 @@
-import { Page, expect, test } from '@playwright/test';
+import { Page } from '@playwright/test';
+import { expect, test } from './support/test';
 import { openNewUser } from './support/app';
 
 const detailStatus = (page: Page) => page.locator('app-user-detail-page p[role="status"]');

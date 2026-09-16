@@ -1,4 +1,5 @@
-import { Page, expect, test } from '@playwright/test';
+import { Page } from '@playwright/test';
+import { expect, test } from './support/test';
 import { openList, recordListRequests, storeTableSettings } from './support/app';
 import { applyTextSpacing, clippedText, waitForLoaded } from './support/layout';
 

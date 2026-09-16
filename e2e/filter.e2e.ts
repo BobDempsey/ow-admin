@@ -1,4 +1,5 @@
-import { Page, expect, test } from '@playwright/test';
+import { Page } from '@playwright/test';
+import { expect, test } from './support/test';
 import { listStatus, openList, recordListRequests, roleFilter, statusFilter } from './support/app';
 
 const searchField = (page: Page) => page.getByLabel('Search users');
