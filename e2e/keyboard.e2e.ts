@@ -193,7 +193,7 @@ test.describe('keyboard flows', () => {
     await pressUntilFocused(page, 'Create user');
     await page.keyboard.press('Enter');
     await expect(focused(page)).toHaveAccessibleName('Name');
-    await expect(focused(page)).toHaveAccessibleDescription('Enter a name.');
+    await expect(focused(page)).toHaveAccessibleDescription('Enter a name');
 
     await page.keyboard.type('Grace Hopper');
     await page.keyboard.press('Tab');
@@ -220,6 +220,13 @@ test.describe('keyboard flows', () => {
     await page.keyboard.type(' III');
     await pressUntilFocused(page, 'Cancel');
     await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/\/users$/);
+    await expect(focused(page)).toHaveRole('heading');
+    await expect(focused(page)).toHaveText('Users');
+
+    // Back reopens the user inside the app, so the in-memory store keeps the saved name.
+    await page.goBack();
+    await expect(page).toHaveURL(new RegExp(`/users/${USER_ID}$`));
     await expect(name).toHaveValue(`${original} Jr`);
   });
 
@@ -388,6 +395,22 @@ test.describe('the nav drawer at 320px', () => {
     await expect(navDrawer(page)).toBeHidden();
     await expect(focused(page)).toHaveRole('heading');
     await expect(focused(page)).toHaveText('About this app');
+  });
+
+  test('Enter on the current screen closes the drawer and returns to the Menu button', async ({
+    page,
+  }) => {
+    await openList(page);
+    await pressUntilFocused(page, 'Menu');
+    await page.keyboard.press('Enter');
+    await expect(navDrawer(page)).toBeVisible();
+
+    await pressUntilFocused(page, 'Users');
+    await page.keyboard.press('Enter');
+
+    await expect(navDrawer(page)).toBeHidden();
+    await expect(focused(page)).toHaveAccessibleName('Menu');
+    expect(new URL(page.url()).pathname).toBe('/users');
   });
 });
 

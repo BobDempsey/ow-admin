@@ -63,7 +63,7 @@ describe('UserFormFields', () => {
     await fixture.whenStable();
 
     expect(control('Name')?.getAttribute('aria-invalid')).toBe('true');
-    expect(errorFor('Name')).toBe('Enter a name.');
+    expect(errorFor('Name')).toBe('Enter a name');
     expect(errorFor('Email')).toBeUndefined();
   });
 
@@ -73,8 +73,8 @@ describe('UserFormFields', () => {
     await submit(host.fields, async () => undefined);
     await fixture.whenStable();
 
-    expect(errorFor('Name')).toBe('Enter a name.');
-    expect(errorFor('Email')).toBe('Enter an email address.');
+    expect(errorFor('Name')).toBe('Enter a name');
+    expect(errorFor('Email')).toBe('Enter an email address');
   });
 
   it('shows a 400 field error from the API on its control', async () => {
@@ -86,7 +86,7 @@ describe('UserFormFields', () => {
       status: 'active',
     });
     const rejected = new ApiError(400, 'The user is invalid.', {
-      email: 'Email must be a valid email address.',
+      email: 'Email must be a valid email address',
     });
 
     const ok = await submit(host.fields, async (fields) => toFieldErrors(fields, rejected));
@@ -94,7 +94,7 @@ describe('UserFormFields', () => {
 
     expect(ok).toBe(false);
     expect(control('Email')?.getAttribute('aria-invalid')).toBe('true');
-    expect(errorFor('Email')).toBe('Email must be a valid email address.');
+    expect(errorFor('Email')).toBe('Email must be a valid email address');
     expect(control('Email')?.value).toBe('grace@example.com');
   });
 

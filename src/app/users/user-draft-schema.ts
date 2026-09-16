@@ -13,10 +13,10 @@ import { UserDraft } from '../core/api/user.model';
 /** Client-side rules for a user draft, matching what the API rejects with 400. */
 export const userDraftSchema = schema<UserDraft>((user) => {
   validate(user.name, ({ value }) =>
-    value().trim() ? undefined : requiredError({ message: 'Enter a name.' }),
+    value().trim() ? undefined : requiredError({ message: 'Enter a name' }),
   );
-  required(user.email, { message: 'Enter an email address.' });
-  email(user.email, { message: 'Enter an email address like name@example.com.' });
+  required(user.email, { message: 'Enter an email address' });
+  email(user.email, { message: 'Enter an email address like name@example.com' });
 });
 
 const DRAFT_FIELDS = ['name', 'email', 'role', 'status'] as const;

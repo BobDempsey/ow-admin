@@ -2,6 +2,7 @@ import { Location } from '@angular/common';
 import {
   Component,
   ElementRef,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -84,13 +85,12 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
           >
             Save
           </button>
-          <button
-            type="button"
-            (click)="cancel()"
-            class="min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          <!-- Leaving the screen discards the draft, the same as Cancel on the create screen. -->
+          <a
+            routerLink="/users"
+            class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >Cancel</a
           >
-            Cancel
-          </button>
         </div>
       </form>
 
@@ -181,7 +181,8 @@ export default class UserDetailPage {
   protected readonly saveFailed = signal(false);
   protected readonly resetFailed = signal(false);
   private readonly resetting = signal(false);
-  private readonly notice = signal(createdNotice(inject(Location).getState()));
+  private readonly location = inject(Location);
+  private readonly notice = signal(createdNotice(this.location.getState()));
   private readonly overwriting = signal(false);
 
   protected readonly notFound = computed(() => this.loadError()?.status === 404);
@@ -202,10 +203,12 @@ export default class UserDetailPage {
     if (this.resetting()) {
       return 'Sending password reset email…';
     }
-    return this.notice();
+    // Every notice is about a loaded user, so none sits beside "User not found" or a load failure.
+    return this.loaded() ? this.notice() : '';
   });
 
   constructor() {
+    this.forgetCreatedNotice();
     const title = inject(Title);
     // The route title is only `User`; once the load settles, name the user (WCAG 2.4.2).
     effect(() => {
@@ -228,13 +231,6 @@ export default class UserDetailPage {
       return;
     }
     await this.submitWith(loaded.etag);
-  }
-
-  protected cancel(): void {
-    this.saveFailed.set(false);
-    this.resetFailed.set(false);
-    this.notice.set('');
-    this.fields().reset(toDraft(this.loaded()));
   }
 
   protected async simulate(): Promise<void> {
@@ -277,6 +273,22 @@ export default class UserDetailPage {
     // The admin already confirmed this reset, so it goes out without the dialog.
     this.resetButton()?.nativeElement.focus();
     await this.sendReset();
+  }
+
+  /**
+   * The router keeps navigation state in the history entry and replays it on a reload or on Back
+   * and Forward, so the created notice is dropped from the entry once read. The router writes the
+   * entry before this screen renders, so replacing it after the first render is not overwritten.
+   */
+  private forgetCreatedNotice(): void {
+    const state = this.location.getState();
+    if (!this.notice() || !isRecord(state)) {
+      return;
+    }
+    afterNextRender(() => {
+      const { notice: _notice, ...rest } = state;
+      this.location.replaceState(this.location.path(), '', rest);
+    });
   }
 
   private busy(): boolean {
@@ -358,7 +370,9 @@ function toDraft(loaded: Versioned<User> | undefined): UserDraft {
 }
 
 function createdNotice(state: unknown): string {
-  const created =
-    typeof state === 'object' && state !== null && 'notice' in state && state.notice === 'created';
-  return created ? 'User created.' : '';
+  return isRecord(state) && state['notice'] === 'created' ? 'User created.' : '';
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }

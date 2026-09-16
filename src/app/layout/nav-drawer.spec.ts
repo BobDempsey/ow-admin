@@ -13,11 +13,43 @@ const ENTRIES: readonly NavEntry[] = [
   { label: 'About', path: '/about' },
 ];
 
+/** A controllable `matchMedia`, since jsdom has none. Records the queries it was asked for. */
+function stubMatchMedia() {
+  const listeners = new Set<(event: MediaQueryListEvent) => void>();
+  const queries: string[] = [];
+  const query = {
+    matches: false,
+    addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) =>
+      listeners.add(listener),
+    removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) =>
+      listeners.delete(listener),
+  };
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: (media: string) => {
+      queries.push(media);
+      return query;
+    },
+  });
+  return {
+    queries,
+    listeners,
+    change(matches: boolean) {
+      query.matches = matches;
+      listeners.forEach((listener) => listener({ matches } as MediaQueryListEvent));
+    },
+  };
+}
+
 async function openDrawer(url = '/users') {
   const dialogMethods = stubDialogMethods();
   const opener = document.createElement('button');
   opener.textContent = 'Menu';
-  document.body.append(opener);
+  const fallback = document.createElement('a');
+  fallback.href = '/users';
+  fallback.textContent = 'Orbweaver Admin';
+  document.body.append(opener, fallback);
   TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
   const router = TestBed.inject(Router);
   // Navigating before the drawer exists keeps this first `NavigationEnd` out of its subscription.
@@ -25,13 +57,14 @@ async function openDrawer(url = '/users') {
   const fixture = TestBed.createComponent(NavDrawer);
   fixture.componentRef.setInput('entries', ENTRIES);
   await fixture.whenStable();
-  fixture.componentInstance.show(opener);
+  fixture.componentInstance.show(opener, fallback);
   await fixture.whenStable();
   const element = fixture.nativeElement as HTMLElement;
   return {
     fixture,
     element,
     opener,
+    fallback,
     router,
     dialogMethods,
     dialog: element.querySelector('dialog')!,
@@ -42,7 +75,10 @@ async function openDrawer(url = '/users') {
 }
 
 describe('NavDrawer', () => {
-  afterEach(() => document.body.querySelectorAll('button').forEach((button) => button.remove()));
+  afterEach(() => {
+    document.body.querySelectorAll('button, a').forEach((control) => control.remove());
+    Reflect.deleteProperty(window, 'matchMedia');
+  });
 
   it('opens as a modal named Menu with focus on its heading', async () => {
     const { dialog, dialogMethods } = await openDrawer();
@@ -128,6 +164,40 @@ describe('NavDrawer', () => {
     expect(dialog.hasAttribute('open')).toBe(false);
     expect(document.activeElement).not.toBe(opener);
     expect(document.activeElement).toBe(heading);
+  });
+
+  it('closes and returns focus to the opener when the current screen is chosen', async () => {
+    const { fixture, dialog, opener, router } = await openDrawer('/users');
+
+    // The router skips a navigation to the URL already shown.
+    await router.navigateByUrl('/users');
+    await fixture.whenStable();
+
+    expect(dialog.hasAttribute('open')).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('closes and focuses the fallback when the viewport reaches the md breakpoint', async () => {
+    const media = stubMatchMedia();
+    const { fixture, dialog, fallback } = await openDrawer();
+
+    expect(media.queries).toEqual(['(min-width: 48rem)']);
+    media.change(true);
+    await fixture.whenStable();
+
+    expect(dialog.hasAttribute('open')).toBe(false);
+    expect(document.activeElement).toBe(fallback);
+  });
+
+  it('stays open while the viewport stays narrow, and stops listening once destroyed', async () => {
+    const media = stubMatchMedia();
+    const { fixture, dialog } = await openDrawer();
+
+    media.change(false);
+    expect(dialog.hasAttribute('open')).toBe(true);
+
+    fixture.destroy();
+    expect(media.listeners.size).toBe(0);
   });
 
   it('has no axe violations while open', async () => {

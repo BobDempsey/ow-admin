@@ -30,14 +30,14 @@ describe('userDraftSchema', () => {
         .name()
         .errors()
         .map((error) => error.message),
-    ).toEqual(['Enter a name.']);
+    ).toEqual(['Enter a name']);
   });
 
   it('rejects a missing email', () => {
     const fields = draftForm({ ...complete, email: '' });
 
     expect(fields().valid()).toBe(false);
-    expect(fields.email().errors()[0]?.message).toBe('Enter an email address.');
+    expect(fields.email().errors()[0]?.message).toBe('Enter an email address');
   });
 
   it('rejects an invalid email', () => {
@@ -45,7 +45,7 @@ describe('userDraftSchema', () => {
 
     expect(fields().valid()).toBe(false);
     expect(fields.email().errors()[0]?.message).toBe(
-      'Enter an email address like name@example.com.',
+      'Enter an email address like name@example.com',
     );
   });
 });
@@ -54,12 +54,12 @@ describe('toFieldErrors', () => {
   it('targets each API field error at its form field and drops the rest', () => {
     const fields = draftForm(complete);
     const error = new ApiError(400, 'The user is invalid.', {
-      email: 'Email must be a valid email address.',
+      email: 'Email must be a valid email address',
       id: 'The id in the body must match the user in the URL.',
     });
 
     expect(toFieldErrors(fields, error)).toEqual([
-      { kind: 'server', message: 'Email must be a valid email address.', fieldTree: fields.email },
+      { kind: 'server', message: 'Email must be a valid email address', fieldTree: fields.email },
     ]);
   });
 });

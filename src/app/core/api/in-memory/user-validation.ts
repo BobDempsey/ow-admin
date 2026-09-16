@@ -32,16 +32,16 @@ export function validateDraft(body: unknown): ValidationResult<UserDraft> {
   const status = body['status'];
 
   if (!name) {
-    errors['name'] = 'Name is required.';
+    errors['name'] = 'Name is required';
   }
   if (!EMAIL_PATTERN.test(email)) {
-    errors['email'] = 'Email must be a valid email address.';
+    errors['email'] = 'Email must be a valid email address';
   }
   if (!isOneOf(USER_ROLES, role)) {
-    errors['role'] = `Role must be one of ${USER_ROLES.join(', ')}.`;
+    errors['role'] = `Role must be one of ${USER_ROLES.join(', ')}`;
   }
   if (!isOneOf(USER_STATUSES, status)) {
-    errors['status'] = `Status must be one of ${USER_STATUSES.join(', ')}.`;
+    errors['status'] = `Status must be one of ${USER_STATUSES.join(', ')}`;
   }
 
   if (!isOneOf(USER_ROLES, role) || !isOneOf(USER_STATUSES, status) || Object.keys(errors).length) {

@@ -18,7 +18,12 @@ async function renderPage(
   options: { id?: string; state?: unknown; beforeCreate?: () => void } = {},
 ) {
   TestBed.configureTestingModule({
-    providers: [provideRouter([]), provideUsersApi(), { provide: API_LATENCY_MS, useValue: 0 }],
+    providers: [
+      // Cancel and Back to users lead to the list, so that URL needs a route to land on.
+      provideRouter([{ path: 'users', children: [] }]),
+      provideUsersApi(),
+      { provide: API_LATENCY_MS, useValue: 0 },
+    ],
   });
   const dialogStubs = stubDialogMethods();
   vi.spyOn(TestBed.inject(Location), 'getState').mockReturnValue(options.state ?? null);
@@ -200,6 +205,39 @@ describe('UserDetailPage', () => {
 
       expect(status()).toBe('User created.');
     });
+
+    it('clears the created notice from history so a reload or Back does not repeat it', async () => {
+      let replaceState!: ReturnType<typeof vi.spyOn>;
+
+      await renderPage({
+        state: { notice: 'created', navigationId: 2 },
+        beforeCreate: () => (replaceState = vi.spyOn(TestBed.inject(Location), 'replaceState')),
+      });
+
+      expect(replaceState).toHaveBeenCalledOnce();
+      expect(replaceState.mock.calls[0][2]).toEqual({ navigationId: 2 });
+    });
+
+    it('leaves history alone when there is no created notice', async () => {
+      let replaceState!: ReturnType<typeof vi.spyOn>;
+
+      await renderPage({
+        state: { navigationId: 2 },
+        beforeCreate: () => (replaceState = vi.spyOn(TestBed.inject(Location), 'replaceState')),
+      });
+
+      expect(replaceState).not.toHaveBeenCalled();
+    });
+
+    it('shows no created notice beside a missing user', async () => {
+      const { heading, status } = await renderPage({
+        id: 'u-999999',
+        state: { notice: 'created', navigationId: 2 },
+      });
+
+      expect(heading()?.textContent?.trim()).toBe('User not found');
+      expect(status()).toBe('');
+    });
   });
 
   describe('editing', () => {
@@ -241,23 +279,25 @@ describe('UserDetailPage', () => {
       expect(document.activeElement).toBe(page.control('Name'));
     });
 
-    it('restores the loaded values on Cancel without a request', async () => {
+    it('makes Cancel a link back to the user list that sends no request', async () => {
       const page = await renderPage();
       const saveUser = vi.spyOn(page.users, 'saveUser');
       await page.type('Name', 'Grace Hopper');
-      await page.type('Role', 'Viewer');
+      const cancel = Array.from(page.element.querySelectorAll('form a')).find(
+        (link) => link.textContent?.trim() === 'Cancel',
+      ) as HTMLAnchorElement | undefined;
 
-      await page.click('Cancel');
+      expect(cancel?.getAttribute('href')).toBe('/users');
+      cancel?.click();
+      await page.settle();
 
-      expect(page.control('Name')?.value).toBe(seeded.name);
-      expect(page.control('Role')?.value).toBe(seeded.role);
       expect(saveUser).not.toHaveBeenCalled();
     });
 
     it('shows a 400 field error from the API on its control and keeps the values', async () => {
       const page = await renderPage();
       vi.spyOn(page.users, 'saveUser').mockRejectedValue(
-        new ApiError(400, 'The user is invalid.', { email: 'Email is already in use.' }),
+        new ApiError(400, 'The user is invalid.', { email: 'Email is already in use' }),
       );
       await page.type('Email', 'grace@example.com');
 
@@ -265,7 +305,7 @@ describe('UserDetailPage', () => {
 
       const describedBy = page.control('Email')?.getAttribute('aria-describedby');
       expect(page.element.querySelector(`#${describedBy}`)?.textContent?.trim()).toBe(
-        'Email is already in use.',
+        'Email is already in use',
       );
       expect(page.control('Email')?.value).toBe('grace@example.com');
       expect(document.activeElement).toBe(page.control('Email'));
@@ -524,17 +564,12 @@ describe('UserDetailPage', () => {
       expect(document.activeElement).toBe(page.resetButton());
     });
 
-    it('clears the reset alert on Cancel and when a save starts', async () => {
+    it('clears the reset alert when a save starts', async () => {
       const page = await renderPage();
       vi.spyOn(page.users, 'resetPassword').mockRejectedValue(new ApiError(500, 'Server error'));
       await page.confirmReset();
       expect(page.resetAlert()).not.toBeNull();
 
-      await page.click('Cancel');
-      expect(page.resetAlert()).toBeNull();
-
-      await page.confirmReset();
-      expect(page.resetAlert()).not.toBeNull();
       await page.saveForm();
       expect(page.resetAlert()).toBeNull();
       expect(page.status()).toBe('User saved.');

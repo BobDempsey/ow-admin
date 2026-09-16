@@ -275,6 +275,19 @@ test('the header holds the wordmark, Menu and Theme on one row at 320px', async 
   expect(await scrollsHorizontally(page)).toBe(false);
 });
 
+test('widening past 768px closes the drawer and moves focus to the wordmark', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await showNavDrawer(page);
+
+  await page.setViewportSize({ width: 1024, height: 800 });
+
+  await expect(navDrawer(page)).toBeHidden();
+  await expect(page.locator(':focus')).toHaveAccessibleName('Orbweaver Admin');
+  await expect(page.getByRole('link', { name: 'About' })).toBeVisible();
+  await tableSettingsButton(page).click();
+  await expect(page.getByRole('dialog', { name: 'Table settings' })).toBeVisible();
+});
+
 test('the entries stay in the bar with no Menu button at 1280px', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openList(page);

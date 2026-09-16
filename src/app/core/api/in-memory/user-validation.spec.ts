@@ -60,6 +60,18 @@ describe('validateDraft', () => {
       },
     });
   });
+
+  it('words field errors as phrases without a closing period', () => {
+    expect(validateDraft({})).toEqual({
+      ok: false,
+      errors: {
+        name: 'Name is required',
+        email: 'Email must be a valid email address',
+        role: 'Role must be one of Admin, Member, Viewer',
+        status: 'Status must be one of active, invited, suspended',
+      },
+    });
+  });
 });
 
 describe('validateUser', () => {

@@ -77,6 +77,21 @@ describe('NewUserPage', () => {
     expect(element.querySelector('[role="alert"]')).toBeNull();
   });
 
+  it('words every field message after an empty submit without a closing period', async () => {
+    const { element, control, submitForm } = await renderPage();
+
+    await submitForm();
+
+    const messages = ['Name', 'Email'].map((label) => {
+      const describedBy = control(label)?.getAttribute('aria-describedby');
+      return element.querySelector(`#${describedBy}`)?.textContent?.trim();
+    });
+    expect(messages).toEqual(['Enter a name', 'Enter an email address']);
+    for (const message of messages) {
+      expect(message).not.toMatch(/\.$/);
+    }
+  });
+
   it('creates the user and opens it with the created notice', async () => {
     const { type, fillValid, submitForm, navigate, users } = await renderPage();
     const create = vi.spyOn(users, 'createUser');
@@ -99,7 +114,7 @@ describe('NewUserPage', () => {
   it('shows a 400 field error from the API on its control and keeps the values', async () => {
     const { element, control, fillValid, submitForm, navigate, users } = await renderPage();
     vi.spyOn(users, 'createUser').mockRejectedValue(
-      new ApiError(400, 'The user is invalid.', { email: 'Email is already in use.' }),
+      new ApiError(400, 'The user is invalid.', { email: 'Email is already in use' }),
     );
     await fillValid();
 
@@ -107,7 +122,7 @@ describe('NewUserPage', () => {
 
     const describedBy = control('Email')?.getAttribute('aria-describedby');
     expect(element.querySelector(`#${describedBy}`)?.textContent?.trim()).toBe(
-      'Email is already in use.',
+      'Email is already in use',
     );
     expect(document.activeElement).toBe(control('Email'));
     expect(control('Name')?.value).toBe('Grace Hopper');

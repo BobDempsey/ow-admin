@@ -22,6 +22,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
   template: `
     <nav aria-label="Primary" class="flex flex-wrap items-center gap-x-3 gap-y-1 md:gap-x-6">
       <a
+        #wordmark
         routerLink="/users"
         class="inline-flex min-h-11 items-center font-bold text-header-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus md:text-lg"
       >
@@ -67,10 +68,12 @@ const NAV_ENTRIES: readonly NavEntry[] = [
 export class TopNav {
   protected readonly entries = NAV_ENTRIES;
 
+  private readonly wordmark = viewChild.required<ElementRef<HTMLAnchorElement>>('wordmark');
   private readonly menuButton = viewChild.required<ElementRef<HTMLButtonElement>>('menuButton');
   private readonly drawer = viewChild.required(NavDrawer);
 
   protected openDrawer(): void {
-    this.drawer().show(this.menuButton().nativeElement);
+    // The wordmark shows at every width, so it takes focus if widening hides the Menu button.
+    this.drawer().show(this.menuButton().nativeElement, this.wordmark().nativeElement);
   }
 }
