@@ -15,7 +15,8 @@ import { RouterLink } from '@angular/router';
       <section aria-labelledby="about-what">
         <h2 id="about-what" class="text-xl font-semibold text-ink">What it does</h2>
         <p class="mt-2 text-ink-muted">
-          Page through 500,000 users, create new ones, and view or edit any user.
+          Page through 500,000 users, create new ones, and view or edit any user. The AI assistant
+          button in the header opens a demo chat that links to a live example.
         </p>
         <div class="mt-4 flex flex-wrap gap-3">
           <a
