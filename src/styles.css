@@ -201,11 +201,12 @@
 
 /*
  * While the save bar is stuck to the viewport bottom, the browser keeps focused controls clear of
- * it when it scrolls them into view (WCAG 2.4.11).
+ * it when it scrolls them into view (WCAG 2.4.11). The bar wraps to two rows at 320 px, about
+ * 6.3rem tall, so the padding leaves room for that.
  */
 @media (min-height: 30rem) {
   html:has([data-save-bar-stuck]) {
-    scroll-padding-bottom: 6rem;
+    scroll-padding-bottom: 8rem;
   }
 }
 
