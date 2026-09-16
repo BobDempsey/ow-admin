@@ -5,6 +5,7 @@ import {
   VIEWPORTS,
   choosePageSize,
   forceResetFailure,
+  holdListLoad,
   openAbout,
   openConflictDialog,
   openDetail,
@@ -38,12 +39,26 @@ import {
   zoomTo200Percent,
 } from './support/layout';
 
-const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void> }[] = [
+/** A screen the layout checks open. `holdsLoad` marks one whose page request never settles. */
+interface Screen {
+  name: string;
+  slug: string;
+  open: (page: Page) => Promise<void>;
+  holdsLoad?: boolean;
+}
+
+const SCREENS: Screen[] = [
   { name: 'user list', slug: 'list', open: openList },
   { name: 'user list with search results', slug: 'search', open: showSearchResults },
   { name: 'user list with no search results', slug: 'no-results', open: showNoSearchResults },
   { name: 'user list with a filter', slug: 'filter', open: showFilteredList },
   { name: 'user list with a search and two filters', slug: 'chips', open: showChipsList },
+  {
+    name: 'user list while a page loads (held through ng.getComponent)',
+    slug: 'loading',
+    open: holdListLoad,
+    holdsLoad: true,
+  },
   { name: 'user list with a fixed header', slug: 'fixed-header', open: showFixedHeader },
   { name: 'new user with errors', slug: 'new-errors', open: showNewUserErrors },
   { name: 'user detail', slug: 'detail', open: openDetail },
@@ -89,7 +104,9 @@ for (const colorScheme of COLOR_SCHEMES) {
       test(screen.name, async ({ page }) => {
         await screen.open(page);
         await applyTextSpacing(page);
-        await waitForLoaded(page);
+        if (!screen.holdsLoad) {
+          await waitForLoaded(page);
+        }
         await shot(page, `${screen.slug}-text-spacing-${colorScheme}`);
 
         expect(await clippedText(page)).toEqual([]);
@@ -105,7 +122,9 @@ for (const colorScheme of COLOR_SCHEMES) {
       test(screen.name, async ({ page }) => {
         await screen.open(page);
         await zoomTo200Percent(page);
-        await waitForLoaded(page);
+        if (!screen.holdsLoad) {
+          await waitForLoaded(page);
+        }
         await shot(page, `${screen.slug}-zoom-200-${colorScheme}`);
 
         expect(await clippedText(page)).toEqual([]);

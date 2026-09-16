@@ -246,6 +246,39 @@ export async function forceListFailure(page: Page): Promise<void> {
   await expect(page.getByRole('alert')).toContainText('Users could not be loaded.');
 }
 
+/**
+ * Opens the list, holds every later page request until `releaseListLoad`, and moves to the next
+ * page, so the grid shows skeleton rows and the status line says users are loading.
+ */
+export async function holdListLoad(page: Page): Promise<void> {
+  await openList(page);
+  await page.evaluate(() => {
+    const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+    const grid = debug.getComponent(document.querySelector('app-users-grid')!);
+    const held = window as unknown as { releaseListLoad?: () => void };
+    const original = grid.users.loadPage.bind(grid.users);
+    const waiting: (() => void)[] = [];
+    held.releaseListLoad = () => {
+      grid.users.loadPage = original;
+      waiting.splice(0).forEach((release) => release());
+    };
+    grid.users.loadPage = (request: unknown) =>
+      new Promise((resolve, reject) => {
+        waiting.push(() => original(request).then(resolve, reject));
+      });
+  });
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(page.locator('app-skeleton-cell span').first()).toBeVisible();
+  await expect(listStatus(page)).toContainText('Loading users…');
+}
+
+/** Lets the requests `holdListLoad` held go through, and every later one straight away. */
+export async function releaseListLoad(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    (window as unknown as { releaseListLoad?: () => void }).releaseListLoad?.(),
+  );
+}
+
 /** Makes the detail screen's load fail and shows its alert. */
 export async function forceDetailLoadFailure(page: Page): Promise<void> {
   await openDetail(page);

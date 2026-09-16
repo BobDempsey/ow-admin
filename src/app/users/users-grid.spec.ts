@@ -1,9 +1,17 @@
 import { TestBed } from '@angular/core/testing';
-import { ColDef, GridApi, GridReadyEvent, IGetRowsParams } from 'ag-grid-community';
+import {
+  ColDef,
+  GridApi,
+  GridReadyEvent,
+  ICellRendererParams,
+  IGetRowsParams,
+} from 'ag-grid-community';
 import { API_LATENCY_MS } from '../core/api/api-config';
+import { seedUser } from '../core/api/in-memory/user-seed';
 import { provideUsersApi } from '../core/api/provide-users-api';
 import { User, UserPage } from '../core/api/user.model';
 import { ListQuery, UsersDatasource } from './users-datasource';
+import { SkeletonCell, UsersGridContext } from './skeleton-cell';
 import { UserNameCell } from './user-name-cell';
 import { UserPillCell } from './user-pill-cell';
 import { UsersGrid } from './users-grid';
@@ -52,6 +60,44 @@ const columnDefs = (fixture: Awaited<ReturnType<typeof renderGrid>>['fixture']) 
   (fixture.componentInstance as unknown as { columnDefs: ColDef<User>[] }).columnDefs;
 
 describe('UsersGrid', () => {
+  it('draws skeleton cells only for rows whose page has not answered', async () => {
+    const { fixture } = await renderGrid({ q: '' });
+    const grid = fixture.componentInstance as unknown as { initialDefaultColDef: ColDef<User> };
+    const select = grid.initialDefaultColDef.cellRendererSelector!;
+
+    expect(select({ data: undefined } as ICellRendererParams<User>)).toEqual({
+      component: SkeletonCell,
+    });
+    expect(select({ data: seedUser(1) } as ICellRendererParams<User>)).toBeUndefined();
+  });
+
+  it('tells skeleton cells when a page request is in flight', async () => {
+    const { fixture } = await renderGrid({ q: '' });
+    let resolve: (page: UserPage) => void = () => undefined;
+    vi.spyOn(TestBed.inject(UsersService), 'loadPage').mockReturnValue(
+      new Promise((settle) => (resolve = settle)),
+    );
+    const grid = fixture.componentInstance as unknown as {
+      context: UsersGridContext;
+      datasource: UsersDatasource;
+    };
+    expect(grid.context.loading()).toBe(false);
+
+    const load = grid.datasource.getRows({
+      startRow: 0,
+      endRow: 25,
+      sortModel: [],
+      filterModel: {},
+      successCallback: vi.fn(),
+      failCallback: vi.fn(),
+    } as unknown as IGetRowsParams);
+    expect(grid.context.loading()).toBe(true);
+
+    resolve({ items: [], total: 0 });
+    await load;
+    expect(grid.context.loading()).toBe(false);
+  });
+
   it('renders the name with its initials circle, with room for both', async () => {
     const { fixture } = await renderGrid({ q: '' });
     const name = columnDefs(fixture).find((column) => column.field === 'name');

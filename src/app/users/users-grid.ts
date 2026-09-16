@@ -7,6 +7,7 @@ import {
   input,
   isDevMode,
   output,
+  signal,
   untracked,
 } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -27,6 +28,7 @@ import {
 import { ApiError } from '../core/api/api-error';
 import { User } from '../core/api/user.model';
 import { ROW_HEIGHTS, TableSettingsService } from '../core/table-settings.service';
+import { SkeletonCell, UsersGridContext } from './skeleton-cell';
 import { UserNameCell } from './user-name-cell';
 import { UserPillCell, UserPillCellParams } from './user-pill-cell';
 import {
@@ -50,7 +52,7 @@ const DEFAULT_PAGE_SIZE = 25;
  * The space the heading, description, the card's filter row and status line, and the page padding
  * take above and below the grid.
  */
-const GRID_HEIGHT_OFFSET = '21.5rem';
+const GRID_HEIGHT_OFFSET = '19.5rem';
 
 /**
  * Tailwind slate and sky values, so the grid matches the app's color tokens in styles.css. AG Grid
@@ -110,6 +112,8 @@ const usersGridTheme = themeQuartz
       [paginationPageSize]="defaultPageSize"
       [paginationPageSizeSelector]="pageSizes"
       [cacheBlockSize]="defaultPageSize"
+      [infiniteInitialRowCount]="defaultPageSize"
+      [context]="context"
       [maxBlocksInCache]="1"
       [blockLoadDebounceMillis]="50"
       [domLayout]="initialDomLayout"
@@ -233,12 +237,14 @@ export class UsersGrid {
    * a header sorts on click or Enter. Resizing is off unless the admin turns on Resizable columns,
    * since AG Grid Community resizes by dragging a header edge or with Alt and an arrow key, and
    * WCAG 2.5.7 asks for a single-pointer way. Columns flex to fill the width until one is resized.
+   * A row whose page has not answered draws skeleton bars in every column, whatever its renderer.
    */
   private readonly defaultColDef = computed<ColDef<User>>(() => ({
     sortable: true,
     sortingOrder: ['asc', 'desc', null],
     filter: false,
     resizable: this.settings.resizableColumns(),
+    cellRendererSelector: (params) => (params.data ? undefined : { component: SkeletonCell }),
   }));
   protected readonly initialDefaultColDef = untracked(this.defaultColDef);
   protected readonly noRowsTemplate = '<span>No users match your search or filters.</span>';
@@ -257,10 +263,16 @@ export class UsersGrid {
    * the pagination controls are reachable. Arrow keys move between cells.
    */
   protected readonly leaveGridOnTab = () => false as const;
+  /** Whether a request that shows loading is in flight; skeleton cells read it. */
+  private readonly loading = signal(false);
+  protected readonly context: UsersGridContext = { loading: this.loading.asReadonly() };
   protected readonly datasource = createUsersDatasource(
     (request) => this.users.loadPage(request),
     {
-      loading: (inFlight) => this.emitWhileActive(() => this.loadingChange.emit(inFlight)),
+      loading: (inFlight) => {
+        this.loading.set(inFlight);
+        this.emitWhileActive(() => this.loadingChange.emit(inFlight));
+      },
       loaded: (total) => this.emitWhileActive(() => this.loaded.emit(total)),
       failed: (error) => this.emitWhileActive(() => this.failed.emit(error)),
     },

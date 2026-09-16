@@ -98,6 +98,8 @@ describe('UsersPage', () => {
     grid.loadingChange.emit(true);
     await settle();
     expect(status?.textContent?.trim()).toBe('Loading users…');
+    // Skeleton rows show the load, so the text is for screen readers only.
+    expect(status?.querySelector('.sr-only')?.textContent?.trim()).toBe('Loading users…');
 
     grid.loadingChange.emit(false);
     await settle();
@@ -229,21 +231,21 @@ describe('UsersPage', () => {
       expect(statusText(page.element)).toBe('1 user matches');
     });
 
-    it('hides the announced result visually but keeps Loading users… visible', async () => {
+    it('hides both the announced result and Loading users… visually', async () => {
       const page = await renderPage();
       const status = page.element.querySelector('[role="status"]')!;
       await type(page, 'lamport');
 
       page.grid.loadingChange.emit(true);
       await page.settle();
-      expect(status.querySelector('.sr-only')).toBeNull();
+      expect(status.querySelector('span.sr-only')?.textContent?.trim()).toBe('Loading users…');
       expect(statusText(page.element)).toBe('Loading users…');
 
       page.grid.loadingChange.emit(false);
       page.grid.loaded.emit(17_241);
       await page.settle();
       expect(status.querySelector('span.sr-only')?.textContent?.trim()).toBe('17,241 users match');
-      expect(status.classList).toContain('min-h-6');
+      expect(status.classList).not.toContain('min-h-6');
     });
 
     it('keeps the total worded for the last loaded result until the search loads', async () => {

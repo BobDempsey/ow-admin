@@ -123,11 +123,14 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
         (remove)="removeChip($event)"
         (clearAll)="clearAll()"
       />
-      <p role="status" class="min-h-6 px-4 pb-2 text-sm text-ink-subtle">
+      <!--
+        Skeleton rows show a load and the total beside the heading shows the count, so both
+        messages are for screen readers only.
+      -->
+      <p role="status" class="px-4 text-sm text-ink-subtle">
         @if (loading()) {
-          Loading users…
+          <span class="sr-only">Loading users…</span>
         } @else if (announcementText(); as text) {
-          <!-- The total beside the heading already shows the count, so only screen readers hear it here. -->
           <span class="sr-only">{{ text }}</span>
         }
       </p>

@@ -1,6 +1,14 @@
 import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
-import { openList, recordListRequests, storeTableSettings } from './support/app';
+import {
+  holdListLoad,
+  listStatus,
+  openList,
+  openSettingsDialog,
+  recordListRequests,
+  releaseListLoad,
+  storeTableSettings,
+} from './support/app';
 import { applyTextSpacing, clippedText, waitForLoaded } from './support/layout';
 
 const headerNames = (page: Page) =>
@@ -166,5 +174,92 @@ test.describe('user grid sorting', () => {
         limit: 25,
         sort: { field: 'status', direction: 'asc' },
       });
+  });
+});
+
+const skeletonBars = (page: Page) => page.locator('app-skeleton-cell span span');
+
+test.describe('skeleton rows', () => {
+  test('show hidden bars while a page loads, and go once it answers', async ({ page }) => {
+    await holdListLoad(page);
+
+    expect(await skeletonBars(page).count()).toBeGreaterThan(0);
+    expect(
+      await page
+        .locator('app-skeleton-cell > span')
+        .evaluateAll((cells) => cells.every((cell) => cell.getAttribute('aria-hidden') === 'true')),
+    ).toBe(true);
+    await expect(page.locator('.ag-row:has(app-skeleton-cell)').first()).toHaveText('');
+
+    await releaseListLoad(page);
+
+    await page.locator('.ag-row a').first().waitFor();
+    await expect(listStatus(page)).not.toContainText('Loading');
+    await expect(skeletonBars(page)).toHaveCount(0);
+  });
+
+  test('show a full page of placeholder rows on the first load', async ({ page }) => {
+    await page.goto('/users');
+    await expect(page.locator('.ag-row:has(app-skeleton-cell span)').first()).toBeVisible();
+    expect(await page.locator('.ag-row:has(app-skeleton-cell span)').count()).toBe(25);
+
+    await page.locator('.ag-row a').first().waitFor();
+    await expect(page.getByText('1 to 25 of 500,000')).toBeVisible();
+    await expect(page.getByRole('spinbutton', { name: /Page number/ })).toHaveAccessibleName(
+      /Page number, 1 of 20,000/,
+    );
+  });
+
+  test.describe('under reduced motion', () => {
+    test.use({ reducedMotion: 'reduce' });
+
+    test('do not animate', async ({ page }) => {
+      await holdListLoad(page);
+
+      const animations = await skeletonBars(page).evaluateAll((bars) =>
+        bars.map((bar) => getComputedStyle(bar).animationName),
+      );
+      expect(animations.length).toBeGreaterThan(0);
+      expect(new Set(animations)).toEqual(new Set(['none']));
+    });
+  });
+
+  test('are not shown beside a load failure', async ({ page }) => {
+    await openList(page);
+    await page.evaluate(() => {
+      const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+      const grid = debug.getComponent(document.querySelector('app-users-grid')!);
+      grid.users.loadPage = () => Promise.reject(new Error('Forced failure'));
+    });
+
+    await page.getByRole('button', { name: 'Next Page' }).click();
+
+    await expect(page.getByRole('alert')).toContainText('Users could not be loaded.');
+    await expect(skeletonBars(page)).toHaveCount(0);
+  });
+
+  test('are not shown for a density change, which keeps the rows on screen', async ({ page }) => {
+    await openSettingsDialog(page);
+    await page.evaluate(() => {
+      const record = window as unknown as { skeletonSeen: boolean };
+      record.skeletonSeen = false;
+      new MutationObserver(() => {
+        if (document.querySelector('app-skeleton-cell span')) {
+          record.skeletonSeen = true;
+        }
+      }).observe(document.querySelector('app-users-grid')!, { childList: true, subtree: true });
+    });
+    const requests = await recordListRequests(page);
+
+    await page
+      .getByRole('dialog', { name: 'Table settings' })
+      .getByRole('radio', { name: 'Comfortable' })
+      .check();
+
+    await expect.poll(async () => (await requests()).length).toBe(1);
+    await page.waitForTimeout(500);
+    expect(
+      await page.evaluate(() => (window as unknown as { skeletonSeen: boolean }).skeletonSeen),
+    ).toBe(false);
   });
 });
