@@ -1,5 +1,3 @@
-- [!] (Optional) Build password reset action
 - [ ] improve ui styling to a modern look
-- [!] dropdown carets in user detail page need padding right
 - [ ] run/go through app to surface and fix any console errors or console warnings
 - [ ] go through app to find any ui bugs that aren't functioning (cancel btn in user detail page doesn't work)

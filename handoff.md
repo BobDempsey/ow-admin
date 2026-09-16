@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-16, the five 2026-09-15 changes archived with their deltas merged (earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
+Last updated: 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived (earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -209,7 +209,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`0c1a0c5` (the mobile nav drawer). Commit `handoff.md` and `tasks.md` edits after
+`53aeaa3` (the password reset action and select carets). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Nine capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -245,7 +245,10 @@ filter requirements to `user-api-client`, replaced "Placeholder nav
 entries" with "Unavailable nav entries" and added the drawer requirement in
 `admin-navigation`, rewrote `settings-dialog` for the Table settings dialog
 (its Purpose edited by hand afterwards), added the menu requirement to
-`theme-switcher`, and widened two `accessibility` requirements.
+`theme-switcher`, and widened two `accessibility` requirements. The
+`add-password-reset-action` archive rewrote "Trigger password reset" in
+`password-reset` with the confirmation, messages and failure scenarios,
+and put the reset back into the keyboard scenario in `accessibility`.
 `openspec validate --specs --strict` passes all nine.
 
 No OpenSpec change is active. Five changes were drafted and built on 2026-09-15, in this order because the first four each edit `users-page.ts` or the header, and archived on 2026-09-16 under `openspec/changes/archive/2026-09-16-*`:
@@ -255,6 +258,8 @@ No OpenSpec change is active. Five changes were drafted and built on 2026-09-15,
 3. `add-list-role-status-filters` (all 13 tasks done, committed in `72a894c`, archived 2026-09-16). `role` and `status` on `GET /users`, and Role and Status dropdowns beside search. `UserFilter { q?, role?, status? }` lives in `user.model.ts` and `PageRequest` extends it; `UserStore.list` takes that filter and its old `search` is now a cached `scan` keyed on writes, sort, q, role and status; `ListQuery`, `EMPTY_LIST_QUERY` and `sameListQuery` live in `users-datasource.ts`. `countLabel`'s second parameter is now a `matching` boolean, since the match wording follows any filter. Checks on 2026-09-15: `ng test` 265 passed, `ng build` passed, `npm run test:a11y` 228 passed, Prettier clean.
 4. `add-theme-menu` (all 8 tasks done, committed in `07329a5`, archived 2026-09-16). The header's three theme radios are now a "Theme" menu button following the ARIA menu button pattern with `menuitemradio` items, built in-house. Tab closes the menu and leaves focus on the item, and `<app-theme-switcher class="ml-auto" />` keeps the menu on screen at 320 px. Checks on 2026-09-15: `ng test` 278 passed, `ng build` passed, `npm run test:a11y` 245 passed, Prettier clean.
 5. `add-mobile-nav-drawer` (all 8 tasks done, committed in `0c1a0c5`, archived 2026-09-16). Below 768 px the nav entries sit in `NavDrawer` (`src/app/layout/nav-drawer.ts`), a modal `<dialog>` behind a Menu button, while the wordmark and theme control stay in the bar. `TopNav` owns `NAV_ENTRIES` and feeds both renderings; the `NavEntry` type lives in `nav-drawer.ts`. To fit 320 px the header and nav gaps are `gap-x-3 md:gap-x-6` and the wordmark is `text-base md:text-lg`. Checks on 2026-09-15: `ng test` 289 passed, `ng build` passed, `npm run test:a11y` 256 passed, Prettier clean.
+
+A sixth change, `add-password-reset-action` (all 12 tasks done, committed in `53aeaa3`, archived 2026-09-16), added a "Password" section to the user detail screen. "Reset password" opens `ResetPasswordDialog` (`src/app/users/reset-password-dialog.ts`, a native `<dialog>` with Cancel focused first and "Send reset email"), then `UsersService.resetPassword` calls the endpoint. The screen's status line shows "Sending password reset email…" and "Password reset email sent.", and a failure shows an alert with Try again, which resends without asking again. Unsaved edits and the held ETag survive a reset. The same change draws the Role and Status select carets with `appearance-none`, a `select-caret` utility and a `--select-caret` variable per theme, on the detail, create and list filter selects; forced colors get the native caret back. Checks on 2026-09-16: `ng test` 315 passed, `ng build` passed, `npm run test:a11y` 300 passed (20 states, 82 axe runs), Prettier clean.
 
 What `fix-search-match-count` built, beyond its own files: `countLabel` in `users-page.ts` feeds both the heading total and the announcement, so "1 user matches" and "1 user" read correctly; `createUsersDatasource` takes a `quietNextLoad()` hook that records the current request and stays quiet only when the next `getRows` asks for the same page, sort and query. Checks on 2026-09-15: `ng test` 238 passed, `ng build` passed, `npm run test:a11y` 188 passed, Prettier clean.
 
@@ -459,12 +464,16 @@ formatted it; `npx prettier --check src e2e` does not cover it.
   `openspec/specs/` is the single source of truth for requirements. Stack and
   commit conventions carried over into `openspec/config.yaml`'s `context`
   field, which OpenSpec feeds to the agent when generating artifacts.
-- The password reset UI action is optional (decided 2026-09-13). The PDF
+- Password reset UI (decided 2026-09-13, revised 2026-09-16): the PDF
   lists `POST /users/{id}/password-reset` in the API contract but never asks
-  for a reset control in the UI. The API layer still implements the endpoint;
-  the UI action is the last task in `tasks.md` and gets built only if time
-  allows. `openspec/specs/password-reset/spec.md` still says SHALL and has
-  not been updated to match.
+  for a reset control in the UI, so the control was optional. On 2026-09-16
+  the user chose to build it on the user detail screen, with a confirmation
+  dialog and status messages, and the `password-reset` spec's SHALL now
+  matches the built action.
+- Select carets (decided 2026-09-16): drawn with `appearance-none` and a
+  token-colored chevron instead of extra right padding, because Chromium
+  keeps the native caret the same short distance from the border whatever
+  `padding-right` is (checked at 0.75rem, 2.5rem and 5rem).
 - State management (decided 2026-09-13): plain signals in a `UsersService`,
   holding each loaded user's ETag beside the record, with Angular's
   `resource()` API loading the paged list. The app is almost entirely server
@@ -793,6 +802,19 @@ All pre-implementation decisions are made.
     needs to see the page change.
   - `clippedText` in `e2e/support/layout.ts` already skips `sr-only` text,
     so the visually hidden announcement needed no exemption.
+- Facts found while building `add-password-reset-action` on 2026-09-16:
+  - Chromium reports the caret's computed `background-position` as
+    `calc(100% - 12px) 50%` and `background-size` as `16px auto`, not the
+    authored values, so tests match those strings.
+  - A Vitest spec that checks a message while a request runs must hold the
+    request with a deferred promise; with `API_LATENCY_MS` at 0 a real call
+    finishes before `fixture.whenStable()` returns.
+  - The detail page has two `<dialog>` elements now. Its spec's
+    `dialogOpen()` reads the first (the conflict dialog), so reset queries
+    are scoped to `app-reset-password-dialog dialog`.
+  - A Python heredoc containing an apostrophe also fails in this Git Bash;
+    write the script to a file first.
+  - PIL is not installed, so screenshots cannot be measured by pixel.
 - `openspec archive` (1.10.0) failed on 2026-09-16 with `EPERM` renaming
   each change folder inside `openspec/changes/`, and after that failure it
   rolled back the spec updates it had just printed as applied. Check
@@ -826,8 +848,8 @@ All pre-implementation decisions are made.
   light header following in `3fe5b7f`). Compact default and resizing were
   built in `polish-settings-dialog` (`86c2e2e`), which rewrote the two
   `settings-dialog` lines they contradicted.
-- The optional password reset UI action is not built, and the
-  `password-reset` spec still needs softening to match the optional status.
+- The password reset UI action was built on 2026-09-16 in
+  `add-password-reset-action`.
 - The user added three optional tasks to `tasks.md` on 2026-09-13: a light,
   dark and system theme switcher (built 2026-09-15, see State); striped
   table rows as a setting (built 2026-09-15 in `add-settings-dialog`); and
@@ -842,8 +864,10 @@ All pre-implementation decisions are made.
   count while the visible total is right. Reproduced only from a script,
   about 5 ms apart. Fixing it means tagging each `loaded` emission with the
   request it belongs to.
-- "improve ui styling to a modern look" is the only task in `tasks.md` with
-  no spec behind it.
+- Three tasks in `tasks.md` have no spec yet: "improve ui styling to a
+  modern look", a pass for console errors and warnings, and a pass for UI
+  bugs, which the user seeded with "the Cancel button on the user detail
+  page doesn't work".
 
 ## Working style notes
 
@@ -853,14 +877,15 @@ All pre-implementation decisions are made.
   tooling attribution of any kind.
 - Update `handoff.md` and `tasks.md` whenever a task is completed. The user
   asked for this explicitly.
-- The user decides; confirm before acting. They ask yes/no questions, ask for
-  one-sentence answers, and expect a proposed commit message shown before the
-  commit is made. Answer the question asked, then stop.
+- The user decides; confirm before acting. They ask yes/no questions and ask
+  for one-sentence answers. Answer the question asked, then stop.
+- Since 2026-09-15 the user wants each finished OpenSpec change committed
+  without asking first: the code in one commit, the change folder in
+  another, and the handoff and `tasks.md` in a third. Never push.
 - Short replies carry weight: "y" adopts the recommendation on the table,
   "Go" means start the next task in `tasks.md`, and "Next task?" wants the
   single next unchecked item in one line. After each task, update the handoff
-  and `tasks.md`, propose a commit message, and wait for "y" before
-  committing. After the commit, the handoff must not still describe the
+  and `tasks.md` and commit. After the commit, the handoff must not still describe the
   work as uncommitted; the user checks for that.
 - The user asks for a quick web check of a library before relying on it (as
   with AG Grid) and wants the sources cited.
