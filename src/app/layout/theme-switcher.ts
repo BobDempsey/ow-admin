@@ -59,7 +59,7 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
             [tabindex]="index === focusedIndex() ? 0 : -1"
             (click)="select(option.value)"
             (keydown)="onMenuKeydown($event, option.value)"
-            class="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-muted focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-focus"
+            class="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
           >
             <!-- The mark keeps its space when unchecked so the labels stay in one column. -->
             <span class="inline-flex size-4 shrink-0 items-center justify-center">

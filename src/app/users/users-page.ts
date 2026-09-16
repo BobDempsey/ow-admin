@@ -73,7 +73,7 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
           id="users-role"
           [value]="role()"
           (change)="onRoleChange($event)"
-          class="min-h-11 rounded border border-line-input bg-surface pl-3 select-caret text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="min-h-11 select-caret rounded border border-line-input bg-surface pl-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <option value="">Any role</option>
           @for (option of roles; track option) {
@@ -87,7 +87,7 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
           id="users-status"
           [value]="status()"
           (change)="onStatusChange($event)"
-          class="min-h-11 rounded border border-line-input bg-surface pl-3 select-caret text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="min-h-11 select-caret rounded border border-line-input bg-surface pl-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           <option value="">Any status</option>
           @for (option of statuses; track option) {

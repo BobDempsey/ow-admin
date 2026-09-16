@@ -56,7 +56,7 @@ export interface NavEntry {
           <button
             type="button"
             (click)="close()"
-            class="min-h-11 rounded border border-header-muted px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-header-focus"
+            class="min-h-11 rounded border border-header-muted px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-header-focus"
           >
             Close
           </button>
@@ -69,7 +69,7 @@ export interface NavEntry {
                   [routerLink]="entry.path"
                   routerLinkActive
                   ariaCurrentWhenActive="page"
-                  class="flex min-h-11 items-center border-l-4 border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
+                  class="flex min-h-11 items-center border-l-4 border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
                 >
                   {{ entry.label }}
                 </a>
@@ -77,7 +77,7 @@ export interface NavEntry {
                 <button
                   type="button"
                   aria-disabled="true"
-                  class="flex min-h-11 w-full cursor-not-allowed items-center border-l-4 border-transparent px-3 text-left text-sm text-header-muted focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-header-focus"
+                  class="flex min-h-11 w-full cursor-not-allowed items-center border-l-4 border-transparent px-3 text-left text-sm text-header-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-header-focus"
                 >
                   {{ entry.label }}<span class="sr-only"> (not available yet)</span>
                 </button>
