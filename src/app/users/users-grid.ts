@@ -46,10 +46,10 @@ ModuleRegistry.registerModules([
 const DEFAULT_PAGE_SIZE = 25;
 
 /**
- * The space the heading, description, search row, status line and page padding take above and
- * below the grid.
+ * The space the heading, description, the card's filter row and status line, and the page padding
+ * take above and below the grid.
  */
-const GRID_HEIGHT_OFFSET = '20.75rem';
+const GRID_HEIGHT_OFFSET = '21.5rem';
 
 /**
  * Tailwind slate and sky values, so the grid matches the app's color tokens in styles.css. AG Grid
@@ -66,6 +66,9 @@ const usersGridTheme = themeQuartz
     // Quartz tints the focus ring to half opacity, which drops below 3:1 on the header.
     focusShadow: { radius: 0, spread: 3, color: '#0369a1' },
     headerHeight: 44,
+    // The list's card draws the edge and rounds the corners, so the grid sits flush inside it.
+    wrapperBorder: false,
+    wrapperBorderRadius: 0,
   })
   .withParams(
     {
@@ -75,6 +78,8 @@ const usersGridTheme = themeQuartz
       borderColor: '#334155',
       accentColor: '#38bdf8',
       focusShadow: { radius: 0, spread: 3, color: '#38bdf8' },
+      wrapperBorder: false,
+      wrapperBorderRadius: 0,
     },
     'dark',
   );

@@ -24,30 +24,32 @@ import { UsersService } from './users.service';
         Creating user…
       }
     </p>
-    <form novalidate (submit)="create($event)" class="mt-4 grid gap-6">
-      <app-user-form-fields [fields]="fields" />
-      @if (failed()) {
-        <div
-          role="alert"
-          class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
-        >
-          The user could not be created. Try again.
+    <div class="mt-4 rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6">
+      <form novalidate (submit)="create($event)" class="grid gap-6">
+        <app-user-form-fields [fields]="fields" />
+        @if (failed()) {
+          <div
+            role="alert"
+            class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+          >
+            The user could not be created. Try again.
+          </div>
+        }
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Create user
+          </button>
+          <a
+            routerLink="/users"
+            class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >Cancel</a
+          >
         </div>
-      }
-      <div class="flex flex-wrap items-center gap-3">
-        <button
-          type="submit"
-          class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >
-          Create user
-        </button>
-        <a
-          routerLink="/users"
-          class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >Cancel</a
-        >
-      </div>
-    </form>
+      </form>
+    </div>
   `,
 })
 export default class NewUserPage {

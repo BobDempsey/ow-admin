@@ -157,6 +157,16 @@ describe('UserDetailPage', () => {
       expect(status()).toBe('');
     });
 
+    it('puts the form in a Details card with the ID under its heading', async () => {
+      const { element } = await renderPage();
+      const card = element.querySelector('section[aria-labelledby="details-heading"]');
+
+      expect(card?.querySelector('h2')?.textContent?.trim()).toBe('Details');
+      expect(card?.querySelector('h2 + p')?.textContent?.trim()).toBe(`ID ${ID}`);
+      expect(card?.querySelector('form')).not.toBeNull();
+      expect(card?.classList).toContain('rounded-card');
+    });
+
     it('links back to the user list', async () => {
       const { element } = await renderPage();
       const back = Array.from(element.querySelectorAll('a')).find(

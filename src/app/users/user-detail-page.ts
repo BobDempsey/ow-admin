@@ -70,35 +70,44 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
         </button>
       </div>
     } @else if (user.hasValue()) {
-      <p class="text-sm text-ink-subtle tabular-nums">ID {{ user.value().data.id }}</p>
-      <form novalidate (submit)="save($event)" class="mt-4 grid gap-6">
-        <app-user-form-fields [fields]="fields" />
-        @if (saveFailed()) {
-          <div
-            role="alert"
-            class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
-          >
-            The user could not be saved. Try again.
+      <section
+        aria-labelledby="details-heading"
+        class="mt-4 rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6"
+      >
+        <h2 id="details-heading" class="font-semibold text-ink">Details</h2>
+        <p class="text-sm text-ink-subtle tabular-nums">ID {{ user.value().data.id }}</p>
+        <form novalidate (submit)="save($event)" class="mt-4 grid gap-6">
+          <app-user-form-fields [fields]="fields" />
+          @if (saveFailed()) {
+            <div
+              role="alert"
+              class="rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+            >
+              The user could not be saved. Try again.
+            </div>
+          }
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              #saveButton
+              type="submit"
+              class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              Save
+            </button>
+            <!-- Leaving the screen discards the draft, the same as Cancel on the create screen. -->
+            <a
+              routerLink="/users"
+              class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >Cancel</a
+            >
           </div>
-        }
-        <div class="flex flex-wrap items-center gap-3">
-          <button
-            #saveButton
-            type="submit"
-            class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            Save
-          </button>
-          <!-- Leaving the screen discards the draft, the same as Cancel on the create screen. -->
-          <a
-            routerLink="/users"
-            class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >Cancel</a
-          >
-        </div>
-      </form>
+        </form>
+      </section>
 
-      <section aria-labelledby="password-heading" class="mt-10 max-w-md">
+      <section
+        aria-labelledby="password-heading"
+        class="mt-6 max-w-md rounded-card border border-line-subtle bg-surface p-4 shadow-card sm:p-6"
+      >
         <h2 id="password-heading" class="font-semibold text-ink">Password</h2>
         <p class="mt-1 text-sm text-ink-muted">
           Send this user an email with a link to choose a new password.
@@ -131,7 +140,7 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
 
       <section
         aria-labelledby="demo-heading"
-        class="mt-10 max-w-md rounded border border-dashed border-line-strong p-4"
+        class="mt-6 max-w-md rounded-card border border-dashed border-line-strong bg-surface p-4 shadow-card sm:p-6"
       >
         <h2 id="demo-heading" class="font-semibold text-ink">Demo</h2>
         <p class="mt-1 text-sm text-ink-muted">
