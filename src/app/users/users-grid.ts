@@ -105,7 +105,8 @@ const usersGridTheme = themeQuartz
 
 /**
  * The paged user grid. Each page is one block of the Infinite Row Model and one `GET /users`
- * request; only the current page is kept.
+ * request; only the current page is kept. With five columns every cell is rendered, even off to
+ * the side at 320 px, so the Actions button always exists for the pointer and for focus to return to.
  */
 @Component({
   selector: 'app-users-grid',
@@ -134,6 +135,7 @@ const usersGridTheme = themeQuartz
       [blockLoadDebounceMillis]="50"
       [domLayout]="initialDomLayout"
       [ensureDomOrder]="true"
+      [suppressColumnVirtualisation]="true"
       [suppressMultiSort]="true"
       [suppressOverlays]="suppressedOverlays"
       [suppressMovableColumns]="!settings.movableColumns()"

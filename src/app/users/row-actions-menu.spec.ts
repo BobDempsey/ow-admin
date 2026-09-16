@@ -158,9 +158,18 @@ describe('RowActionsMenu', () => {
     expect(host.isConnected).toBe(true);
   });
 
-  it('closes on scroll or resize, returning focus when it was in the menu', async () => {
+  it('ignores a scroll that leaves its button where the menu was placed', async () => {
     const { closes } = await renderMenu();
 
+    document.dispatchEvent(new Event('scroll'));
+
+    expect(closes).toEqual([]);
+  });
+
+  it('closes on a scroll that moves its button, or on resize, returning focus', async () => {
+    const { anchor, closes } = await renderMenu();
+
+    anchor.getBoundingClientRect = () => rect(60, 600, 32, 32);
     document.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('resize'));
 

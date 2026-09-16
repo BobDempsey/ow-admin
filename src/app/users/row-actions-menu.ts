@@ -82,14 +82,23 @@ export class RowActionsMenu {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly items = viewChildren<ElementRef<HTMLElement>>('item');
   protected readonly focusedIndex = signal(0);
+  /** Where the button was when the menu was placed. */
+  private placedAt = { top: 0, left: 0 };
 
   constructor() {
     afterNextRender(() => {
       this.place();
       this.focusItem(0);
     });
-    // Scrolling anywhere, the grid's own scroll boxes included, would leave the menu behind.
-    const onScroll = () => this.closeForViewportChange();
+    // Scrolling anywhere, the grid's own scroll boxes included, would leave the menu behind. A
+    // click scrolls its button into view first, and that scroll event can arrive after the menu
+    // opened, so a scroll closes the menu only once the button has moved from where it was placed.
+    const onScroll = () => {
+      const button = this.anchor().getBoundingClientRect();
+      if (button.top !== this.placedAt.top || button.left !== this.placedAt.left) {
+        this.closeForViewportChange();
+      }
+    };
     this.document.addEventListener('scroll', onScroll, true);
     inject(DestroyRef).onDestroy(() => this.document.removeEventListener('scroll', onScroll, true));
   }
@@ -157,6 +166,7 @@ export class RowActionsMenu {
    */
   private place(): void {
     const button = this.anchor().getBoundingClientRect();
+    this.placedAt = { top: button.top, left: button.left };
     const menu = this.host.getBoundingClientRect();
     const view = this.document.documentElement;
     const width = view.clientWidth;
