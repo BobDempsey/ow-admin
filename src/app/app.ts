@@ -2,12 +2,13 @@ import { Component, ElementRef, Injector, afterNextRender, inject, viewChild } f
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, skip } from 'rxjs';
+import { AiChatDrawer } from './layout/ai-chat-drawer';
 import { ThemeSwitcher } from './layout/theme-switcher';
 import { TopNav } from './layout/top-nav';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ThemeSwitcher, TopNav],
+  imports: [AiChatDrawer, RouterOutlet, ThemeSwitcher, TopNav],
   host: { class: 'block min-h-screen bg-surface text-ink' },
   template: `
     <a
@@ -22,8 +23,11 @@ import { TopNav } from './layout/top-nav';
         class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-2 gap-y-1 px-4 py-1 md:gap-x-6"
       >
         <app-top-nav>
-          <!-- Pushed to the right end of the row, so its right-aligned menu opens on screen at any width. -->
-          <app-theme-switcher class="ml-auto" />
+          <!-- Pushed to the right end of the row, so the theme's right-aligned menu opens on screen at any width. -->
+          <div class="ml-auto flex items-center gap-x-1">
+            <app-ai-chat-drawer />
+            <app-theme-switcher />
+          </div>
         </app-top-nav>
       </div>
     </header>

@@ -245,8 +245,21 @@ app-nav-drawer dialog {
   }
 }
 
+/* The AI assistant drawer slides in from the right the same way. */
+app-ai-chat-drawer dialog {
+  translate: 0;
+  transition: translate 200ms ease-out;
+}
+
+@starting-style {
+  app-ai-chat-drawer dialog[open] {
+    translate: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  app-nav-drawer dialog {
+  app-nav-drawer dialog,
+  app-ai-chat-drawer dialog {
     transition: none;
   }
 }
