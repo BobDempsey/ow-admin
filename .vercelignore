@@ -1,0 +1,15 @@
+# Only the app source and its build config go to Vercel.
+/Admin_User_Management_Take-Home.pdf
+/node_modules
+/dist
+/test-results
+/playwright-report
+/.playwright-mcp
+/e2e
+/docs
+/openspec
+/.claude
+/handoff.md
+/tasks.md
+/.env*
+/.vercel

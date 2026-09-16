@@ -50,3 +50,9 @@ Thumbs.db
 # Playwright accessibility suite output
 /test-results
 /playwright-report
+
+# Vercel project link
+/.vercel
+
+.vercel
+.env*
