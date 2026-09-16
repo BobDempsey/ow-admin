@@ -1,5 +1,4 @@
 - [ ] (Optional) Build password reset action
-- [!] Update the theme switcher UI in the navbar
 - [!] (Optional) Add mobile nav menu and drawer
 - [ ] improve ui styling to a modern look
 - [ ] dropdown carets in user detail page need padding right
