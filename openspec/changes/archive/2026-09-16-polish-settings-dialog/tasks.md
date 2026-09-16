@@ -34,4 +34,4 @@
 
 - [x] 7.1 Update `README.md`'s Settings paragraph, the `docs/accessibility.md` rows that name the Settings entry, the Theme group or 64 px rows, 2.5.7 for the second known gap, and 2.4.11 for the fixed header, and verify `npx prettier --check src e2e` is clean
 - [x] 7.2 Run `ng test --watch=false`, `ng build`, `npm run test:a11y` with port 4600 free, and `openspec validate polish-settings-dialog --strict`, and verify all pass
-- [ ] 7.3 After archive, rewrite the Purpose in `openspec/specs/settings-dialog/spec.md` for a table settings dialog opened from the user list, and verify `openspec validate --specs --strict` passes
+- [x] 7.3 After archive, rewrite the Purpose in `openspec/specs/settings-dialog/spec.md` for a table settings dialog opened from the user list, and verify `openspec validate --specs --strict` passes
