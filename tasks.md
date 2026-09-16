@@ -1,2 +1,1 @@
-- [ ] Archive the refresh-header-and-icon-buttons OpenSpec change
 - [ ] Update handoff.md for these UI changes, including the dark header
