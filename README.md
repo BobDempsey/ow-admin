@@ -4,6 +4,26 @@ OW Admin is an admin UI for managing users. It has a top navigation bar, a paged
 
 It uses Angular 22 (standalone components, signals, Signal Forms, zoneless), Tailwind CSS 4, and AG Grid Community for the list.
 
+The live app is at [ow.bobdempsey83.com](https://ow.bobdempsey83.com).
+
+## Screenshots
+
+The user list in the light theme:
+
+![The user list in the light theme, with search, role and status filters, and a paged table of users](docs/screenshots/users-light.png)
+
+The user list in the dark theme:
+
+![The user list in the dark theme](docs/screenshots/users-dark.png)
+
+The demo AI assistant drawer, opened from the robot icon in the header:
+
+![The AI assistant drawer with a sample conversation and a link to the live example](docs/screenshots/ai-assistant.png)
+
+The navigation drawer on a phone-width window:
+
+<img src="docs/screenshots/mobile-menu.png" alt="The navigation drawer open at phone width, listing Dashboard, Users, Reports, Settings and About" width="320">
+
 ## Running the app
 
 Install dependencies, then start the dev server:
