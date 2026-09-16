@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-16, stale claims corrected after sync and the avatar task recorded (earlier 2026-09-16, the UI styling update built in 14 group commits plus fixes and archived (earlier 2026-09-16, the console warning fix and guard built in `7225214` and archived, and the small and medium UI styling changes decided; earlier 2026-09-16, UI bug fixes built in `5a2c8f0` and archived; earlier 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived; earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
+Last updated: 2026-09-16, the header and icon button refresh, the AI assistant demo drawer and the light gray page background built, checked and archived (earlier 2026-09-16, stale claims corrected after sync and the avatar task recorded; earlier 2026-09-16, the UI styling update built in 14 group commits plus fixes and archived (earlier 2026-09-16, the console warning fix and guard built in `7225214` and archived, and the small and medium UI styling changes decided; earlier 2026-09-16, UI bug fixes built in `5a2c8f0` and archived; earlier 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived; earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -21,8 +21,8 @@ at `/users/:id`, and the About screen at `/about`. It was generated with `@angul
 Tailwind 4.1 through `@tailwindcss/postcss` (`@import 'tailwindcss'` in
 `src/styles.css`), Vitest 4 with jsdom, zoneless change detection, no SSR,
 and the 2025 file naming style (`app.ts`, not `app.component.ts`).
-`ng build` and `ng test --watch=false` both pass (432 tests in 34 files),
-`npm run test:a11y` passes (450 Playwright tests, 2026-09-16), and
+`ng build` and `ng test --watch=false` both pass (442 tests in 35 files),
+`npm run test:a11y` ran 471 Playwright tests on 2026-09-16 with 470 passing; the one failure (header on one row at 320 px) passed on its own rerun after the fix, and the full suite has not run since, and
 `npx prettier --check src e2e` is clean.
 
 The app shell and nav were built through the OpenSpec change
@@ -44,9 +44,13 @@ How it works:
   Reports and Settings as `aria-disabled` buttons with hidden
   "(not available yet)" text. Those three labels are invented. The active
   style is semibold plus a `nav-current` bottom border, driven by
-  `aria-[current=page]:` Tailwind variants. Since `c5c1075` the header is
-  light (`bg-surface` with a `line-subtle` bottom rule); the slate-900
-  figures in the 2026-09-13 check below describe the old dark header.
+  `aria-[current=page]:` Tailwind variants (`header-accent` in the bar).
+  The header is dark again in both themes (`bg-header`), after `c5c1075`
+  made it light for a while. `TopNav`'s host is `display: contents` and it
+  projects content between its `<nav>` and the Menu button, which sits
+  outside the Primary landmark. `App` projects the AI assistant and Theme
+  buttons there, so the header reads wordmark, nav entries, AI assistant,
+  Theme, then Menu below 768 px.
 - Routes: `''` and `**` redirect to `users`; `users` lazy-loads
   `src/app/users/users-page.ts`, `users/new` lazy-loads
   `src/app/users/new-user-page.ts`, `users/:id` lazy-loads
@@ -211,10 +215,10 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`8fd6617` (the last UI styling fix). Commit `handoff.md` and `tasks.md` edits after
+`861560b` (the light gray page background). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
-Ten capability specs are archived in `openspec/specs/`: `admin-navigation`, `runtime-quality`,
+Eleven capability specs are archived in `openspec/specs/`: `ai-assistant-demo`, `admin-navigation`, `runtime-quality`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`,
 `accessibility`, `about-page`, `theme-switcher` and `settings-dialog` (84
 requirements total). The change that created them is at
@@ -260,8 +264,13 @@ requirements to `user-list` (result and loading announcements, filter
 chips, empty state, row actions menu), removed "Search result announced"
 there, added a list entry point to `password-reset` and "Detail layout and
 save bar" to `user-management`, and widened requirements in `user-list`,
-`settings-dialog`, `accessibility` and `runtime-quality`.
-`openspec validate --specs --strict` passes all ten.
+`settings-dialog`, `accessibility` and `runtime-quality`. The
+`refresh-header-and-icon-buttons` archive created `ai-assistant-demo` with
+five requirements, added "Header order" and "Dark header in both themes"
+and modified the drawer requirement in `admin-navigation`, modified two
+`settings-dialog` requirements and one `theme-switcher` requirement, and
+added "Detail avatar" and "Button icons" to `user-management`.
+`openspec validate --specs --strict` passes all eleven.
 
 No OpenSpec change is active. Five changes were drafted and built on 2026-09-15, in this order because the first four each edit `users-page.ts` or the header, and archived on 2026-09-16 under `openspec/changes/archive/2026-09-16-*`:
 
@@ -279,7 +288,9 @@ An eighth change, `fix-console-errors-and-warnings` (all 6 tasks done, committed
 
 A ninth change, `modernize-ui-styling` (all tasks done, archived 2026-09-16), restyled the app from `docs/ui-styling-ideas.md`. The user asked for one commit per UI change so each can be reverted alone. In order: `233e936` Tailwind class sorting, `9a430b1` tokens, `06b4135` Inter, `c5c1075` light header, `68e7054` screen descriptions, `56f549a` cards, `3aca0d5` role and status pills, `d76a61b` initials avatars, `a12842c` filter chips and Clear all, `92a89da` skeleton rows, `3d0212c` empty state, `950b0b5` row Actions menu, `11ec641` two-column detail screen with a save bar, `2989777` docs. The final full run found problems that were fixed in separate commits naming their group: `e39b331` and `c134792` (row menu), `bd748f1` (avatars), `56a7225` (save bar), `8fd6617` (Inter and the paging panel), and test fixes `b6d5336` and `4757723`. The design's Rollback section (in the archived change) lists which groups depend on which: group 2's tokens feed most later groups, group 6's cards feed the toolbar and the detail layout, and groups 7, 8, 10 and 12 all edit the grid's column definitions. The user chose to skip per-group browser tests from group 5 on and test once at the end.
 
-What changed in behavior: "Loading users…" is now visually hidden behind skeleton rows; search counts as a filter chip and Clear all empties it; the empty state sits in the card below the grid (`EmptyUsersOverlay`), after the paging controls in Tab order, because AG Grid's overlay ignores pointer events; Enter on the Actions cell opens the row menu instead of the user; a reset from a row announces "Password reset email sent to {name}."; the dark header and its `header-*` tokens are gone. Checks on 2026-09-16: `ng test` 432 passed in 34 files, `ng build` passed with no warnings, `npm run test:a11y` 450 passed, Prettier clean. Every new color pair passed in both themes and is in the Theme colors table.
+What changed in behavior: "Loading users…" is now visually hidden behind skeleton rows; search counts as a filter chip and Clear all empties it; the empty state sits in the card below the grid (`EmptyUsersOverlay`), after the paging controls in Tab order, because AG Grid's overlay ignores pointer events; Enter on the Actions cell opens the row menu instead of the user; a reset from a row announces "Password reset email sent to {name}."; the dark header and its `header-*` tokens were removed (the tenth change brought them back). Checks on 2026-09-16: `ng test` 432 passed in 34 files, `ng build` passed with no warnings, `npm run test:a11y` 450 passed, Prettier clean. Every new color pair passed in both themes and is in the Theme colors table.
+
+A tenth change, `refresh-header-and-icon-buttons` (archived 2026-09-16), recorded a round of UI iteration the user drove by eye with no tests, then checked by three background agents. It made the Theme, Table settings and Menu buttons icon-only (44 px, `sr-only` names and matching `title` tooltips), put X Close buttons at the top right of the Table settings dialog and the nav drawer (the dialog's bottom Close is gone, so Close now comes right after the heading in Tab order), added icons to New user, Create user, Save, Cancel, Reset password and Simulate, put the initials avatar beside the name on the detail screen, restored the dark header, and added `AiChatDrawer` (`src/app/layout/ai-chat-drawer.ts`): a robot icon that opens a right-side modal demo with a fixed conversation, a disabled message field and a link to https://ai-storefront.bobdempsey83.com/ in a new tab. The Theme button is now named "Theme: Light", "Theme: Dark" or "Theme: System", and its menu stays "Theme". Code commits: `097e88b`, `949dd1f`, `af7eca2`, `b32c5a2`, `97c90a6`, `001969b`, `e94a2cb`, `1260cf4`, `47546c3`; browser tests in `f72fe75`. Checks on 2026-09-16: `ng test` 442 passed in 35 files, `ng build` passed, Prettier clean, `npm run test:a11y` 470 of 471 (26 axe states, 106 runs), with measured header ratios in `docs/accessibility.md` (lowest text pair 9.83:1, lowest non-text 6.71:1).
 
 No OpenSpec change is active.
 
@@ -308,7 +319,7 @@ The settings dialog went through `openspec/changes/archive/2026-09-15-add-settin
 The theme switcher went through `openspec/changes/archive/2026-09-15-add-theme-switcher/` (all 14 tasks done, committed in `916c1cc`, archived 2026-09-15 with its deltas merged). It adds a new `theme-switcher` capability and a "Contrast in both themes" scenario to `accessibility`'s "Sufficient color contrast". What it built:
 
 - Named color tokens in `src/styles.css` (`@theme`, 30 tokens such as `surface`, `ink`, `link`, `primary`, `danger-*`, `header-*`). Light values point at the palette variables the templates used before (`var(--color-slate-900)`), so light pixels did not change: six full-page light screenshots at 1280 px matched with zero differing pixels before and after the class mapping. `:root[data-theme='dark']` redefines every token and sets `color-scheme: dark`. No component uses a palette class any more; use token classes (`bg-surface`, `text-ink-muted`) for new UI.
-- As first built, the header stayed dark in both themes; `c5c1075` (`modernize-ui-styling`) made it light and removed the `header-*` tokens.
+- The header is dark in both themes (slate-900 in light, slate-950 with a slate-700 bottom rule in dark). `c5c1075` made it light and removed the `header-*` tokens; the tenth change restored both.
 - `ThemeService` (`src/app/core/theme.service.ts`) holds the preference, follows `matchMedia` under System, and writes `data-theme` and `data-ag-theme-mode` on `<html>`. It writes `localStorage['orbweaver-admin-theme']` only when the admin chooses, so a first visit stores nothing.
 - An inline script in `src/index.html` applies the stored theme before Angular loads. Keep its key and values in step with the service.
 - `ThemeSwitcher` (`src/app/layout/theme-switcher.ts`) is now a menu button (see `add-theme-menu`). As first built it was a `fieldset` with legend "Theme" and three visually hidden native radios whose labels carry the underline, bold and focus ring. `App`'s header now wraps `TopNav` and the switcher in one `max-w-7xl` row, so `TopNav`'s `<nav>` lost its own container classes. At 320 px the switcher wraps to its own row under the nav.
@@ -894,6 +905,18 @@ All pre-implementation decisions are made.
   a scratch directory, run `openspec archive <name> --yes` there in order,
   copy `specs/` back, and move the change folders into
   `openspec/changes/archive/<date>-<name>` with PowerShell `Move-Item`.
+- Facts found in the header and icon button refresh on 2026-09-16:
+  - The 320 px header fits one row only with `gap-x-1`; it needs 284.8 px
+    of 288 px. A wider wordmark or another header button wraps it again,
+    and `e2e/layout.e2e.ts` fails on purpose when it wraps.
+  - A private component in the same file still has to be exported, or the
+    dev build fails with `NG3004: Unable to import symbol`.
+  - An e2e `document.querySelector('dialog ...')` now finds the AI
+    assistant drawer first; scope dialog queries to the component.
+  - A background agent's turn can end while its Playwright run keeps going.
+    Its report arrives when the run ends, about 20 minutes for the full
+    suite; look for `ng serve --port 4600` before assuming it stalled.
+  - The `openspec archive` scratch-directory workaround below worked again.
 - OpenSpec refuses a MODIFIED requirement that drops a scenario the main
   spec still has. To retire one, REMOVE the requirement and ADD it back
   under a new name, as `polish-settings-dialog` does with "Placeholder nav
@@ -937,13 +960,20 @@ All pre-implementation decisions are made.
   request it belongs to.
 - The larger styling options in `docs/ui-styling-ideas.md` (sidebar
   layout, command palette, bulk selection) were deferred on 2026-09-16.
-- The user added "add a mock ai chatbot that links back to my ai
-  storefront" to `tasks.md` on 2026-09-16 and asked to hold it; it has no
-  spec.
-- The user added "avatar should also go on user detail page" to `tasks.md`
-  on 2026-09-16; not built. `UserAvatar` helpers (`initialsOf`,
-  `avatarColorIndex`, `AVATAR_COLOR_CLASSES` in `src/app/users/user-avatar.ts`)
-  are used only by `user-name-cell.ts` so far, and there is no spec for it.
+- The mock AI chatbot and the detail screen avatar, both added to
+  `tasks.md` on 2026-09-16, were built and archived in
+  `refresh-header-and-icon-buttons`.
+- The light gray page background (`canvas` token, slate-50 in light,
+  slate-900 in dark, on the `App` host) came after that change, in
+  `861560b`. Nobody has measured contrast on it or run the browser suite
+  since. `ink-subtle` (slate-600) on slate-50 should still pass, but the
+  Theme colors table in `docs/accessibility.md` does not list the pair and
+  no spec names the token. The user tried slate-100 and went back to
+  slate-50, because slate-100 matches `surface-muted`, the hover fill, so
+  outlined buttons sitting on the page showed no hover.
+- The About screen's "What it does" copy and link icons changed in
+  `8b9eddc` after the change was archived; only its own spec ran (8
+  passed).
 - `e2e/filter.e2e.ts` "choosing a status filters from the first page and
   shows only those rows" failed once on 2026-09-16 because an extra
   `skip: 25` request was recorded before the filter, then passed on every
@@ -994,6 +1024,14 @@ All pre-implementation decisions are made.
 - Tell the user about side effects a command had beyond the task, such as the
   extra `.mcp.json` from `ai-config` or a stray `angular.json` change, and ask
   before committing them.
+- For quick UI iteration (2026-09-16) the user runs the app, asks for one
+  visual change at a time, and confirms by eye. Run no tests, builds or
+  browser checks then. When they say "write follow ups to tasks", list the
+  checks, tests and docs the change still needs in `tasks.md` without doing
+  them, and commit the code and `tasks.md` separately.
+- Follow-ups split well across background agents: code and unit tests, docs
+  and spec, then browser checks once the code settles (only one run can
+  hold port 4600).
 - A design canvas (the `/design` skill) can preview the UI in Tailwind markup,
   but it cannot run Angular or a real component library. Treat any canvas as a
   visual mock, not a prototype.
