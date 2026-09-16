@@ -1,3 +1,1 @@
-- [ ] Measure text contrast on the light gray page background and add the pair to docs/accessibility.md
-- [ ] Run the full browser suite after the page background and About changes
-- [ ] Record the page background token in an OpenSpec change or the accessibility spec
+- [ ] Run the full browser suite after the About screen changes
