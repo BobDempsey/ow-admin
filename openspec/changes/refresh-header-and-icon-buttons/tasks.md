@@ -27,4 +27,4 @@
 ## 6. Docs and checks
 
 - [x] 6.1 Update `README.md` and `docs/accessibility.md` for the icon buttons, the dark header, the avatar, the AI drawer and the Tab order, and mark header pairs not yet re-measured
-- [ ] 6.2 Run the browser checks: `npm run test:a11y` with port 4600 free, covering axe on the open AI drawer in both themes at 1280 and 320 CSS pixels, header contrast in both themes, target sizes of the icon buttons, the Table settings dialog's Tab order, and the header's Tab order at both widths, then record the measured header ratios in `docs/accessibility.md`
+- [x] 6.2 Run the browser checks: `npm run test:a11y` with port 4600 free, covering axe on the open AI drawer in both themes at 1280 and 320 CSS pixels, header contrast in both themes, target sizes of the icon buttons, the Table settings dialog's Tab order, and the header's Tab order at both widths, then record the measured header ratios in `docs/accessibility.md`
