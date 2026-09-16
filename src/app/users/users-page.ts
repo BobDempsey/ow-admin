@@ -1,6 +1,8 @@
 import {
   Component,
   ElementRef,
+  Injector,
+  afterNextRender,
   computed,
   effect,
   inject,
@@ -11,6 +13,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
 import { USER_ROLES, USER_STATUSES, UserRole, UserStatus } from '../core/api/user.model';
+import { FilterChip, FilterChipRemoval, FilterChips } from './filter-chips';
 import { TableSettingsDialog } from './table-settings-dialog';
 import { EMPTY_LIST_QUERY, ListQuery } from './users-datasource';
 import { UsersGrid } from './users-grid';
@@ -38,7 +41,7 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
  */
 @Component({
   selector: 'app-users-page',
-  imports: [RouterLink, TableSettingsDialog, UsersGrid],
+  imports: [FilterChips, RouterLink, TableSettingsDialog, UsersGrid],
   template: `
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <h1 #heading tabindex="-1" class="text-2xl font-semibold text-ink focus:outline-none">
@@ -59,46 +62,50 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
     <!-- One card holds the filters, the load status and the grid; the grid sits flush inside it. -->
     <div class="mt-4 overflow-clip rounded-card border border-line-subtle bg-surface shadow-card">
       <div class="flex flex-wrap items-end gap-4 px-4 pt-4 pb-2">
-        <div class="grid max-w-md grow basis-64 gap-1">
-          <label for="users-search" class="font-medium text-ink">Search users</label>
-          <input
-            id="users-search"
-            type="search"
-            placeholder="Name or email"
-            autocomplete="off"
-            maxlength="100"
-            [value]="searchText()"
-            (input)="onSearchInput($event)"
-            class="min-h-11 w-full rounded border border-line-input bg-surface px-3 text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          />
-        </div>
-        <div class="grid gap-1">
-          <label for="users-role" class="font-medium text-ink">Role</label>
-          <select
-            id="users-role"
-            [value]="role()"
-            (change)="onRoleChange($event)"
-            class="min-h-11 select-caret rounded border border-line-input bg-surface pl-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <option value="">Any role</option>
-            @for (option of roles; track option) {
-              <option [value]="option">{{ option }}</option>
-            }
-          </select>
-        </div>
-        <div class="grid gap-1">
-          <label for="users-status" class="font-medium text-ink">Status</label>
-          <select
-            id="users-status"
-            [value]="status()"
-            (change)="onStatusChange($event)"
-            class="min-h-11 select-caret rounded border border-line-input bg-surface pl-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <option value="">Any status</option>
-            @for (option of statuses; track option) {
-              <option [value]="option">{{ option }}</option>
-            }
-          </select>
+        <!-- A search landmark rather than a toolbar: arrow keys already mean something in each control. -->
+        <div role="search" aria-label="Filter users" class="flex grow flex-wrap items-end gap-4">
+          <div class="grid max-w-md grow basis-64 gap-1">
+            <label for="users-search" class="font-medium text-ink">Search users</label>
+            <input
+              #searchField
+              id="users-search"
+              type="search"
+              placeholder="Name or email"
+              autocomplete="off"
+              maxlength="100"
+              [value]="searchText()"
+              (input)="onSearchInput($event)"
+              class="min-h-11 w-full rounded border border-line-input bg-surface px-3 text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            />
+          </div>
+          <div class="grid gap-1">
+            <label for="users-role" class="font-medium text-ink">Role</label>
+            <select
+              id="users-role"
+              [value]="role()"
+              (change)="onRoleChange($event)"
+              class="min-h-11 select-caret rounded border border-line-input bg-surface pl-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <option value="">Any role</option>
+              @for (option of roles; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+          <div class="grid gap-1">
+            <label for="users-status" class="font-medium text-ink">Status</label>
+            <select
+              id="users-status"
+              [value]="status()"
+              (change)="onStatusChange($event)"
+              class="min-h-11 select-caret rounded border border-line-input bg-surface pl-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <option value="">Any status</option>
+              @for (option of statuses; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
         </div>
         <button
           #tableSettingsButton
@@ -110,6 +117,12 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
           Table settings
         </button>
       </div>
+      <app-filter-chips
+        class="block px-4 pb-2 empty:hidden"
+        [chips]="chips()"
+        (remove)="removeChip($event)"
+        (clearAll)="clearAll()"
+      />
       <p role="status" class="min-h-6 px-4 pb-2 text-sm text-ink-subtle">
         @if (loading()) {
           Loading users…
@@ -148,7 +161,10 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
 })
 export default class UsersPage {
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
   private readonly heading = viewChild.required<ElementRef<HTMLElement>>('heading');
+  private readonly searchField = viewChild.required<ElementRef<HTMLInputElement>>('searchField');
+  private readonly filterChips = viewChild.required(FilterChips);
 
   protected readonly total = signal<number | undefined>(undefined);
   protected readonly loading = signal(false);
@@ -177,6 +193,23 @@ export default class UsersPage {
       query.status = status;
     }
     return query;
+  });
+  /** One chip per applied filter, in the order of the controls. */
+  protected readonly chips = computed<FilterChip[]>(() => {
+    const chips: FilterChip[] = [];
+    const search = this.search();
+    if (search) {
+      chips.push({ key: 'search', label: `Search: ${search}` });
+    }
+    const role = this.role();
+    if (role) {
+      chips.push({ key: 'role', label: `Role: ${role}` });
+    }
+    const status = this.status();
+    if (status) {
+      chips.push({ key: 'status', label: `Status: ${status}` });
+    }
+    return chips;
   });
   /** The query the shown total belongs to, so the wording never runs ahead of the load. */
   protected readonly loadedQuery = signal<ListQuery>(EMPTY_LIST_QUERY);
@@ -224,6 +257,43 @@ export default class UsersPage {
   protected onStatusChange(event: Event): void {
     this.announceNextLoad = true;
     this.status.set((event.target as HTMLSelectElement).value as UserStatus | '');
+  }
+
+  /**
+   * Removes one filter at once; the search chip empties the field without waiting for a pause.
+   * Focus then moves to the chip that took its place, the new last chip, or the search field.
+   */
+  protected removeChip({ key, index }: FilterChipRemoval): void {
+    this.announceNextLoad = true;
+    if (key === 'search') {
+      this.searchText.set('');
+      this.search.set('');
+    } else if (key === 'role') {
+      this.role.set('');
+    } else {
+      this.status.set('');
+    }
+    afterNextRender(
+      () => {
+        if (!this.filterChips().focusChip(index)) {
+          this.searchField().nativeElement.focus();
+        }
+      },
+      { injector: this.injector },
+    );
+  }
+
+  /**
+   * Removes every filter in one step, so the grid sends a single request. Clear all leaves the DOM
+   * with the chips, so focus goes to the search field, where starting over begins.
+   */
+  clearAll(): void {
+    this.announceNextLoad = true;
+    this.searchText.set('');
+    this.search.set('');
+    this.role.set('');
+    this.status.set('');
+    afterNextRender(() => this.searchField().nativeElement.focus(), { injector: this.injector });
   }
 
   protected onLoadingChange(inFlight: boolean): void {

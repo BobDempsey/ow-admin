@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
@@ -19,6 +19,12 @@ class StubUsersGrid {
   readonly failed = output<ApiError>();
   readonly openUser = output<string>();
   readonly refresh = vi.fn();
+  /** Every query the grid has been given, one entry per change the grid would see. */
+  readonly queries: ListQuery[] = [];
+
+  constructor() {
+    effect(() => this.queries.push(this.query()));
+  }
 }
 
 async function renderPage() {
@@ -426,6 +432,172 @@ describe('UsersPage', () => {
     });
   });
 
+  describe('filter chips', () => {
+    beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }));
+    afterEach(() => vi.useRealTimers());
+
+    async function choose(page: Awaited<ReturnType<typeof renderPage>>, id: string, value: string) {
+      const field = page.element.querySelector<HTMLSelectElement>(`#${id}`)!;
+      field.value = value;
+      field.dispatchEvent(new Event('change'));
+      await page.settle();
+    }
+
+    const chipButtons = (element: HTMLElement) =>
+      Array.from(
+        element.querySelectorAll<HTMLButtonElement>('ul[aria-label="Active filters"] button'),
+      );
+    const chipNames = (element: HTMLElement) =>
+      chipButtons(element).map((chip) => chip.textContent?.replace(/\s+/g, ' ').trim());
+    const clearAllButton = (element: HTMLElement) =>
+      Array.from(element.querySelectorAll('button')).find(
+        (button) => button.textContent?.trim() === 'Clear all',
+      );
+    const chip = (element: HTMLElement, label: string) =>
+      chipButtons(element).find((button) => button.textContent?.includes(label))!;
+    const searchField = (element: HTMLElement) =>
+      element.querySelector<HTMLInputElement>('#users-search')!;
+    const select = (element: HTMLElement, id: string) =>
+      element.querySelector<HTMLSelectElement>(`#${id}`)!;
+
+    it('keeps Search users, Role and Status in the filter group and Table settings outside', async () => {
+      const { element } = await renderPage();
+      const group = element.querySelector('[role="search"]');
+      const settings = Array.from(element.querySelectorAll('button')).find(
+        (button) => button.textContent?.trim() === 'Table settings',
+      )!;
+
+      expect(group?.getAttribute('aria-label')).toBe('Filter users');
+      expect(
+        Array.from(group?.querySelectorAll('input, select') ?? []).map((control) => control.id),
+      ).toEqual(['users-search', 'users-role', 'users-status']);
+      expect(group?.contains(settings)).toBe(false);
+      expect(group?.compareDocumentPosition(settings)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it('shows no chip and no Clear all without a filter', async () => {
+      const { element } = await renderPage();
+
+      expect(chipButtons(element)).toEqual([]);
+      expect(clearAllButton(element)).toBeUndefined();
+    });
+
+    it('shows a chip for each applied filter in control order, then Clear all', async () => {
+      const page = await renderPage();
+
+      await choose(page, 'users-role', 'Admin');
+      await type(page, 'hopper');
+
+      expect(chipNames(page.element)).toEqual([
+        'Remove filter Search: hopper',
+        'Remove filter Role: Admin',
+      ]);
+      expect(clearAllButton(page.element)).toBeDefined();
+    });
+
+    it('shows no chip for search text still waiting on the pause', async () => {
+      const page = await renderPage();
+
+      await type(page, 'hop', SEARCH_DEBOUNCE_MS - 1);
+
+      expect(chipButtons(page.element)).toEqual([]);
+    });
+
+    it('removes the role filter and focuses the Status chip that took its place', async () => {
+      const page = await renderPage();
+      await choose(page, 'users-role', 'Admin');
+      await choose(page, 'users-status', 'suspended');
+
+      chip(page.element, 'Role: Admin').click();
+      await page.settle();
+
+      expect(page.grid.query()).toEqual({ q: '', status: 'suspended' });
+      expect(select(page.element, 'users-role').value).toBe('');
+      expect(document.activeElement).toBe(chip(page.element, 'Status: suspended'));
+    });
+
+    it('removes the last chip in the row and focuses the new last chip', async () => {
+      const page = await renderPage();
+      await type(page, 'hopper');
+      await choose(page, 'users-role', 'Admin');
+
+      chip(page.element, 'Role: Admin').click();
+      await page.settle();
+
+      expect(page.grid.query()).toEqual({ q: 'hopper' });
+      expect(document.activeElement).toBe(chip(page.element, 'Search: hopper'));
+    });
+
+    it('removes the search at once and focuses Search users when no chip is left', async () => {
+      const page = await renderPage();
+      await type(page, 'hopper');
+
+      chip(page.element, 'Search: hopper').click();
+      await page.settle();
+
+      expect(page.grid.query()).toEqual({ q: '' });
+      expect(searchField(page.element).value).toBe('');
+      expect(document.activeElement).toBe(searchField(page.element));
+      expect(chipButtons(page.element)).toEqual([]);
+      expect(clearAllButton(page.element)).toBeUndefined();
+
+      // Nothing is left waiting on the pause to bring the search back.
+      vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+      await page.settle();
+      expect(page.grid.query()).toEqual({ q: '' });
+    });
+
+    it('announces the result after a chip is removed', async () => {
+      const page = await renderPage();
+      await choose(page, 'users-status', 'suspended');
+      page.grid.loaded.emit(25_000);
+      await page.settle();
+
+      chip(page.element, 'Status: suspended').click();
+      await page.settle();
+      page.grid.loadingChange.emit(true);
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+
+      expect(statusText(page.element)).toBe('500,000 users');
+    });
+
+    it('clears every filter with one query change and focuses Search users', async () => {
+      const page = await renderPage();
+      await type(page, 'hopper');
+      await choose(page, 'users-role', 'Admin');
+      await choose(page, 'users-status', 'active');
+      const before = page.grid.queries.length;
+
+      clearAllButton(page.element)?.click();
+      await page.settle();
+
+      expect(page.grid.queries.slice(before)).toEqual([{ q: '' }]);
+      expect(searchField(page.element).value).toBe('');
+      expect(select(page.element, 'users-role').value).toBe('');
+      expect(select(page.element, 'users-status').value).toBe('');
+      expect(chipButtons(page.element)).toEqual([]);
+      expect(clearAllButton(page.element)).toBeUndefined();
+      expect(document.activeElement).toBe(searchField(page.element));
+
+      page.grid.loadingChange.emit(true);
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+      expect(statusText(page.element)).toBe('500,000 users');
+    });
+
+    it('has no axe violations with chips shown', async () => {
+      const page = await renderPage();
+      await type(page, 'hopper');
+      await choose(page, 'users-role', 'Admin');
+
+      vi.useRealTimers();
+      await expectNoAxeViolations(page.element);
+    });
+  });
+
   describe('table settings', () => {
     const settingsButton = (element: HTMLElement) =>
       Array.from(element.querySelectorAll('button')).find(
@@ -439,7 +611,8 @@ describe('UsersPage', () => {
 
       expect(button.getAttribute('aria-haspopup')).toBe('dialog');
       expect(button.getAttribute('type')).toBe('button');
-      expect(button.closest('div')).toBe(search.closest('div')?.parentElement);
+      // Same toolbar row as the filter group, but outside it.
+      expect(button.closest('div')).toBe(search.closest('[role="search"]')?.parentElement);
     });
 
     it('opens the dialog and returns focus to the button on Close', async () => {

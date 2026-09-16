@@ -1,6 +1,15 @@
 import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
-import { listStatus, openList, recordListRequests, roleFilter, statusFilter } from './support/app';
+import {
+  clearAllButton,
+  filterChip,
+  listStatus,
+  openList,
+  recordListRequests,
+  roleFilter,
+  searchList,
+  statusFilter,
+} from './support/app';
 
 const searchField = (page: Page) => page.getByLabel('Search users');
 const total = (page: Page) => page.locator('app-users-page h1 + p');
@@ -120,5 +129,82 @@ test.describe('user list filters', () => {
     await expect(listStatus(page)).toContainText(/users match/);
     await expect(total(page)).toContainText(/users match/);
     await expect(statusFilter(page)).toBeFocused();
+  });
+});
+
+test.describe('user list filter chips', () => {
+  test('shows a chip for each active filter, then Clear all', async ({ page }) => {
+    await openList(page);
+    await expect(clearAllButton(page)).toBeHidden();
+
+    await searchField(page).fill('hopper');
+    await roleFilter(page).selectOption('Admin');
+
+    await expect(page.getByRole('list', { name: 'Active filters' }).getByRole('button')).toHaveText(
+      [/Search: hopper/, /Role: Admin/],
+    );
+    await expect(filterChip(page, 'Search: hopper')).toBeVisible();
+    await expect(filterChip(page, 'Role: Admin')).toBeVisible();
+    await expect(clearAllButton(page)).toBeVisible();
+  });
+
+  test('removing a chip drops that filter from the first page and moves focus', async ({
+    page,
+  }) => {
+    await openList(page);
+    await roleFilter(page).selectOption('Admin');
+    await statusFilter(page).selectOption('suspended');
+    await expect(filterChip(page, 'Status: suspended')).toBeVisible();
+    await expect(listStatus(page)).toContainText(/match/);
+    const requests = await recordListRequests(page);
+
+    await filterChip(page, 'Role: Admin').click();
+
+    await expect.poll(requests).toEqual([{ skip: 0, limit: 25, status: 'suspended' }]);
+    await expect(roleFilter(page)).toHaveValue('');
+    await expect(filterChip(page, 'Status: suspended')).toBeFocused();
+    await expect(listStatus(page)).toContainText(/users match/);
+  });
+
+  test('removing the search chip empties the field without waiting for a pause', async ({
+    page,
+  }) => {
+    await searchList(page, 'hopper');
+    const requests = await recordListRequests(page);
+
+    await filterChip(page, 'Search: hopper').click();
+
+    await expect(searchField(page)).toHaveValue('');
+    await expect(searchField(page)).toBeFocused();
+    await expect.poll(requests).toEqual([{ skip: 0, limit: 25 }]);
+    await expect(listStatus(page)).toHaveText('500,000 users');
+  });
+
+  test('Clear all removes every filter with one request and keeps the sort', async ({ page }) => {
+    await openList(page);
+    const email = page.getByRole('columnheader', { name: 'Email' });
+    await email.click();
+    await email.click();
+    await expect(email).toHaveAttribute('aria-sort', 'descending');
+    await searchField(page).fill('hopper');
+    await roleFilter(page).selectOption('Viewer');
+    await statusFilter(page).selectOption('active');
+    await expect(filterChip(page, 'Status: active')).toBeVisible();
+    await expect(listStatus(page)).toContainText(/match/);
+    const requests = await recordListRequests(page);
+
+    await clearAllButton(page).click();
+
+    await expect(total(page)).toHaveText('500,000 users');
+    expect(await requests()).toEqual([
+      { skip: 0, limit: 25, sort: { field: 'email', direction: 'desc' } },
+    ]);
+    await expect(searchField(page)).toHaveValue('');
+    await expect(searchField(page)).toBeFocused();
+    await expect(roleFilter(page)).toHaveValue('');
+    await expect(statusFilter(page)).toHaveValue('');
+    await expect(clearAllButton(page)).toBeHidden();
+    await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
+    await expect(email).toHaveAttribute('aria-sort', 'descending');
   });
 });

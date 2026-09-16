@@ -1,5 +1,12 @@
 import { expect, test } from './support/test';
-import { openList, statusFilter } from './support/app';
+import {
+  clearAllButton,
+  filterChip,
+  listStatus,
+  openList,
+  showChipsList,
+  statusFilter,
+} from './support/app';
 
 /**
  * A page request settles within the in-memory API's 250 ms latency plus the grid's 50 ms debounce.
@@ -29,6 +36,21 @@ test.describe('leaving the list mid-load logs nothing', () => {
     await page.keyboard.press('Enter');
 
     await expect(page.getByRole('heading', { level: 1, name: 'New user' })).toBeVisible();
+    await page.waitForTimeout(SETTLE_MS);
+  });
+});
+
+test.describe('operating the list logs nothing', () => {
+  test('removing a filter chip, then Clear all', async ({ page }) => {
+    await showChipsList(page);
+
+    await filterChip(page, 'Role: Admin').click();
+    await expect(filterChip(page, 'Status: active')).toBeFocused();
+    await expect(listStatus(page)).toContainText(/match/);
+    await clearAllButton(page).click();
+
+    await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
+    await expect(listStatus(page)).toHaveText('500,000 users');
     await page.waitForTimeout(SETTLE_MS);
   });
 });

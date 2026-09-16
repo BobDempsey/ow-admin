@@ -4,6 +4,7 @@ import {
   USER_ID,
   VIEWPORTS,
   choosePageSize,
+  filterChip,
   openDetail,
   openList,
   openMissingUser,
@@ -11,6 +12,7 @@ import {
   menuButton,
   navDrawer,
   resetPasswordDialog,
+  showChipsList,
   showFixedHeader,
 } from './support/app';
 import { obscuredFocusStops } from './support/layout';
@@ -162,6 +164,48 @@ test.describe('keyboard flows', () => {
       () => !!document.activeElement?.closest('.ag-paging-panel'),
     );
     expect(inPaging).toBe(true);
+  });
+
+  test('list: chips and Clear all come after Table settings and before the grid', async ({
+    page,
+  }) => {
+    await showChipsList(page);
+
+    await page.getByLabel('Search users').focus();
+    const stops = [
+      'Role',
+      'Status',
+      'Table settings',
+      'Remove filter Search: hopper',
+      'Remove filter Role: Admin',
+      'Remove filter Status: active',
+      'Clear all',
+    ];
+    for (const name of stops) {
+      await page.keyboard.press('Tab');
+      await expect(focused(page)).toHaveAccessibleName(name);
+    }
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAttribute('role', 'columnheader');
+  });
+
+  test('list: Enter removes a chip and Space on Clear all clears the rest', async ({ page }) => {
+    await showChipsList(page);
+
+    await filterChip(page, 'Role: Admin').focus();
+    await page.keyboard.press('Enter');
+    await expect(filterChip(page, 'Role: Admin')).toHaveCount(0);
+    await expect(focused(page)).toHaveAccessibleName('Remove filter Status: active');
+    await expect(page.getByLabel('Role', { exact: true })).toHaveValue('');
+
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Clear all');
+    await page.keyboard.press('Space');
+
+    await expect(focused(page)).toHaveAccessibleName('Search users');
+    await expect(page.getByLabel('Search users')).toHaveValue('');
+    await expect(page.getByLabel('Status', { exact: true })).toHaveValue('');
+    await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
   });
 
   test('list: a fixed header never hides the focused cell while arrowing a 100-row page', async ({

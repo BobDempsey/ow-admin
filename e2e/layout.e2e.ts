@@ -14,6 +14,7 @@ import {
   openResetDialog,
   menuButton,
   navDrawer,
+  showChipsList,
   showFixedHeader,
   showFilteredList,
   showNavDrawer,
@@ -42,6 +43,7 @@ const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void>
   { name: 'user list with search results', slug: 'search', open: showSearchResults },
   { name: 'user list with no search results', slug: 'no-results', open: showNoSearchResults },
   { name: 'user list with a filter', slug: 'filter', open: showFilteredList },
+  { name: 'user list with a search and two filters', slug: 'chips', open: showChipsList },
   { name: 'user list with a fixed header', slug: 'fixed-header', open: showFixedHeader },
   { name: 'new user with errors', slug: 'new-errors', open: showNewUserErrors },
   { name: 'user detail', slug: 'detail', open: openDetail },
@@ -191,9 +193,15 @@ test('new user screen passes at 320px with no errors shown', async ({ page }) =>
   expect(await scrollsHorizontally(page)).toBe(false);
 });
 
-test('Table settings sits across from the search field at 1280px', async ({ page }) => {
+/** The card that holds the list's filters and grid. */
+const listCard = (page: Page) => page.locator('app-users-page div:has(> app-users-grid)');
+
+test('Table settings sits in the table card top-right, across from the search field at 1280px', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await openList(page);
+  const card = (await listCard(page).boundingBox())!;
   const field = (await page.getByLabel('Search users').boundingBox())!;
   const button = (await tableSettingsButton(page).boundingBox())!;
 
@@ -201,15 +209,25 @@ test('Table settings sits across from the search field at 1280px', async ({ page
   expect(button.y).toBeLessThan(field.y + field.height);
   expect(field.y).toBeLessThan(button.y + button.height);
   expect(button.x).toBeGreaterThan(field.x + field.width);
+  // The card's top-right corner, inside its padding.
+  expect(button.x + button.width).toBeGreaterThan(card.x + card.width - 32);
+  expect(button.x + button.width).toBeLessThanOrEqual(card.x + card.width);
+  expect(button.y).toBeLessThan(card.y + 80);
+  await expect(page.getByRole('search', { name: 'Filter users' })).not.toContainText(
+    'Table settings',
+  );
 });
 
-test('Table settings wraps below the search field at 320px', async ({ page }) => {
+test('Table settings wraps below the filters inside the table card at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await openList(page);
+  const card = (await listCard(page).boundingBox())!;
   const field = (await page.getByLabel('Search users').boundingBox())!;
   const button = (await tableSettingsButton(page).boundingBox())!;
 
   expect(button.y).toBeGreaterThanOrEqual(field.y + field.height);
+  expect(button.x).toBeGreaterThanOrEqual(card.x);
+  expect(button.x + button.width).toBeLessThanOrEqual(card.x + card.width);
   expect(await scrollsHorizontally(page)).toBe(false);
 });
 

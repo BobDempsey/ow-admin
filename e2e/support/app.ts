@@ -62,6 +62,31 @@ export async function showFilteredList(page: Page): Promise<void> {
   await expect(listStatus(page)).toContainText(/match/);
 }
 
+/** A chip in the list's Active filters row, found by its visible label such as "Role: Admin". */
+export const filterChip = (page: Page, label: string) =>
+  page.getByRole('button', { name: `Remove filter ${label}`, exact: true });
+
+/** The Clear all button after the filter chips. */
+export const clearAllButton = (page: Page) =>
+  page.getByRole('button', { name: 'Clear all', exact: true });
+
+/**
+ * Opens the list with a search and two filters, so three chips and Clear all show, and waits for
+ * the filtered result to be announced.
+ */
+export async function showChipsList(page: Page): Promise<void> {
+  await searchList(page, 'hopper');
+  const requests = await recordListRequests(page);
+  await roleFilter(page).selectOption('Admin');
+  await statusFilter(page).selectOption('active');
+  // Both loads end in "match", so wait on the request before waiting on the text.
+  await expect
+    .poll(async () => (await requests()).at(-1))
+    .toMatchObject({ q: 'hopper', role: 'Admin', status: 'active' });
+  await expect(listStatus(page)).toContainText(/match/);
+  await expect(clearAllButton(page)).toBeVisible();
+}
+
 /**
  * Records every page request the list makes from now on, by wrapping `UsersService.loadPage` on
  * the live grid through `ng.getComponent`. Dev server only. Returns a reader for the requests.
