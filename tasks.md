@@ -3,7 +3,9 @@
 - [ ] Add unit tests for the detail screen avatar and the AI assistant drawer
 - [ ] Recheck header contrast in e2e/contrast.e2e.ts now that the header is dark again, including the muted icon buttons
 - [ ] Run the accessibility e2e suite, adding the open AI assistant drawer as an axe state
+- [ ] Check Tab order in the Table settings dialog now that Close sits first, after the heading
 - [ ] Check the header at 320px and at md with the AI assistant, Theme and Menu buttons, and Tab order through them
 - [ ] Record the icon buttons, detail avatar, header order, dark header and AI assistant demo in docs/accessibility.md, README and the About page
 - [ ] Decide whether the Theme button name should include the current theme
 - [ ] Record these UI changes as an OpenSpec change
+- [ ] Update handoff.md for these UI changes, including the dark header
