@@ -122,9 +122,25 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
           type="button"
           aria-haspopup="dialog"
           (click)="tableSettings.show(tableSettingsButton)"
-          class="ml-auto min-h-11 shrink-0 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          title="Table settings"
+          class="ml-auto inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-line text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-safe:transition-colors"
         >
-          Table settings
+          <svg
+            aria-hidden="true"
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" />
+            <circle cx="15" cy="6" r="2" />
+            <circle cx="9" cy="12" r="2" />
+            <circle cx="17" cy="18" r="2" />
+          </svg>
+          <span class="sr-only">Table settings</span>
         </button>
       </div>
       <app-filter-chips
