@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <h1 tabindex="-1" class="text-3xl font-semibold text-ink focus:outline-none">About this app</h1>
-    <p class="mt-3 max-w-prose text-lg text-ink-muted">
+    <p class="mt-1 max-w-prose text-ink-muted">
       An admin screen for managing users, built as a take-home exercise.
     </p>
 

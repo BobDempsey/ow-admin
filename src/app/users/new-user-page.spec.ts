@@ -49,6 +49,9 @@ describe('NewUserPage', () => {
     const { element, control } = await renderPage();
 
     expect(element.querySelector('h1')?.textContent?.trim()).toBe('New user');
+    expect(element.querySelector('h1 + p')?.textContent?.trim()).toBe(
+      'Add a user and choose their role and status.',
+    );
     expect(control('Name')?.value).toBe('');
     expect(control('Email')?.value).toBe('');
     expect(control('Role')?.value).toBe('Member');

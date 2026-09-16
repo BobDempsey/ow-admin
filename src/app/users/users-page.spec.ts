@@ -116,6 +116,19 @@ describe('UsersPage', () => {
     expect(document.activeElement).toBe(element.querySelector('h1'));
   });
 
+  it('describes the screen under the title row, which keeps the total and New user', async () => {
+    const { element, grid, settle } = await renderPage();
+    grid.loaded.emit(12);
+    await settle();
+    const titleRow = element.querySelector('h1')?.parentElement;
+
+    expect(titleRow?.nextElementSibling?.textContent?.trim()).toBe(
+      'Find a user by name or email, or narrow the list by role and status.',
+    );
+    expect(titleRow?.textContent).toContain('12 users');
+    expect(titleRow?.querySelector('a')?.textContent?.trim()).toBe('New user');
+  });
+
   it('links New user to the create screen', async () => {
     const { element } = await renderPage();
     const link = Array.from(element.querySelectorAll('a')).find(

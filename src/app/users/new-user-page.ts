@@ -18,6 +18,7 @@ import { UsersService } from './users.service';
       >Back to users</a
     >
     <h1 tabindex="-1" class="mt-4 text-2xl font-semibold text-ink focus:outline-none">New user</h1>
+    <p class="mt-1 text-ink-muted">Add a user and choose their role and status.</p>
     <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">
       @if (fields().submitting()) {
         Creating user…

@@ -53,6 +53,9 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
         >New user</a
       >
     </div>
+    <p class="mt-1 text-ink-muted">
+      Find a user by name or email, or narrow the list by role and status.
+    </p>
     <div class="mt-4 flex flex-wrap items-end gap-4">
       <div class="grid max-w-md grow basis-64 gap-1">
         <label for="users-search" class="font-medium text-ink">Search users</label>

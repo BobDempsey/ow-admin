@@ -143,6 +143,9 @@ describe('UserDetailPage', () => {
 
       expect(heading()?.textContent?.trim()).toBe(seeded.name);
       expect(element.textContent).toContain(`ID ${ID}`);
+      expect(element.textContent).toContain(
+        "Change this user's details, or send a password reset email.",
+      );
       const idLine = Array.from(element.querySelectorAll('p')).find(
         (paragraph) => paragraph.textContent?.trim() === `ID ${ID}`,
       );
@@ -168,6 +171,9 @@ describe('UserDetailPage', () => {
 
       expect(heading()?.textContent?.trim()).toBe('User not found');
       expect(element.textContent).toContain('No user exists with the id u-999999.');
+      expect(element.textContent).not.toContain(
+        "Change this user's details, or send a password reset email.",
+      );
       expect(element.querySelector('form')).toBeNull();
       expect(element.querySelector('[role="alert"]')).toBeNull();
     });
@@ -183,6 +189,9 @@ describe('UserDetailPage', () => {
       });
       expect(page.alert()).toContain('The user could not be loaded.');
       expect(page.element.querySelector('form')).toBeNull();
+      expect(page.element.textContent).not.toContain(
+        "Change this user's details, or send a password reset email.",
+      );
 
       await page.click('Try again');
 

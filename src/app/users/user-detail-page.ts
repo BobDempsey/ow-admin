@@ -47,6 +47,10 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
     >
       {{ heading() }}
     </h1>
+    <!-- Only a loaded user gets the description, never "User not found" or a load failure. -->
+    @if (user.hasValue()) {
+      <p class="mt-1 text-ink-muted">Change this user's details, or send a password reset email.</p>
+    }
     <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">{{ status() }}</p>
 
     @if (notFound()) {

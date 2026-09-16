@@ -45,8 +45,11 @@ ModuleRegistry.registerModules([
 
 const DEFAULT_PAGE_SIZE = 25;
 
-/** The space the heading, search row, status line and page padding take above and below the grid. */
-const GRID_HEIGHT_OFFSET = '19rem';
+/**
+ * The space the heading, description, search row, status line and page padding take above and
+ * below the grid.
+ */
+const GRID_HEIGHT_OFFSET = '20.75rem';
 
 /**
  * Tailwind slate and sky values, so the grid matches the app's color tokens in styles.css. AG Grid

@@ -22,6 +22,15 @@ describe('AboutPage', () => {
     expect(headings[0].getAttribute('tabindex')).toBe('-1');
   });
 
+  it('follows the heading with a lead paragraph in the screen description style', async () => {
+    const element = await render();
+    const lead = element.querySelector('h1 + p');
+
+    expect(text(lead)).toBe('An admin screen for managing users, built as a take-home exercise.');
+    expect(lead?.classList).toContain('text-ink-muted');
+    expect(lead?.classList).not.toContain('text-lg');
+  });
+
   it('has a section for each topic', async () => {
     const element = await render();
 
