@@ -1,8 +1,9 @@
 - [ ] avatar should also go on user detail page
-- [ ] Run Prettier check on the new icon buttons (theme, table settings, dialog and drawer close)
-- [ ] Run unit tests for the new icon buttons and fix any that expect the old Close placement
-- [ ] Run the accessibility e2e suite for the new icon buttons, including Tab order in the Table settings dialog and 320px layout
-- [ ] Record the icon buttons in docs/accessibility.md and README
+- [ ] Run Prettier check on the new icon buttons (theme, table settings, menu, dialog and drawer close)
+- [ ] Run unit tests for the new icon buttons and fix any that expect the old Close placement or Menu inside the nav
+- [ ] Run the accessibility e2e suite for the new icon buttons, including Tab order in the Table settings dialog and header
+- [ ] Check the header at 320px and at md with the Menu button outside the nav landmark and the theme menu still on screen
+- [ ] Record the icon buttons and header order in docs/accessibility.md and README
 - [ ] Decide whether the Theme button name should include the current theme
-- [ ] Record the icon button restyles as an OpenSpec change
+- [ ] Record the icon button restyles and header order as an OpenSpec change
 - [ ] add a mock ai chatbot that links back to my ai storefront "visit x to see how an ai assistant could be added to your app"
