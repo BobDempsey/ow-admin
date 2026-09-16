@@ -1,5 +1,4 @@
 - [ ] (Optional) Build password reset action
-- [!] (Optional) Add mobile nav menu and drawer
 - [ ] improve ui styling to a modern look
 - [ ] dropdown carets in user detail page need padding right
 - [ ] run/go through app to surface and fix any console errors or console warnings
