@@ -4,6 +4,7 @@ import { API_LATENCY_MS } from '../core/api/api-config';
 import { provideUsersApi } from '../core/api/provide-users-api';
 import { User, UserPage } from '../core/api/user.model';
 import { ListQuery, UsersDatasource } from './users-datasource';
+import { UserNameCell } from './user-name-cell';
 import { UserPillCell } from './user-pill-cell';
 import { UsersGrid } from './users-grid';
 import { UsersService } from './users.service';
@@ -51,6 +52,13 @@ const columnDefs = (fixture: Awaited<ReturnType<typeof renderGrid>>['fixture']) 
   (fixture.componentInstance as unknown as { columnDefs: ColDef<User>[] }).columnDefs;
 
 describe('UsersGrid', () => {
+  it('renders the name with its initials circle, with room for both', async () => {
+    const { fixture } = await renderGrid({ q: '' });
+    const name = columnDefs(fixture).find((column) => column.field === 'name');
+
+    expect(name).toMatchObject({ cellRenderer: UserNameCell, minWidth: 220 });
+  });
+
   it('shows role and status as pills, with room for "suspended"', async () => {
     const { fixture } = await renderGrid({ q: '' });
     const byField = new Map(columnDefs(fixture).map((column) => [column.field, column]));

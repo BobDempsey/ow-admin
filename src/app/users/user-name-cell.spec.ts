@@ -23,9 +23,31 @@ describe('UserNameCell', () => {
     expect(link?.getAttribute('href')).toBe(`/users/${user.id}`);
   });
 
+  it('shows the initials in a colored circle hidden from assistive technology', async () => {
+    const user: User = { ...seedUser(42), id: 'u-000042', name: 'Radia Lamport' };
+    const element = await renderCell(user);
+    const circle = element.querySelector('span[aria-hidden="true"]');
+
+    expect(circle?.textContent?.trim()).toBe('RL');
+    // u-000042 sums to 456, the first of the six colors.
+    expect(circle?.classList).toContain('bg-avatar-1-surface');
+    expect(circle?.classList).toContain('text-avatar-1-ink');
+    expect(circle?.classList).toContain('rounded-full');
+    expect(circle?.nextElementSibling?.tagName).toBe('A');
+  });
+
+  it('keeps the link name to the user name alone', async () => {
+    const user: User = { ...seedUser(42), name: 'Radia Lamport' };
+    const element = await renderCell(user);
+
+    expect(element.querySelector('a')?.textContent?.trim()).toBe('Radia Lamport');
+    expect(element.querySelector('a span')).toBeNull();
+  });
+
   it('renders nothing while the row is loading', async () => {
     const element = await renderCell(undefined);
 
     expect(element.querySelector('a')).toBeNull();
+    expect(element.querySelector('span')).toBeNull();
   });
 });

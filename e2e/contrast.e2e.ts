@@ -166,6 +166,29 @@ for (const colorScheme of COLOR_SCHEMES) {
       expect(fills.size).toBe(3);
     });
 
+    test('one initials circle of each color reaches 4.5:1', async ({ page }) => {
+      await openList(page);
+      const circles = await page
+        .locator('.ag-row:has(a) [col-id="name"] span[aria-hidden="true"]')
+        .evaluateAll((elements) =>
+          elements.map((circle) => {
+            const style = getComputedStyle(circle);
+            const color = Array.from(circle.classList).find((name) => name.startsWith('bg-avatar'));
+            return { color, text: style.color, fill: style.backgroundColor };
+          }),
+        );
+      const byColor = new Map(circles.map((circle) => [circle.color, circle]));
+
+      expect([...byColor.keys()].sort()).toEqual(
+        [1, 2, 3, 4, 5, 6].map((index) => `bg-avatar-${index}-surface`),
+      );
+      for (const [color, circle] of byColor) {
+        const ratio = await contrast(page, circle.text, circle.fill);
+        console.log(`${colorScheme}: ${color} ${ratio.toFixed(2)}:1`);
+        expect(ratio).toBeGreaterThanOrEqual(TEXT);
+      }
+    });
+
     test('role pills reach 4.5:1 on plain and striped rows', async ({ page }) => {
       await storeTableSettings(page, { striped: true });
       await openList(page);

@@ -207,7 +207,8 @@ export class UsersGrid {
   protected readonly defaultPageSize = DEFAULT_PAGE_SIZE;
   protected readonly pageSizes = [25, 50, 100];
   protected readonly columnDefs: ColDef<User>[] = [
-    { field: 'name', headerName: 'Name', cellRenderer: UserNameCell, flex: 1, minWidth: 180 },
+    // 220 px leaves room for the initials circle beside a two-line name.
+    { field: 'name', headerName: 'Name', cellRenderer: UserNameCell, flex: 1, minWidth: 220 },
     { field: 'email', headerName: 'Email', flex: 1.5, minWidth: 240 },
     {
       field: 'role',

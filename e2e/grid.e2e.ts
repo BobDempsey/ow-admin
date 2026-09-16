@@ -61,6 +61,27 @@ test.describe('user grid', () => {
     expect(await clippedText(page)).toEqual([]);
   });
 
+  test('a user keeps the same initials circle color after paging away and back', async ({
+    page,
+  }) => {
+    await openList(page);
+    const circle = page
+      .locator('.ag-row:has(a)', { hasText: 'Ada Allen' })
+      .locator('[col-id="name"] span[aria-hidden="true"]');
+    const before = await circle.getAttribute('class');
+    const pageNumber = page.getByRole('spinbutton', { name: /Page number/ });
+
+    await page.getByRole('button', { name: 'Next Page' }).click();
+    await expect(pageNumber).toHaveAccessibleName(/Page number, 2 of/);
+    await page.locator('.ag-row a').first().waitFor();
+    await page.getByRole('button', { name: 'Previous Page' }).click();
+    await expect(pageNumber).toHaveAccessibleName(/Page number, 1 of/);
+
+    await expect(circle).toHaveText('AA');
+    expect(await circle.getAttribute('class')).toBe(before);
+    expect(before).toMatch(/bg-avatar-\d-surface/);
+  });
+
   for (const movableColumns of [false, true]) {
     test(`columns cannot be resized by dragging a header edge with Draggable columns ${movableColumns ? 'on' : 'off'} (2.5.7)`, async ({
       page,
