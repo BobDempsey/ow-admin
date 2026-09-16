@@ -1,2 +1,1 @@
 - [ ] improve ui styling to a modern look
-- [!] run/go through app to surface and fix any console errors or console warnings
