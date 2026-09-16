@@ -62,16 +62,30 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
       }
       <a
         routerLink="/users/new"
-        class="ml-auto inline-flex min-h-11 items-center rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >New user</a
+        class="ml-auto inline-flex min-h-11 items-center gap-2 rounded bg-primary pr-4 pl-3 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
+        <svg
+          aria-hidden="true"
+          class="size-5 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="9" cy="8" r="4" />
+          <path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6" />
+        </svg>
+        New user
+      </a>
     </div>
     <p class="mt-1 text-ink-muted">
       Find a user by name or email, or narrow the list by role and status.
     </p>
     <!-- One card holds the filters, the load status and the grid; the grid sits flush inside it. -->
-    <div class="mt-4 overflow-clip rounded-card border border-line-subtle bg-surface shadow-card">
-      <div class="flex flex-wrap items-end gap-4 px-4 pt-4 pb-2">
+    <div class="mt-6 overflow-clip rounded-card border border-line-subtle bg-surface shadow-card">
+      <div class="flex flex-wrap items-end gap-4 px-4 pt-5 pb-4">
         <!-- A search landmark rather than a toolbar: arrow keys already mean something in each control. -->
         <div role="search" aria-label="Filter users" class="flex grow flex-wrap items-end gap-4">
           <div class="grid max-w-md grow basis-64 gap-1">

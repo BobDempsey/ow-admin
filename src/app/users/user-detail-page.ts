@@ -20,6 +20,7 @@ import { APP_NAME } from '../core/page-title-strategy';
 import { User, UserDraft, Versioned } from '../core/api/user.model';
 import { ConflictChoice, ConflictDialog } from './conflict-dialog';
 import { ResetPasswordDialog } from './reset-password-dialog';
+import { AVATAR_COLOR_CLASSES, avatarColorIndex, initialsOf } from './user-avatar';
 import { toFieldErrors, userDraftSchema } from './user-draft-schema';
 import { UserFormFields, focusFirstError } from './user-form-fields';
 import { UsersService } from './users.service';
@@ -39,17 +40,28 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
       class="text-link underline underline-offset-2 hover:text-link-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >Back to users</a
     >
-    <!-- One heading element for every state, so the focus placed on it after navigation stays. -->
-    <h1
-      #headingElement
-      tabindex="-1"
-      class="mt-4 text-2xl font-semibold break-words text-ink focus:outline-none"
-    >
-      {{ heading() }}
-    </h1>
+    <div class="mt-4 flex items-center gap-4">
+      <!-- Hidden from assistive technology, since the heading beside it already names the user. -->
+      @if (avatar(); as avatar) {
+        <span
+          aria-hidden="true"
+          class="inline-flex size-14 shrink-0 items-center justify-center rounded-full text-xl font-semibold"
+          [class]="avatar.classes"
+          >{{ avatar.initials }}</span
+        >
+      }
+      <!-- One heading element for every state, so the focus placed on it after navigation stays. -->
+      <h1
+        #headingElement
+        tabindex="-1"
+        class="min-w-0 text-2xl font-semibold break-words text-ink focus:outline-none"
+      >
+        {{ heading() }}
+      </h1>
+    </div>
     <!-- Only a loaded user gets the description, never "User not found" or a load failure. -->
     @if (user.hasValue()) {
-      <p class="mt-1 text-ink-muted">Change this user's details, or send a password reset email.</p>
+      <p class="mt-2 text-ink-muted">Change this user's details, or send a password reset email.</p>
     }
     <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">{{ status() }}</p>
 
@@ -106,16 +118,41 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
                 #saveButton
                 type="submit"
                 aria-describedby="save-bar-status"
-                class="min-h-11 rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                class="inline-flex min-h-11 items-center gap-2 rounded bg-primary pr-4 pl-3 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
+                <svg
+                  aria-hidden="true"
+                  class="size-5 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
                 Save
               </button>
               <!-- Leaving the screen discards the draft, the same as Cancel on the create screen. -->
               <a
                 routerLink="/users"
-                class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                >Cancel</a
+                class="inline-flex min-h-11 items-center gap-2 rounded border border-line pr-4 pl-3 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
+                <svg
+                  aria-hidden="true"
+                  class="size-5 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+                Cancel
+              </a>
               <!-- Always present, so the text is announced once when it appears. -->
               <p id="save-bar-status" role="status" class="text-sm text-ink-muted">
                 {{ unsaved() ? 'Unsaved changes' : '' }}
@@ -138,8 +175,21 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
               #resetButton
               type="button"
               (click)="openResetDialog()"
-              class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              class="mt-3 inline-flex min-h-11 items-center gap-2 rounded border border-line pr-4 pl-3 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
+              <svg
+                aria-hidden="true"
+                class="size-5 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="7.5" cy="15.5" r="4.5" />
+                <path d="m10.7 12.3 9.8-9.8M17 6l3 3M14 9l2 2" />
+              </svg>
               Reset password
             </button>
             @if (resetFailed()) {
@@ -171,8 +221,20 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
             <button
               type="button"
               (click)="simulate()"
-              class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              class="mt-3 inline-flex min-h-11 items-center gap-2 rounded border border-line pr-4 pl-3 text-left font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
+              <svg
+                aria-hidden="true"
+                class="size-5 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" />
+              </svg>
               Simulate an edit by another admin
             </button>
           </section>
@@ -244,6 +306,13 @@ export default class UserDetailPage {
       return 'User not found';
     }
     return this.loaded()?.data.name ?? 'User';
+  });
+  /** The saved user's initials and color, matching the circle beside their name in the list. */
+  protected readonly avatar = computed(() => {
+    const user = this.notFound() ? undefined : this.loaded()?.data;
+    return user
+      ? { initials: initialsOf(user.name), classes: AVATAR_COLOR_CLASSES[avatarColorIndex(user.id)] }
+      : undefined;
   });
   protected readonly status = computed(() => {
     if (this.user.isLoading()) {

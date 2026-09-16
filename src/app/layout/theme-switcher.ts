@@ -83,7 +83,7 @@ export class ThemeIcon {
       [attr.aria-controls]="open() ? menuId : null"
       (click)="toggle()"
       (keydown)="onButtonKeydown($event)"
-      class="inline-flex size-11 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-expanded:bg-surface-muted aria-expanded:text-ink motion-safe:transition-colors"
+      class="inline-flex size-11 items-center justify-center rounded-lg text-header-muted hover:bg-header-hover hover:text-header-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus aria-expanded:bg-header-hover aria-expanded:text-header-ink motion-safe:transition-colors"
     >
       <app-theme-icon [preference]="theme.preference()" class="size-5" />
       <span class="sr-only">Theme</span>
