@@ -203,10 +203,11 @@ describe('UserDetailPage', () => {
     });
 
     it('shows no avatar for a user that does not exist', async () => {
-      const { element, heading } = await renderPage({ id: 'u-999999' });
+      const { heading } = await renderPage({ id: 'u-999999' });
 
       expect(heading()?.previousElementSibling).toBeNull();
-      expect(element.querySelector('span.rounded-full[aria-hidden="true"]')).toBeNull();
+      // Scoped to the heading row: the dialogs have their own round icon badges.
+      expect(heading()?.parentElement?.querySelector('span.rounded-full')).toBeNull();
     });
 
     it('shows an alert when loading fails, and Try again loads the user', async () => {
