@@ -1,9 +1,10 @@
-- [ ] avatar should also go on user detail page
-- [ ] Run Prettier check on the new icon buttons (theme, table settings, menu, dialog and drawer close)
-- [ ] Run unit tests for the new icon buttons and fix any that expect the old Close placement or Menu inside the nav
-- [ ] Run the accessibility e2e suite for the new icon buttons, including Tab order in the Table settings dialog and header
+- [ ] Run Prettier check on the new icons, avatar, spacing and dark header changes
+- [ ] Run unit tests and fix any that expect the old Close placement, Menu inside the nav, or plain button text
+- [ ] Add unit tests for the detail screen avatar
+- [ ] Recheck header contrast in e2e/contrast.e2e.ts now that the header is dark again, including the muted theme and menu icons
+- [ ] Run the accessibility e2e suite, including Tab order in the Table settings dialog and header
 - [ ] Check the header at 320px and at md with the Menu button outside the nav landmark and the theme menu still on screen
-- [ ] Record the icon buttons and header order in docs/accessibility.md and README
+- [ ] Record the icon buttons, detail avatar, header order and dark header in docs/accessibility.md and README
 - [ ] Decide whether the Theme button name should include the current theme
-- [ ] Record the icon button restyles and header order as an OpenSpec change
+- [ ] Record these UI changes as an OpenSpec change
 - [ ] add a mock ai chatbot that links back to my ai storefront "visit x to see how an ai assistant could be added to your app"
