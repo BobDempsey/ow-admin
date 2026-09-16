@@ -81,6 +81,31 @@ export async function recordListRequests(page: Page): Promise<() => Promise<unkn
   return () => page.evaluate(() => (window as unknown as { listRequests: unknown[] }).listRequests);
 }
 
+/** The header's Theme button, which opens the menu of Light, Dark and System. */
+export const themeButton = (page: Page) => page.getByRole('button', { name: 'Theme' });
+
+/** The open Theme menu. */
+export const themeMenu = (page: Page) => page.getByRole('menu', { name: 'Theme' });
+
+/** Opens the header's Theme menu on whatever screen is showing. */
+export async function openThemeMenu(page: Page): Promise<void> {
+  await themeButton(page).click();
+  await expect(themeMenu(page)).toBeVisible();
+}
+
+/** Opens the user list with the header's Theme menu open. */
+export async function showThemeMenu(page: Page): Promise<void> {
+  await openList(page);
+  await openThemeMenu(page);
+}
+
+/** Opens the Theme menu and picks a choice by pointer. */
+export async function chooseTheme(page: Page, name: 'Light' | 'Dark' | 'System'): Promise<void> {
+  await openThemeMenu(page);
+  await page.getByRole('menuitemradio', { name, exact: true }).click();
+  await expect(themeMenu(page)).toBeHidden();
+}
+
 /** Opens the Table settings dialog from the button beside the user list's search field. */
 export async function openSettingsDialog(page: Page): Promise<void> {
   await openList(page);

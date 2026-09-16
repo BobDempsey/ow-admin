@@ -1,4 +1,13 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  inject,
+  signal,
+  viewChild,
+  viewChildren,
+} from '@angular/core';
 import { ThemePreference, ThemeService } from '../core/theme.service';
 
 const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
@@ -8,36 +17,175 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
 ];
 
 /**
- * The header's Light, Dark and System choice. Native radios give the group name, checked state
- * and arrow-key selection; the inputs are visually hidden and their labels drawn as a segmented
- * control, marked like the current nav entry (underline and bold, not only color).
+ * The header's Light, Dark and System choice, built as a menu button following the WAI-ARIA menu
+ * button pattern: a "Theme" button opens a `menu` of `menuitemradio` items, the chosen one marked
+ * with a check mark. A closed menu is not rendered, so it is out of the accessibility tree. Focus
+ * moves through the items with a roving `tabindex`, and choosing applies the theme, closes the
+ * menu and returns focus to the button.
  */
 @Component({
   selector: 'app-theme-switcher',
+  host: {
+    class: 'relative block',
+    '(document:pointerdown)': 'onDocumentPointerDown($event)',
+    '(focusout)': 'onFocusOut($event)',
+  },
   template: `
-    <fieldset class="m-0 flex min-w-0 flex-wrap items-center gap-x-2 border-0 p-0">
-      <legend class="float-left mr-1 text-sm text-header-muted">Theme</legend>
-      <div class="flex flex-wrap items-center gap-1">
-        @for (option of options; track option.value) {
-          <label
-            class="relative inline-flex min-h-11 cursor-pointer items-center border-b-[3px] border-transparent px-3 text-sm text-header-ink hover:bg-header-hover has-checked:border-header-accent has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-header-focus"
+    <button
+      #button
+      type="button"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="open()"
+      [attr.aria-controls]="open() ? menuId : null"
+      (click)="toggle()"
+      (keydown)="onButtonKeydown($event)"
+      class="inline-flex min-h-11 items-center px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
+    >
+      Theme
+    </button>
+    @if (open()) {
+      <div
+        [id]="menuId"
+        role="menu"
+        aria-label="Theme"
+        class="absolute top-full right-0 z-20 mt-1 min-w-40 rounded border border-line bg-surface py-1 text-ink shadow-lg"
+      >
+        @for (option of options; track option.value; let index = $index) {
+          <button
+            #item
+            type="button"
+            role="menuitemradio"
+            [attr.aria-checked]="theme.preference() === option.value"
+            [tabindex]="index === focusedIndex() ? 0 : -1"
+            (click)="select(option.value)"
+            (keydown)="onMenuKeydown($event, option.value)"
+            class="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-muted focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-focus"
           >
-            <input
-              type="radio"
-              name="theme"
-              class="sr-only"
-              [value]="option.value"
-              [checked]="theme.preference() === option.value"
-              (change)="theme.choose(option.value)"
-            />
+            <!-- The mark keeps its space when unchecked so the labels stay in one column. -->
+            <span class="inline-flex size-4 shrink-0 items-center justify-center">
+              @if (theme.preference() === option.value) {
+                <svg
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4"
+                >
+                  <path d="M3.5 8.5 6.5 11.5 12.5 5" />
+                </svg>
+              }
+            </span>
             {{ option.label }}
-          </label>
+          </button>
         }
       </div>
-    </fieldset>
+    }
   `,
 })
 export class ThemeSwitcher {
+  private readonly injector = inject(Injector);
+  private readonly hostElement = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly button = viewChild.required<ElementRef<HTMLButtonElement>>('button');
+  private readonly items = viewChildren<ElementRef<HTMLButtonElement>>('item');
+
   protected readonly theme = inject(ThemeService);
   protected readonly options = OPTIONS;
+  protected readonly menuId = 'theme-menu';
+  protected readonly open = signal(false);
+  protected readonly focusedIndex = signal(0);
+
+  protected toggle(): void {
+    if (this.open()) {
+      this.close();
+    } else {
+      this.openMenu();
+    }
+  }
+
+  protected select(preference: ThemePreference): void {
+    this.theme.choose(preference);
+    this.close();
+  }
+
+  protected onButtonKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'ArrowDown') {
+      return;
+    }
+    // Handling Enter and Space here rather than letting them click the button keeps one path into
+    // the menu, and stops Space scrolling the page.
+    event.preventDefault();
+    this.openMenu();
+  }
+
+  protected onMenuKeydown(event: KeyboardEvent, preference: ThemePreference): void {
+    switch (event.key) {
+      case 'ArrowDown':
+        this.moveFocus(this.focusedIndex() + 1);
+        break;
+      case 'ArrowUp':
+        this.moveFocus(this.focusedIndex() - 1);
+        break;
+      case 'Home':
+        this.moveFocus(0);
+        break;
+      case 'End':
+        this.moveFocus(OPTIONS.length - 1);
+        break;
+      case 'Enter':
+      case ' ':
+        this.select(preference);
+        break;
+      case 'Escape':
+        this.close();
+        break;
+      case 'Tab':
+        // Only the focused item is tabbable, so leaving focus where it is lets Tab move on to the
+        // next control after the menu, or back to the button. Refocusing the button here would
+        // send Tab straight back into the menu, since the menu follows it in the DOM.
+        this.close(false);
+        return;
+      default:
+        return;
+    }
+    event.preventDefault();
+  }
+
+  protected onDocumentPointerDown(event: Event): void {
+    if (this.open() && !this.hostElement.contains(event.target as Node)) {
+      this.close(false);
+    }
+  }
+
+  protected onFocusOut(event: FocusEvent): void {
+    if (this.open() && !this.hostElement.contains(event.relatedTarget as Node | null)) {
+      this.close(false);
+    }
+  }
+
+  private openMenu(): void {
+    const checked = OPTIONS.findIndex((option) => option.value === this.theme.preference());
+    this.focusedIndex.set(Math.max(checked, 0));
+    this.open.set(true);
+    afterNextRender(() => this.focusItem(), { injector: this.injector });
+  }
+
+  private close(returnFocus = true): void {
+    this.open.set(false);
+    if (returnFocus) {
+      this.button().nativeElement.focus();
+    }
+  }
+
+  private moveFocus(index: number): void {
+    const count = OPTIONS.length;
+    this.focusedIndex.set(((index % count) + count) % count);
+    this.focusItem();
+  }
+
+  private focusItem(): void {
+    this.items()[this.focusedIndex()]?.nativeElement.focus();
+  }
 }

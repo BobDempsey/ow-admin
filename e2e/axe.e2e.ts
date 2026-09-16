@@ -18,6 +18,7 @@ import {
   showFixedHeader,
   showSearchResults,
   showSettingsWcagNote,
+  showThemeMenu,
 } from './support/app';
 import { expectNoAxeViolations } from './support/axe';
 
@@ -36,6 +37,7 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user save failure (forced through ng.getComponent)', open: forceSaveFailure },
   { name: 'conflict dialog', open: openConflictDialog },
   { name: 'about', open: openAbout },
+  { name: 'user list with the Theme menu open', open: showThemeMenu },
   { name: 'table settings dialog', open: openSettingsDialog },
   { name: 'table settings dialog with WCAG note', open: showSettingsWcagNote },
 ];

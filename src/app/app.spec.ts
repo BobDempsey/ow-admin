@@ -42,11 +42,11 @@ describe('App', () => {
     const { element } = await renderApp();
     const header = element.querySelector('header');
     const nav = header!.querySelector('nav')!;
-    const group = header!.querySelector('fieldset')!;
+    const button = header!.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
 
-    expect(group.querySelector('legend')?.textContent?.trim()).toBe('Theme');
-    expect(group.querySelectorAll('input[type="radio"]').length).toBe(3);
-    expect(nav.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(button.textContent?.trim()).toBe('Theme');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(nav.compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('leaves Settings a placeholder that opens no dialog', async () => {

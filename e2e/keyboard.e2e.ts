@@ -86,6 +86,23 @@ test.describe('keyboard flows', () => {
     await expect(page.getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page');
   });
 
+  test('header: the Theme button follows the nav, and Tab closes its open menu', async ({
+    page,
+  }) => {
+    await openList(page);
+
+    await pressUntilFocused(page, 'About');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Theme');
+
+    await page.keyboard.press('Enter');
+    await expect(focused(page)).toHaveText('System');
+    await page.keyboard.press('Tab');
+
+    await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
+    await expect(focused(page)).toHaveAccessibleName('New user');
+  });
+
   test('list: the grid is one tab stop and Enter on a row opens the user', async ({ page }) => {
     await openList(page);
 

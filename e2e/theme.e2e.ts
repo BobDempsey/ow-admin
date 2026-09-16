@@ -1,7 +1,9 @@
 import { Page, expect, test } from '@playwright/test';
-import { openAbout, openList } from './support/app';
+import { chooseTheme, openAbout, openList, openThemeMenu, themeButton } from './support/app';
 
 const root = (page: Page) => page.locator('html');
+const focused = (page: Page) => page.locator(':focus');
+const choice = (page: Page, name: string) => page.getByRole('menuitemradio', { name, exact: true });
 
 test.describe('theme control', () => {
   test.use({ colorScheme: 'light' });
@@ -9,27 +11,64 @@ test.describe('theme control', () => {
   test('starts at System and follows the OS on a first visit', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await openAbout(page);
+    await openThemeMenu(page);
 
-    await expect(page.getByRole('radio', { name: 'System' })).toBeChecked();
+    await expect(choice(page, 'System')).toHaveAttribute('aria-checked', 'true');
+    await expect(choice(page, 'Light')).toHaveAttribute('aria-checked', 'false');
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
     await expect(root(page)).toHaveAttribute('data-ag-theme-mode', 'dark');
   });
 
-  test('chooses Dark with the arrow keys', async ({ page }) => {
+  test('opens and chooses Dark from the keyboard', async ({ page }) => {
     await openList(page);
-    await expect(page.getByRole('group', { name: 'Theme' })).toBeVisible();
+    await expect(themeButton(page)).toHaveAttribute('aria-expanded', 'false');
 
-    await page.getByRole('radio', { name: 'System' }).focus();
-    await page.keyboard.press('ArrowLeft');
+    await themeButton(page).focus();
+    await page.keyboard.press('Enter');
+    await expect(themeButton(page)).toHaveAttribute('aria-expanded', 'true');
+    await expect(focused(page)).toHaveText('System');
 
-    await expect(page.getByRole('radio', { name: 'Dark' })).toBeChecked();
-    await expect(page.getByRole('radio', { name: 'System' })).not.toBeChecked();
+    await page.keyboard.press('Home');
+    await expect(focused(page)).toHaveText('Light');
+    await page.keyboard.press('ArrowDown');
+    await expect(focused(page)).toHaveText('Dark');
+    await page.keyboard.press('Enter');
+
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
+    await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
+    await expect(focused(page)).toHaveText('Theme');
+    await openThemeMenu(page);
+    await expect(choice(page, 'Dark')).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('Escape closes the menu without changing the choice', async ({ page }) => {
+    await openList(page);
+    await themeButton(page).focus();
+    await page.keyboard.press('Enter');
+    await expect(focused(page)).toHaveText('System');
+
+    await page.keyboard.press('Home');
+    await expect(focused(page)).toHaveText('Light');
+    await page.keyboard.press('Escape');
+
+    await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
+    await expect(root(page)).toHaveAttribute('data-theme', 'light');
+    await expect(focused(page)).toHaveText('Theme');
+  });
+
+  test('a click outside closes the menu without changing the choice', async ({ page }) => {
+    await openList(page);
+    await openThemeMenu(page);
+
+    await page.getByRole('heading', { level: 1 }).click();
+
+    await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
+    await expect(root(page)).toHaveAttribute('data-theme', 'light');
   });
 
   test('keeps Dark after a reload, applied before the app renders', async ({ page }) => {
     await openAbout(page);
-    await page.locator('header label', { hasText: 'Dark' }).click();
+    await chooseTheme(page, 'Dark');
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
 
     // Records the theme at the moment the parser inserts <app-root>, before Angular's module
@@ -54,7 +93,8 @@ test.describe('theme control', () => {
       return { theme: record['themeAtAppRoot'], rendered: record['renderedAtAppRoot'] };
     });
     expect(early).toEqual({ theme: 'dark', rendered: false });
-    await expect(page.getByRole('radio', { name: 'Dark' })).toBeChecked();
+    await openThemeMenu(page);
+    await expect(choice(page, 'Dark')).toHaveAttribute('aria-checked', 'true');
   });
 
   test('System switches when the OS scheme changes', async ({ page }) => {
@@ -64,7 +104,8 @@ test.describe('theme control', () => {
     await page.emulateMedia({ colorScheme: 'dark' });
 
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
-    await expect(page.getByRole('radio', { name: 'System' })).toBeChecked();
+    await openThemeMenu(page);
+    await expect(choice(page, 'System')).toHaveAttribute('aria-checked', 'true');
   });
 
   test('applies a choice when storage refuses it', async ({ page }) => {
@@ -77,7 +118,7 @@ test.describe('theme control', () => {
     });
     await openAbout(page);
 
-    await page.locator('header label', { hasText: 'Dark' }).click();
+    await chooseTheme(page, 'Dark');
 
     await expect(root(page)).toHaveAttribute('data-theme', 'dark');
     expect(errors).toEqual([]);

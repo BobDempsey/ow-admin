@@ -15,7 +15,10 @@ import {
   showNoSearchResults,
   showSearchResults,
   showSettingsWcagNote,
+  showThemeMenu,
   tableSettingsButton,
+  themeButton,
+  themeMenu,
 } from './support/app';
 import {
   applyTextSpacing,
@@ -37,6 +40,7 @@ const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void>
   { name: 'user not found', slug: 'not-found', open: openMissingUser },
   { name: 'conflict dialog', slug: 'dialog', open: openConflictDialog },
   { name: 'about', slug: 'about', open: openAbout },
+  { name: 'user list with the Theme menu open', slug: 'theme-menu', open: showThemeMenu },
   { name: 'table settings dialog with WCAG note', slug: 'settings', open: showSettingsWcagNote },
 ];
 
@@ -122,6 +126,22 @@ test('Table settings wraps below the search field at 320px', async ({ page }) =>
   expect(button.y).toBeGreaterThanOrEqual(field.y + field.height);
   expect(await scrollsHorizontally(page)).toBe(false);
 });
+
+for (const viewport of VIEWPORTS) {
+  test(`the Theme menu opens below its button and stays on screen at ${viewport.name}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await showThemeMenu(page);
+    const button = (await themeButton(page).boundingBox())!;
+    const menu = (await themeMenu(page).boundingBox())!;
+
+    expect(menu.y).toBeGreaterThanOrEqual(button.y + button.height);
+    expect(menu.x).toBeGreaterThanOrEqual(0);
+    expect(menu.x + menu.width).toBeLessThanOrEqual(viewport.width);
+    expect(await scrollsHorizontally(page)).toBe(false);
+  });
+}
 
 test('the fixed header list reflows at 320 by 256 px (400 percent zoom)', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 256 });

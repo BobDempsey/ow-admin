@@ -22,7 +22,8 @@ import { TopNav } from './layout/top-nav';
         class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-1"
       >
         <app-top-nav />
-        <app-theme-switcher />
+        <!-- Kept at the right end of its row, so its right-aligned menu opens on screen at any width. -->
+        <app-theme-switcher class="ml-auto" />
       </div>
     </header>
     <main #main id="main" tabindex="-1" class="mx-auto max-w-7xl px-4 py-8 focus:outline-none">
