@@ -22,18 +22,22 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
   - Status shows as a colored pill and role as a neutral pill, each with its word inside, and each name has a circle with the user's initials. While a page loads, the table shows placeholder rows.
   - Each row ends with an Actions button that opens a menu with View and Reset password. The button is not a Tab stop of its own: arrow to the row's Actions cell and press Enter or Space. Reset password asks first, then sends the email without reloading the list.
 - `/users/new` creates a user. On success the app opens the new user's detail screen. New users take the next index, so they appear on the last page of the list.
-- `/users/:id` shows a user as an editable form with Save and Cancel. On a window 1024 pixels or wider the Password and Demo cards sit to the right of the form. Once a field differs from the saved value, Save and Cancel stay at the bottom of the window with the words "Unsaved changes", on windows at least 480 pixels tall. Its Reset password button sends the user a password reset email after you confirm, and leaves unsaved edits in the form.
+- `/users/:id` shows a user as an editable form with Save and Cancel, with the user's initials in a colored circle beside their name. On a window 1024 pixels or wider the Password and Demo cards sit to the right of the form. Once a field differs from the saved value, Save and Cancel stay at the bottom of the window with the words "Unsaved changes", on windows at least 480 pixels tall. Its Reset password button sends the user a password reset email after you confirm, and leaves unsaved edits in the form.
 - `/about` explains the app and how to try it.
 
 Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
 
-On a window narrower than 768 pixels the navigation entries move into a drawer behind a Menu button, and the wordmark and the Theme button stay in the header. Choosing an entry navigates and closes the drawer; Escape, Close and a click outside close it and put focus back on the Menu button.
+The header stays dark in both themes. After the wordmark and the navigation entries it shows three icon buttons: AI assistant, Theme and, on narrow windows, Menu. Each icon button has a tooltip with its name.
 
-The Theme button in the header opens a menu of Light, Dark and System, with a check mark on the current choice. A choice applies as soon as you pick it, and the menu closes. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
+On a window narrower than 768 pixels the navigation entries move into a drawer behind the Menu button, and the wordmark, AI assistant and Theme stay in the header. Choosing an entry navigates and closes the drawer; Escape, the X (Close) button and a click outside close it and put focus back on the Menu button.
+
+The Theme button in the header shows the current choice's icon, and its name and tooltip say the choice, for example "Theme: Dark". It opens a menu of Light, Dark and System, with a check mark on the current choice. A choice applies as soon as you pick it, and the menu closes. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
+
+The AI assistant button opens a demo drawer from the right with a fixed sample conversation and a disabled message field. It sends nothing; its "View the live example" link opens [AI Storefront](https://ai-storefront.bobdempsey83.com/) in a new tab.
 
 The app uses Inter as its typeface, served from the app itself (`@fontsource-variable/inter`), with tabular numbers for the user count and paging.
 
-Table settings, at the top-right of the table card across from Search users, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on.
+Table settings, an icon button at the top-right of the table card across from Search users, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on. The X button beside the dialog's heading closes it, and so does Escape.
 
 ## How the API layer works
 
