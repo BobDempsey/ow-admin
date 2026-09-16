@@ -18,8 +18,11 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
 ## Screens
 
 - `/users` lists users 25, 50 or 100 at a time. Each page is one request to the API. Click a row, or press Enter on a focused row, to open that user. Click a column header, or press Enter on a focused one, to sort by it, and type in Search users to find people by name or email. The Role and Status dropdowns beside the search narrow the list to one role or status, and apply as soon as you choose.
+  - Each active search or filter shows as a chip under the filters. Select a chip to remove that filter, or Clear all to remove every one in a single request. When nothing matches, the table card says so and offers Clear filters.
+  - Status shows as a colored pill and role as a neutral pill, each with its word inside, and each name has a circle with the user's initials. While a page loads, the table shows placeholder rows.
+  - Each row ends with an Actions button that opens a menu with View and Reset password. The button is not a Tab stop of its own: arrow to the row's Actions cell and press Enter or Space. Reset password asks first, then sends the email without reloading the list.
 - `/users/new` creates a user. On success the app opens the new user's detail screen. New users take the next index, so they appear on the last page of the list.
-- `/users/:id` shows a user as an editable form with Save and Cancel. Its Reset password button sends the user a password reset email after you confirm, and leaves unsaved edits in the form.
+- `/users/:id` shows a user as an editable form with Save and Cancel. On a window 1024 pixels or wider the Password and Demo cards sit to the right of the form. Once a field differs from the saved value, Save and Cancel stay at the bottom of the window with the words "Unsaved changes", on windows at least 480 pixels tall. Its Reset password button sends the user a password reset email after you confirm, and leaves unsaved edits in the form.
 - `/about` explains the app and how to try it.
 
 Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
@@ -28,7 +31,9 @@ On a window narrower than 768 pixels the navigation entries move into a drawer b
 
 The Theme button in the header opens a menu of Light, Dark and System, with a check mark on the current choice. A choice applies as soon as you pick it, and the menu closes. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
 
-Table settings, beside Search users on the list, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on.
+The app uses Inter as its typeface, served from the app itself (`@fontsource-variable/inter`), with tabular numbers for the user count and paging.
+
+Table settings, at the top-right of the table card across from Search users, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on.
 
 ## How the API layer works
 
@@ -73,6 +78,10 @@ npm run build
 ```
 
 The build output goes to `dist/`.
+
+## Formatting
+
+Prettier formats the code, and `prettier-plugin-tailwindcss` sorts Tailwind class lists, including those in inline component templates. Check with `npx prettier --check src e2e`, or fix with `npx prettier --write src e2e`.
 
 ## Running unit tests
 
