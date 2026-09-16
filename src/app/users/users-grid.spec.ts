@@ -7,7 +7,9 @@ import {
   GridReadyEvent,
   ICellRendererParams,
   IGetRowsParams,
+  PaginationChangedEvent,
   RowClickedEvent,
+  createGrid,
 } from 'ag-grid-community';
 import { API_LATENCY_MS } from '../core/api/api-config';
 import { seedUser } from '../core/api/in-memory/user-seed';
@@ -33,12 +35,17 @@ function stubGridApi() {
     getGridOption: vi.fn((name: string) => options.get(name)),
     paginationGetPageSize: vi.fn(() => 25),
     paginationGetCurrentPage: vi.fn(() => 1),
-    getDisplayedRowAtIndex: vi.fn((index: number) =>
-      index >= 25 && index < 50 ? { data: seedUser(index) } : undefined,
-    ),
-    ensureIndexVisible: vi.fn(),
     setFocusedCell: vi.fn(),
   };
+}
+
+/** Adds a rendered row to the grid host the way AG Grid draws one, with its name and Actions cells. */
+function addRenderedRow(host: HTMLElement, rowIndex: number, user: User) {
+  const row = document.createElement('div');
+  row.className = 'ag-row';
+  row.setAttribute('row-index', String(rowIndex));
+  row.innerHTML = `<div col-id="name"><a href="/users/${user.id}">${user.name}</a></div><div col-id="actions"><button></button></div>`;
+  host.append(row);
 }
 
 /**
@@ -187,21 +194,63 @@ describe('UsersGrid row actions', () => {
     expect(grid.actions()).toBeUndefined();
   });
 
-  it('focuses an Actions cell on the current page', async () => {
+  it('focuses a rendered Actions cell on the current page', async () => {
     const { api, fixture } = await renderGrid({ q: '' });
+    addRenderedRow(fixture.nativeElement, 27, seedUser(27));
 
     expect(fixture.componentInstance.focusActionsCell(27, seedUser(27).id)).toBe(true);
     expect(api.setFocusedCell).toHaveBeenCalledWith(27, 'actions');
   });
 
-  it('reports false for a row off the current page or holding another user', async () => {
+  it('reports false for a row off the page, not rendered, or holding another user', async () => {
     const { api, fixture } = await renderGrid({ q: '' });
     const grid = fixture.componentInstance;
+    addRenderedRow(fixture.nativeElement, 27, seedUser(27));
 
     expect(grid.focusActionsCell(3)).toBe(false);
     expect(grid.focusActionsCell(60)).toBe(false);
+    expect(grid.focusActionsCell(28)).toBe(false);
     expect(grid.focusActionsCell(27, 'u-999999')).toBe(false);
     expect(api.setFocusedCell).not.toHaveBeenCalled();
+  });
+
+  it('uses only grid APIs whose modules are registered', async () => {
+    // A real grid, so a call into a module this app does not register logs AG Grid error #200,
+    // which the stubbed API above cannot show. The grid reports it after a short delay.
+    const logged: string[] = [];
+    const keep = (...args: unknown[]) => logged.push(args.map(String).join(' '));
+    vi.spyOn(console, 'error').mockImplementation(keep);
+    vi.spyOn(console, 'warn').mockImplementation(keep);
+    TestBed.configureTestingModule({
+      providers: [provideUsersApi(), { provide: API_LATENCY_MS, useValue: 0 }],
+    });
+    TestBed.overrideComponent(UsersGrid, { set: { template: '' } });
+    const fixture = TestBed.createComponent(UsersGrid);
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    const grid = fixture.componentInstance as unknown as GridInternals & {
+      columnDefs: ColDef<User>[];
+      onGridReady(event: GridReadyEvent<User>): void;
+      onPaginationChanged(event: PaginationChangedEvent<User>): void;
+      closeActions(open: unknown, close: { returnFocus: boolean }): void;
+    };
+    const api = createGrid<User>(host.appendChild(document.createElement('div')), {
+      rowModelType: 'infinite',
+      pagination: true,
+      columnDefs: grid.columnDefs,
+    });
+    grid.onGridReady({ api } as GridReadyEvent<User>);
+    addRenderedRow(host, 0, seedUser(0));
+    const { cell } = actionsCell();
+
+    fixture.componentInstance.focusActionsCell(0, seedUser(0).id);
+    grid.onCellKeyDown(keyOnCell('actions', 'Enter', cell, 0).event);
+    grid.closeActions(grid.actions(), { returnFocus: true });
+    grid.onPaginationChanged({ newPage: true } as PaginationChangedEvent<User>);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    api.destroy();
+
+    expect(logged.filter((message) => message.includes('#200'))).toEqual([]);
   });
 });
 

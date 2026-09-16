@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  ElementRef,
   computed,
   effect,
   inject,
@@ -157,6 +158,7 @@ const usersGridTheme = themeQuartz
 export class UsersGrid {
   private readonly users = inject(UsersService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   protected readonly settings = inject(TableSettingsService);
   private api: GridApi<User> | undefined;
 
@@ -346,8 +348,12 @@ export class UsersGrid {
   }
 
   /**
-   * Moves focus to a row's Actions cell. Returns false when that row is not on the current page, or
-   * no longer holds the given user, so the caller can put focus somewhere else.
+   * Moves focus to a row's Actions cell. Returns false when that row is not on the current page, is
+   * not rendered, or no longer holds the given user, so the caller can put focus somewhere else.
+   *
+   * The row is read from the rendered cells rather than through `getDisplayedRowAtIndex` and
+   * `ensureIndexVisible`, whose API modules are not registered. `setFocusedCell` focuses the cell
+   * without scrolling, and `revealFocus` then brings it into view.
    */
   focusActionsCell(rowIndex: number, userId?: string): boolean {
     const api = this.api;
@@ -356,14 +362,16 @@ export class UsersGrid {
     }
     const pageSize = api.paginationGetPageSize();
     const firstRow = api.paginationGetCurrentPage() * pageSize;
-    const data = api.getDisplayedRowAtIndex(rowIndex)?.data;
-    if (rowIndex < firstRow || rowIndex >= firstRow + pageSize || !data) {
+    if (rowIndex < firstRow || rowIndex >= firstRow + pageSize) {
       return false;
     }
-    if (userId && data.id !== userId) {
+    const row = this.host.querySelector(`.ag-row[row-index="${rowIndex}"]`);
+    if (!row?.querySelector('[col-id="actions"] button')) {
       return false;
     }
-    api.ensureIndexVisible(rowIndex);
+    if (userId && !row.querySelector(`[col-id="name"] a[href="/users/${userId}"]`)) {
+      return false;
+    }
     api.setFocusedCell(rowIndex, 'actions');
     return true;
   }
