@@ -18,6 +18,8 @@ const NAV_ENTRIES: readonly NavEntry[] = [
  */
 @Component({
   selector: 'app-top-nav',
+  // Its children join the header row, so the projected theme switcher sits between the nav and Menu.
+  host: { class: 'contents' },
   imports: [RouterLink, RouterLinkActive, NavDrawer],
   template: `
     <nav aria-label="Primary" class="flex flex-wrap items-center gap-x-2 gap-y-1 md:gap-x-6">
@@ -52,17 +54,30 @@ const NAV_ENTRIES: readonly NavEntry[] = [
           </li>
         }
       </ul>
-      <button
-        #menuButton
-        type="button"
-        aria-haspopup="dialog"
-        (click)="openDrawer()"
-        class="inline-flex min-h-11 items-center px-2 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:hidden"
-      >
-        Menu
-      </button>
     </nav>
-    <app-nav-drawer [entries]="entries" />
+    <ng-content />
+    <button
+      #menuButton
+      type="button"
+      aria-haspopup="dialog"
+      (click)="openDrawer()"
+      title="Menu"
+      class="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-safe:transition-colors md:hidden"
+    >
+      <svg
+        aria-hidden="true"
+        class="size-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <span class="sr-only">Menu</span>
+    </button>
+    <app-nav-drawer class="contents" [entries]="entries" />
   `,
 })
 export class TopNav {
