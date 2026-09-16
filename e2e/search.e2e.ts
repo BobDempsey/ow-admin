@@ -53,7 +53,7 @@ test.describe('user list search', () => {
 
     await expect(listStatus(page)).toHaveText('No users match');
     await expect(total(page)).toHaveText('0 users match');
-    await expect(page.getByText('No users match your search.')).toBeVisible();
+    await expect(page.getByText('No users match your search or filters.')).toBeVisible();
   });
 
   test('keeps the current sort', async ({ page }) => {

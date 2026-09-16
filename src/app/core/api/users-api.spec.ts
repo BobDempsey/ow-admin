@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Observable, firstValueFrom } from 'rxjs';
+import { vi } from 'vitest';
 import { API_LATENCY_MS } from './api-config';
 import { ApiError } from './api-error';
 import { seedUser } from './in-memory/user-seed';
@@ -126,6 +128,23 @@ describe('UsersApi', () => {
       'u-000030',
     ]);
     expect(searched).toEqual({ items: [seedUser(42)], total: 1 });
+  });
+
+  it('sends role and status, and sends nothing for the values it was not given', async () => {
+    const get = vi.spyOn(TestBed.inject(HttpClient), 'get');
+
+    const filtered = await firstValueFrom(
+      api.list({ limit: 5, role: 'Viewer', status: 'suspended' }),
+    );
+    await firstValueFrom(api.list({ limit: 5 }));
+
+    expect(get.mock.calls.map(([, options]) => String(options?.params))).toEqual([
+      'limit=5&role=Viewer&status=suspended',
+      'limit=5',
+    ]);
+    for (const user of filtered.items) {
+      expect([user.role, user.status]).toEqual(['Viewer', 'suspended']);
+    }
   });
 
   it('keeps plus signs, spaces and @ in a search', async () => {

@@ -30,12 +30,20 @@ export interface UserSort {
   direction: SortDirection;
 }
 
-export interface PageRequest {
+/** What narrows a list to part of the users. Every field is optional, and an empty one filters nothing. */
+export interface UserFilter {
+  /** Text to find in names and emails, ignoring case. Blank means no search. */
+  q?: string;
+  /** The exact role to keep. */
+  role?: UserRole;
+  /** The exact status to keep. */
+  status?: UserStatus;
+}
+
+export interface PageRequest extends UserFilter {
   skip?: number;
   limit?: number;
   sort?: UserSort;
-  /** Text to find in names and emails, ignoring case. Blank means no search. */
-  q?: string;
 }
 
 /** A resource paired with the ETag the server returned for it. */

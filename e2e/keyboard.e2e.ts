@@ -93,6 +93,10 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAccessibleName('Search users');
     await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Role');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Status');
+    await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAccessibleName('Table settings');
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAttribute('role', 'columnheader');
@@ -107,9 +111,10 @@ test.describe('keyboard flows', () => {
     await openList(page);
 
     await pressUntilFocused(page, 'New user');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
+    // Search, Role, Status, Table settings, then the grid.
+    for (let press = 0; press < 5; press++) {
+      await page.keyboard.press('Tab');
+    }
     await expect(focused(page)).toHaveAttribute('role', 'columnheader');
     await page.keyboard.press('ArrowRight');
     await page.keyboard.press('ArrowRight');
@@ -126,10 +131,10 @@ test.describe('keyboard flows', () => {
     await openList(page);
 
     await pressUntilFocused(page, 'New user');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
+    // Search, Role, Status, Table settings, the grid, then the pagination controls.
+    for (let press = 0; press < 6; press++) {
+      await page.keyboard.press('Tab');
+    }
 
     const inPaging = await page.evaluate(
       () => !!document.activeElement?.closest('.ag-paging-panel'),

@@ -27,7 +27,12 @@ import { ApiError } from '../core/api/api-error';
 import { User } from '../core/api/user.model';
 import { ROW_HEIGHTS, TableSettingsService } from '../core/table-settings.service';
 import { UserNameCell } from './user-name-cell';
-import { createUsersDatasource } from './users-datasource';
+import {
+  EMPTY_LIST_QUERY,
+  ListQuery,
+  createUsersDatasource,
+  sameListQuery,
+} from './users-datasource';
 import { UsersService } from './users.service';
 
 // Registered here, not in app.config.ts, so AG Grid ships only in the lazy /users chunk.
@@ -137,15 +142,18 @@ export class UsersGrid {
   );
   protected readonly initialDomLayout = untracked(this.domLayout);
 
-  /** The committed search text. A change starts the list again from its first page. */
-  readonly query = input('');
+  /**
+   * The committed search and filters. A change starts the list again from its first page; an equal
+   * object is compared field by field, so rebuilding it leaves the cache and the page alone.
+   */
+  readonly query = input<ListQuery>(EMPTY_LIST_QUERY);
 
   constructor() {
     let previousQuery = untracked(this.query);
     effect(() => {
       const query = this.query();
       const api = this.api;
-      if (api && query !== previousQuery) {
+      if (api && !sameListQuery(query, previousQuery)) {
         api.purgeInfiniteCache();
         api.paginationGoToFirstPage();
       }
@@ -206,7 +214,7 @@ export class UsersGrid {
     resizable: this.settings.resizableColumns(),
   }));
   protected readonly initialDefaultColDef = untracked(this.defaultColDef);
-  protected readonly noRowsTemplate = '<span>No users match your search.</span>';
+  protected readonly noRowsTemplate = '<span>No users match your search or filters.</span>';
 
   /**
    * AG Grid moves focus to some of its controls, such as Page Size, without scrolling them into

@@ -150,6 +150,40 @@ describe('inMemoryApiInterceptor', () => {
       expect(error.status).toBe(400);
       expect(error.error.fieldErrors).toEqual({ q: expect.any(String) });
     });
+
+    it('returns only users matching role and status, with their count', async () => {
+      const page = await firstValueFrom(
+        http.get<UserPage>('/api/users?role=Viewer&status=suspended&limit=5'),
+      );
+
+      expect(page.total).toBeGreaterThan(5);
+      expect(page.total).toBeLessThan(500_000);
+      expect(page.items).toHaveLength(5);
+      for (const user of page.items) {
+        expect([user.role, user.status]).toEqual(['Viewer', 'suspended']);
+      }
+    });
+
+    it('treats empty role and status as no filter', async () => {
+      const page = await firstValueFrom(http.get<UserPage>('/api/users?role=&status=&limit=5'));
+
+      expect(page.total).toBe(500_000);
+      expect(page.items[0]).toEqual(seedUser(0));
+    });
+
+    it('rejects an unknown role with 400', async () => {
+      const error = await failure(http.get('/api/users?role=Owner'));
+
+      expect(error.status).toBe(400);
+      expect(error.error.fieldErrors).toEqual({ role: expect.any(String) });
+    });
+
+    it('rejects a status in the wrong case with 400', async () => {
+      const error = await failure(http.get('/api/users?status=Active'));
+
+      expect(error.status).toBe(400);
+      expect(error.error.fieldErrors).toEqual({ status: expect.any(String) });
+    });
   });
 
   describe('GET /users/{id}', () => {

@@ -10,22 +10,32 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
+import { USER_ROLES, USER_STATUSES, UserRole, UserStatus } from '../core/api/user.model';
 import { TableSettingsDialog } from './table-settings-dialog';
+import { EMPTY_LIST_QUERY, ListQuery } from './users-datasource';
 import { UsersGrid } from './users-grid';
 
 /** How long typing must pause before the search is sent. */
 export const SEARCH_DEBOUNCE_MS = 300;
 
 /** Words a user count, singular only for exactly 1: "1 user", "2 users", "1 user matches". */
-export function countLabel(total: number, query: string): string {
+export function countLabel(total: number, matching: boolean): string {
   const count = total.toLocaleString('en-US');
   if (total === 1) {
-    return query ? `${count} user matches` : `${count} user`;
+    return matching ? `${count} user matches` : `${count} user`;
   }
-  return query ? `${count} users match` : `${count} users`;
+  return matching ? `${count} users match` : `${count} users`;
 }
 
-/** The user list screen: the total, search, table settings, load status, and the paged user grid. */
+/** Whether a query narrows the list, which is what makes the count a match count. */
+function isNarrowed({ q, role, status }: ListQuery): boolean {
+  return Boolean(q || role || status);
+}
+
+/**
+ * The user list screen: the total, search, role and status filters, table settings, load status,
+ * and the paged user grid.
+ */
 @Component({
   selector: 'app-users-page',
   imports: [RouterLink, TableSettingsDialog, UsersGrid],
@@ -43,7 +53,7 @@ export function countLabel(total: number, query: string): string {
         >New user</a
       >
     </div>
-    <div class="mt-4 flex flex-wrap items-end justify-between gap-4">
+    <div class="mt-4 flex flex-wrap items-end gap-4">
       <div class="grid max-w-md grow basis-64 gap-1">
         <label for="users-search" class="font-medium text-ink">Search users</label>
         <input
@@ -57,12 +67,40 @@ export function countLabel(total: number, query: string): string {
           class="min-h-11 w-full rounded border border-line-input bg-surface px-3 text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         />
       </div>
+      <div class="grid gap-1">
+        <label for="users-role" class="font-medium text-ink">Role</label>
+        <select
+          id="users-role"
+          [value]="role()"
+          (change)="onRoleChange($event)"
+          class="min-h-11 rounded border border-line-input bg-surface px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        >
+          <option value="">Any role</option>
+          @for (option of roles; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
+      <div class="grid gap-1">
+        <label for="users-status" class="font-medium text-ink">Status</label>
+        <select
+          id="users-status"
+          [value]="status()"
+          (change)="onStatusChange($event)"
+          class="min-h-11 rounded border border-line-input bg-surface px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        >
+          <option value="">Any status</option>
+          @for (option of statuses; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
       <button
         #tableSettingsButton
         type="button"
         aria-haspopup="dialog"
         (click)="tableSettings.show(tableSettingsButton)"
-        class="min-h-11 shrink-0 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        class="ml-auto min-h-11 shrink-0 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         Table settings
       </button>
@@ -110,37 +148,59 @@ export default class UsersPage {
   protected readonly loading = signal(false);
   protected readonly error = signal<ApiError | undefined>(undefined);
 
+  protected readonly roles = USER_ROLES;
+  protected readonly statuses = USER_STATUSES;
+
   /** What is in the search field. */
   protected readonly searchText = signal('');
   /** The trimmed search the grid uses, set once typing pauses. */
-  protected readonly query = signal('');
-  /** The search the shown total belongs to, so the wording never runs ahead of the load. */
-  protected readonly loadedQuery = signal('');
-  /** The result count to announce after a search or a cleared search loads. */
-  protected readonly announcement = signal<{ total: number; query: string } | undefined>(undefined);
+  protected readonly search = signal('');
+  /** The chosen role and status. Empty is the "Any" option, which filters nothing. */
+  protected readonly role = signal<UserRole | ''>('');
+  protected readonly status = signal<UserStatus | ''>('');
+
+  /** What the grid loads. A filter applies at once, while typing still waits for the pause. */
+  protected readonly query = computed<ListQuery>(() => {
+    const query: ListQuery = { q: this.search() };
+    const role = this.role();
+    if (role) {
+      query.role = role;
+    }
+    const status = this.status();
+    if (status) {
+      query.status = status;
+    }
+    return query;
+  });
+  /** The query the shown total belongs to, so the wording never runs ahead of the load. */
+  protected readonly loadedQuery = signal<ListQuery>(EMPTY_LIST_QUERY);
+  /** The result count to announce after a search or filter change loads. */
+  protected readonly announcement = signal<{ total: number; matching: boolean } | undefined>(
+    undefined,
+  );
   private announceNextLoad = false;
 
   protected readonly totalLabel = computed(() => {
     const total = this.total();
-    return total === undefined ? '' : countLabel(total, this.loadedQuery());
+    return total === undefined ? '' : countLabel(total, isNarrowed(this.loadedQuery()));
   });
   protected readonly announcementText = computed(() => {
     const result = this.announcement();
     if (!result) {
       return '';
     }
-    return result.total === 0 ? 'No users match' : countLabel(result.total, result.query);
+    return result.total === 0 ? 'No users match' : countLabel(result.total, result.matching);
   });
 
   constructor() {
     effect((onCleanup) => {
       const text = this.searchText().trim();
-      if (text === untracked(this.query)) {
+      if (text === untracked(this.search)) {
         return;
       }
       const timer = setTimeout(() => {
         this.announceNextLoad = true;
-        this.query.set(text);
+        this.search.set(text);
       }, SEARCH_DEBOUNCE_MS);
       onCleanup(() => clearTimeout(timer));
     });
@@ -148,6 +208,16 @@ export default class UsersPage {
 
   protected onSearchInput(event: Event): void {
     this.searchText.set((event.target as HTMLInputElement).value);
+  }
+
+  protected onRoleChange(event: Event): void {
+    this.announceNextLoad = true;
+    this.role.set((event.target as HTMLSelectElement).value as UserRole | '');
+  }
+
+  protected onStatusChange(event: Event): void {
+    this.announceNextLoad = true;
+    this.status.set((event.target as HTMLSelectElement).value as UserStatus | '');
   }
 
   protected onLoadingChange(inFlight: boolean): void {
@@ -158,12 +228,13 @@ export default class UsersPage {
   }
 
   protected onLoaded(total: number): void {
+    const query = this.query();
     this.total.set(total);
-    this.loadedQuery.set(this.query());
+    this.loadedQuery.set(query);
     this.error.set(undefined);
     if (this.announceNextLoad) {
       this.announceNextLoad = false;
-      this.announcement.set({ total, query: this.query() });
+      this.announcement.set({ total, matching: isNarrowed(query) });
     }
   }
 

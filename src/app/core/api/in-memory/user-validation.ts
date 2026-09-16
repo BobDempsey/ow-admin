@@ -5,6 +5,7 @@ import {
   USER_SORT_FIELDS,
   USER_STATUSES,
   UserDraft,
+  UserFilter,
   UserSort,
   UserSortField,
 } from '../user.model';
@@ -84,13 +85,16 @@ export function validatePage(
 const SORT_PATTERN = new RegExp(`^(${USER_SORT_FIELDS.join('|')}):(asc|desc)$`);
 
 /**
- * Parses the optional `sort` (`<field>:<asc|desc>`) and `q` query values. A blank `q` means no
- * search; otherwise it is trimmed.
+ * Parses the optional `sort` (`<field>:<asc|desc>`), `q`, `role` and `status` query values. A blank
+ * `q` means no search; otherwise it is trimmed. A missing or empty `role` or `status` filters
+ * nothing, and any other value must be one of the model's values, matched exactly.
  */
 export function validateListQuery(
   sort: string | null,
   q: string | null,
-): ValidationResult<{ sort?: UserSort; q?: string }> {
+  role: string | null = null,
+  status: string | null = null,
+): ValidationResult<{ sort?: UserSort } & UserFilter> {
   const errors: Record<string, string> = {};
   const match = sort === null ? null : SORT_PATTERN.exec(sort);
   if (sort !== null && !match) {
@@ -100,15 +104,27 @@ export function validateListQuery(
   if (q !== null && q.length > MAX_QUERY_LENGTH) {
     errors['q'] = `q must be ${MAX_QUERY_LENGTH} characters or fewer.`;
   }
+  if (role && !isOneOf(USER_ROLES, role)) {
+    errors['role'] = `role must be one of ${USER_ROLES.join(', ')}.`;
+  }
+  if (status && !isOneOf(USER_STATUSES, status)) {
+    errors['status'] = `status must be one of ${USER_STATUSES.join(', ')}.`;
+  }
   if (Object.keys(errors).length) {
     return { ok: false, errors };
   }
-  const value: { sort?: UserSort; q?: string } = {};
+  const value: { sort?: UserSort } & UserFilter = {};
   if (match) {
     value.sort = { field: match[1] as UserSortField, direction: match[2] as SortDirection };
   }
   if (q?.trim()) {
     value.q = q.trim();
+  }
+  if (isOneOf(USER_ROLES, role)) {
+    value.role = role;
+  }
+  if (isOneOf(USER_STATUSES, status)) {
+    value.status = status;
   }
   return { ok: true, value };
 }

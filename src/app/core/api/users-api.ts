@@ -22,7 +22,7 @@ export class UsersApi {
   private readonly http = inject(HttpClient);
   private readonly usersUrl = `${inject(API_BASE_URL)}/users`;
 
-  list({ skip, limit, sort, q }: PageRequest = {}): Observable<UserPage> {
+  list({ skip, limit, sort, q, role, status }: PageRequest = {}): Observable<UserPage> {
     let params = new HttpParams({ encoder: URI_COMPONENT_CODEC });
     if (skip !== undefined) {
       params = params.set('skip', skip);
@@ -35,6 +35,12 @@ export class UsersApi {
     }
     if (q?.trim()) {
       params = params.set('q', q.trim());
+    }
+    if (role) {
+      params = params.set('role', role);
+    }
+    if (status) {
+      params = params.set('status', status);
     }
     return this.http.get<UserPage>(this.usersUrl, { params }).pipe(catchApiError());
   }

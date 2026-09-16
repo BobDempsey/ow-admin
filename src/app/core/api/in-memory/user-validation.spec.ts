@@ -162,4 +162,39 @@ describe('validateListQuery', () => {
       errors: { sort: expect.any(String), q: expect.any(String) },
     });
   });
+
+  it('accepts every role and status value', () => {
+    for (const role of ['Admin', 'Member', 'Viewer'] as const) {
+      expect(validateListQuery(null, null, role, null)).toEqual({ ok: true, value: { role } });
+    }
+    for (const status of ['active', 'invited', 'suspended'] as const) {
+      expect(validateListQuery(null, null, null, status)).toEqual({ ok: true, value: { status } });
+    }
+    expect(validateListQuery(null, null, 'Viewer', 'suspended')).toEqual({
+      ok: true,
+      value: { role: 'Viewer', status: 'suspended' },
+    });
+  });
+
+  it('rejects an unknown role', () => {
+    expect(validateListQuery(null, null, 'Owner', null)).toEqual({
+      ok: false,
+      errors: { role: expect.any(String) },
+    });
+  });
+
+  it('rejects a status in the wrong case', () => {
+    expect(validateListQuery(null, null, null, 'Active')).toEqual({
+      ok: false,
+      errors: { status: expect.any(String) },
+    });
+    expect(validateListQuery(null, null, 'admin', null)).toEqual({
+      ok: false,
+      errors: { role: expect.any(String) },
+    });
+  });
+
+  it('treats empty role and status as no filter', () => {
+    expect(validateListQuery(null, null, '', '')).toEqual({ ok: true, value: {} });
+  });
 });

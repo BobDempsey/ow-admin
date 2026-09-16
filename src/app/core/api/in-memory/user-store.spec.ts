@@ -136,13 +136,15 @@ describe('UserStore', () => {
     });
 
     it('finds users whose name or email contains the search, ignoring case', () => {
-      const page = store.list(0, 25, undefined, 'Lamport');
+      const page = store.list(0, 25, undefined, { q: 'Lamport' });
 
       expect(page.total).toBe(17_241);
       for (const user of page.items) {
         expect(`${user.name} ${user.email}`.toLowerCase()).toContain('lamport');
       }
-      expect(store.list(0, 25, undefined, 'radia.lamport.42@').items).toEqual([seedUser(42)]);
+      expect(store.list(0, 25, undefined, { q: 'radia.lamport.42@' }).items).toEqual([
+        seedUser(42),
+      ]);
     });
 
     it('combines search, sort and skip', () => {
@@ -159,7 +161,7 @@ describe('UserStore', () => {
                 : 1,
         );
 
-      const page = store.list(25, 25, sort, 'hopper');
+      const page = store.list(25, 25, sort, { q: 'hopper' });
 
       expect(page.total).toBe(expected.length);
       expect(page.items.map((user) => user.id)).toEqual(
@@ -168,17 +170,82 @@ describe('UserStore', () => {
     });
 
     it('returns an empty page when nothing matches', () => {
-      expect(store.list(0, 25, undefined, 'no-such-user-xyz')).toEqual({ items: [], total: 0 });
+      expect(store.list(0, 25, undefined, { q: 'no-such-user-xyz' })).toEqual({
+        items: [],
+        total: 0,
+      });
     });
 
     it('rebuilds a cached search after a write', () => {
-      expect(store.list(0, 25, undefined, 'quartermaine').total).toBe(0);
+      expect(store.list(0, 25, undefined, { q: 'quartermaine' }).total).toBe(0);
 
       const created = store.create({ ...draft, name: 'Zelda Quartermaine' });
 
-      expect(store.list(0, 25, undefined, 'quartermaine')).toEqual({
+      expect(store.list(0, 25, undefined, { q: 'quartermaine' })).toEqual({
         items: [created.user],
         total: 1,
+      });
+    });
+
+    it('keeps only users with the filtered role', () => {
+      const page = store.list(0, 25, undefined, { role: 'Admin' });
+
+      // Every twentieth seeded user is an Admin.
+      expect(page.total).toBe(25_000);
+      expect(page.items.map((user) => user.id)).toEqual(
+        Array.from({ length: 25 }, (_, position) => seedUser(position * 20).id),
+      );
+    });
+
+    it('keeps only users with both the filtered role and status', () => {
+      const filter = { role: 'Viewer', status: 'suspended' } as const;
+      let expected = 0;
+      for (let index = 0; index < 500_000; index++) {
+        const user = seedUser(index);
+        if (user.role === filter.role && user.status === filter.status) {
+          expected++;
+        }
+      }
+
+      const page = store.list(0, 25, undefined, filter);
+
+      expect(page.total).toBe(expected);
+      for (const user of page.items) {
+        expect([user.role, user.status]).toEqual(['Viewer', 'suspended']);
+      }
+    });
+
+    it('combines a filter with a search and a sort across two pages', () => {
+      const sort: UserSort = { field: 'name', direction: 'desc' };
+      const filter = { q: 'hopper', status: 'active' } as const;
+      const first = store.list(0, 25, sort, filter);
+      const second = store.list(25, 25, sort, filter);
+      const users = [...first.items, ...second.items];
+
+      expect(second.total).toBe(first.total);
+      expect(new Set(users.map((user) => user.id)).size).toBe(50);
+      expectInOrder(users, sort);
+      for (const user of users) {
+        expect(user.status).toBe('active');
+        expect(`${user.name} ${user.email}`.toLowerCase()).toContain('hopper');
+      }
+    });
+
+    it('moves a created then updated user between status filters', () => {
+      const created = store.create({ ...draft, name: 'Zelda Quartermaine', status: 'invited' });
+      const updated = store.update(created.user.id, {
+        ...draft,
+        name: 'Zelda Quartermaine',
+        status: 'suspended',
+      });
+
+      expect(store.list(0, 25, undefined, { q: 'quartermaine', status: 'suspended' })).toEqual({
+        items: [updated?.user],
+        total: 1,
+      });
+      expect(store.list(0, 25, undefined, { q: 'quartermaine', status: 'invited' })).toEqual({
+        items: [],
+        total: 0,
       });
     });
   });

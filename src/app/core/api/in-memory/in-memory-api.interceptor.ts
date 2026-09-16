@@ -86,12 +86,17 @@ function listUsers({ req, store }: Context, query: URLSearchParams): Result {
   if (!page.ok) {
     return fail(req, 400, 'Invalid pagination parameters.', page.errors);
   }
-  const listQuery = validateListQuery(query.get('sort'), query.get('q'));
+  const listQuery = validateListQuery(
+    query.get('sort'),
+    query.get('q'),
+    query.get('role'),
+    query.get('status'),
+  );
   if (!listQuery.ok) {
-    return fail(req, 400, 'Invalid sort or search parameters.', listQuery.errors);
+    return fail(req, 400, 'Invalid sort, search or filter parameters.', listQuery.errors);
   }
-  const { sort, q } = listQuery.value;
-  return respond(req, 200, store.list(page.value.skip, page.value.limit, sort, q));
+  const { sort, ...filter } = listQuery.value;
+  return respond(req, 200, store.list(page.value.skip, page.value.limit, sort, filter));
 }
 
 function getUser({ req, store }: Context, id: string): Result {

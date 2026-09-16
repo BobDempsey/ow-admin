@@ -1,5 +1,13 @@
 import { Service } from '@angular/core';
-import { SortDirection, User, UserDraft, UserPage, UserSort, UserSortField } from '../user.model';
+import {
+  SortDirection,
+  User,
+  UserDraft,
+  UserFilter,
+  UserPage,
+  UserSort,
+  UserSortField,
+} from '../user.model';
 import { SEED_USER_COUNT, idToIndex, indexToId, seedUser } from './user-seed';
 
 export interface StoredUser {
@@ -28,26 +36,26 @@ interface Keyed {
  * created or updated are held in memory, so an unsorted page costs O(limit) at any offset.
  *
  * Sorting builds each field's seed order once (well under a second) and merges written users into
- * it on read. A search scans every user in the requested order and keeps its matches until the
- * query, the sort or the data changes.
+ * it on read. A filtered list scans every user in the requested order and keeps its matches until
+ * the filter, the sort or the data changes.
  */
 @Service()
 export class UserStore {
   private readonly written = new Map<number, StoredUser>();
   private nextIndex = SEED_USER_COUNT;
-  /** Bumped on every create and update, so a cached search is rebuilt after a write. */
+  /** Bumped on every create and update, so a cached scan is rebuilt after a write. */
   private writes = 0;
   private readonly seedOrders = new Map<UserSortField, SeedOrders>();
-  private lastSearch: { key: string; matches: number[] } | undefined;
+  private lastScan: { key: string; matches: number[] } | undefined;
 
   get total(): number {
     return this.nextIndex;
   }
 
-  /** A page of users, optionally sorted and filtered to names or emails containing `q`. */
-  list(skip: number, limit: number, sort?: UserSort, q?: string): UserPage {
-    if (q) {
-      const matches = this.search(q, sort);
+  /** A page of users, optionally sorted, and narrowed to those the filter keeps. */
+  list(skip: number, limit: number, sort?: UserSort, filter?: UserFilter): UserPage {
+    if (filter?.q || filter?.role || filter?.status) {
+      const matches = this.scan(filter, sort);
       return {
         items: matches.slice(skip, skip + limit).map((index) => this.read(index).user),
         total: matches.length,
@@ -145,20 +153,34 @@ export class UserStore {
     }
   }
 
-  private search(q: string, sort?: UserSort): number[] {
-    const key = `${this.writes}|${sort ? `${sort.field}:${sort.direction}` : ''}|${q}`;
-    if (this.lastSearch?.key !== key) {
-      const needle = q.toLowerCase();
+  /** The indices the filter keeps, in list order, cached until the data, sort or filter changes. */
+  private scan({ q, role, status }: UserFilter, sort?: UserSort): number[] {
+    const sortKey = sort ? `${sort.field}:${sort.direction}` : '';
+    const key = `${this.writes}|${sortKey}|${q ?? ''}|${role ?? ''}|${status ?? ''}`;
+    if (this.lastScan?.key !== key) {
+      const needle = q?.toLowerCase();
       const matches: number[] = [];
       for (const index of this.ordered(sort)) {
-        const { name, email } = this.read(index).user;
-        if (name.toLowerCase().includes(needle) || email.toLowerCase().includes(needle)) {
-          matches.push(index);
+        const user = this.read(index).user;
+        // Role and status are equality checks, so they run before the two lower-cased text scans.
+        if (role && user.role !== role) {
+          continue;
         }
+        if (status && user.status !== status) {
+          continue;
+        }
+        if (
+          needle &&
+          !user.name.toLowerCase().includes(needle) &&
+          !user.email.toLowerCase().includes(needle)
+        ) {
+          continue;
+        }
+        matches.push(index);
       }
-      this.lastSearch = { key, matches };
+      this.lastScan = { key, matches };
     }
-    return this.lastSearch.matches;
+    return this.lastScan.matches;
   }
 }
 

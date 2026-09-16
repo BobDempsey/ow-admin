@@ -4,6 +4,7 @@ import { Router, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
 import { stubDialogMethods } from '../../testing/dialog';
 import { ApiError } from '../core/api/api-error';
+import { EMPTY_LIST_QUERY, ListQuery } from './users-datasource';
 import { UsersGrid } from './users-grid';
 import UsersPage, { SEARCH_DEBOUNCE_MS, countLabel } from './users-page';
 
@@ -12,7 +13,7 @@ import UsersPage, { SEARCH_DEBOUNCE_MS, countLabel } from './users-page';
   template: '',
 })
 class StubUsersGrid {
-  readonly query = input('');
+  readonly query = input<ListQuery>(EMPTY_LIST_QUERY);
   readonly loadingChange = output<boolean>();
   readonly loaded = output<number>();
   readonly failed = output<ApiError>();
@@ -35,15 +36,32 @@ async function renderPage() {
   return { fixture, element, grid, settle };
 }
 
+/** Types into the search field and waits out the debounce. Needs fake timers. */
+async function type(
+  page: Awaited<ReturnType<typeof renderPage>>,
+  text: string,
+  pauseMs = SEARCH_DEBOUNCE_MS,
+) {
+  const field = page.element.querySelector<HTMLInputElement>('#users-search')!;
+  field.value = text;
+  field.dispatchEvent(new Event('input'));
+  await page.settle();
+  vi.advanceTimersByTime(pauseMs);
+  await page.settle();
+}
+
+const statusText = (element: HTMLElement) =>
+  element.querySelector('[role="status"]')?.textContent?.replace(/\s+/g, ' ').trim();
+
 describe('countLabel', () => {
   it('uses the singular only for exactly 1, with thousands separators', () => {
-    expect([0, 1, 2, 500_000].map((total) => countLabel(total, ''))).toEqual([
+    expect([0, 1, 2, 500_000].map((total) => countLabel(total, false))).toEqual([
       '0 users',
       '1 user',
       '2 users',
       '500,000 users',
     ]);
-    expect([0, 1, 2, 500_000].map((total) => countLabel(total, 'lamport'))).toEqual([
+    expect([0, 1, 2, 500_000].map((total) => countLabel(total, true))).toEqual([
       '0 users match',
       '1 user matches',
       '2 users match',
@@ -124,22 +142,6 @@ describe('UsersPage', () => {
     beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }));
     afterEach(() => vi.useRealTimers());
 
-    async function type(
-      page: Awaited<ReturnType<typeof renderPage>>,
-      text: string,
-      pauseMs = SEARCH_DEBOUNCE_MS,
-    ) {
-      const field = page.element.querySelector<HTMLInputElement>('#users-search')!;
-      field.value = text;
-      field.dispatchEvent(new Event('input'));
-      await page.settle();
-      vi.advanceTimersByTime(pauseMs);
-      await page.settle();
-    }
-
-    const statusText = (element: HTMLElement) =>
-      element.querySelector('[role="status"]')?.textContent?.replace(/\s+/g, ' ').trim();
-
     it('has a visible Search users label and a Name or email placeholder', async () => {
       const { element } = await renderPage();
       const field = element.querySelector<HTMLInputElement>('input[type="search"]')!;
@@ -155,11 +157,11 @@ describe('UsersPage', () => {
       await type(page, 'h', 100);
       await type(page, 'hop', 100);
       await type(page, ' hopper ', SEARCH_DEBOUNCE_MS - 1);
-      expect(page.grid.query()).toBe('');
+      expect(page.grid.query().q).toBe('');
 
       vi.advanceTimersByTime(1);
       await page.settle();
-      expect(page.grid.query()).toBe('hopper');
+      expect(page.grid.query().q).toBe('hopper');
     });
 
     it('does not search again for spaces around the same text', async () => {
@@ -172,7 +174,7 @@ describe('UsersPage', () => {
       page.grid.loaded.emit(900);
       await page.settle();
 
-      expect(page.grid.query()).toBe('hopper');
+      expect(page.grid.query().q).toBe('hopper');
       // A new search would announce this load; the same search does not.
       expect(statusText(page.element)).toBe('1,000 users match');
     });
@@ -253,7 +255,7 @@ describe('UsersPage', () => {
       page.grid.loaded.emit(500_000);
       await page.settle();
 
-      expect(page.grid.query()).toBe('');
+      expect(page.grid.query().q).toBe('');
       expect(page.element.textContent).toContain('500,000 users');
       expect(page.element.textContent).not.toContain('match');
       expect(statusText(page.element)).toBe('500,000 users');
@@ -277,6 +279,129 @@ describe('UsersPage', () => {
       const page = await renderPage();
       await type(page, 'lamport');
       page.grid.loaded.emit(17_241);
+      await page.settle();
+
+      vi.useRealTimers();
+      await expectNoAxeViolations(page.element);
+    });
+  });
+
+  describe('filters', () => {
+    beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }));
+    afterEach(() => vi.useRealTimers());
+
+    const filter = (element: HTMLElement, id: string) =>
+      element.querySelector<HTMLSelectElement>(`#${id}`)!;
+
+    async function choose(page: Awaited<ReturnType<typeof renderPage>>, id: string, value: string) {
+      const field = filter(page.element, id);
+      field.focus();
+      field.value = value;
+      field.dispatchEvent(new Event('change'));
+      await page.settle();
+    }
+
+    it('labels both dropdowns and starts each on its Any option', async () => {
+      const { element } = await renderPage();
+      const role = filter(element, 'users-role');
+      const status = filter(element, 'users-status');
+      const optionsOf = (select: HTMLSelectElement) =>
+        Array.from(select.options).map((option) => `${option.value}:${option.textContent?.trim()}`);
+
+      expect(element.querySelector(`label[for="${role.id}"]`)?.textContent?.trim()).toBe('Role');
+      expect(element.querySelector(`label[for="${status.id}"]`)?.textContent?.trim()).toBe(
+        'Status',
+      );
+      expect(optionsOf(role)).toEqual([
+        ':Any role',
+        'Admin:Admin',
+        'Member:Member',
+        'Viewer:Viewer',
+      ]);
+      expect(optionsOf(status)).toEqual([
+        ':Any status',
+        'active:active',
+        'invited:invited',
+        'suspended:suspended',
+      ]);
+      expect([role.value, status.value]).toEqual(['', '']);
+    });
+
+    it('applies a filter without waiting for the search debounce', async () => {
+      const page = await renderPage();
+
+      await choose(page, 'users-status', 'suspended');
+
+      expect(page.grid.query()).toEqual({ q: '', status: 'suspended' });
+    });
+
+    it('drops a filter when its Any option is chosen', async () => {
+      const page = await renderPage();
+      await choose(page, 'users-role', 'Admin');
+      expect(page.grid.query()).toEqual({ q: '', role: 'Admin' });
+
+      await choose(page, 'users-role', '');
+
+      expect(page.grid.query()).toEqual({ q: '' });
+    });
+
+    it('combines both filters with a search', async () => {
+      const page = await renderPage();
+
+      await type(page, 'hopper');
+      await choose(page, 'users-role', 'Admin');
+      await choose(page, 'users-status', 'active');
+
+      expect(page.grid.query()).toEqual({ q: 'hopper', role: 'Admin', status: 'active' });
+    });
+
+    it('words the total as matches and announces it, leaving focus on the dropdown', async () => {
+      const page = await renderPage();
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+
+      await choose(page, 'users-status', 'invited');
+      page.grid.loadingChange.emit(true);
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(64_935);
+      await page.settle();
+
+      expect(page.element.textContent).toContain('64,935 users match');
+      expect(statusText(page.element)).toBe('64,935 users match');
+      expect(document.activeElement).toBe(filter(page.element, 'users-status'));
+    });
+
+    it('says no users match when a filter alone matches nothing', async () => {
+      const page = await renderPage();
+
+      await choose(page, 'users-role', 'Viewer');
+      page.grid.loaded.emit(0);
+      await page.settle();
+
+      expect(page.element.textContent).toContain('0 users match');
+      expect(statusText(page.element)).toBe('No users match');
+    });
+
+    it('returns the total to plain users once the last filter is cleared', async () => {
+      const page = await renderPage();
+      await choose(page, 'users-role', 'Admin');
+      page.grid.loaded.emit(25_000);
+      await page.settle();
+      expect(page.element.textContent).toContain('25,000 users match');
+
+      await choose(page, 'users-role', '');
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+
+      expect(page.element.textContent).toContain('500,000 users');
+      expect(page.element.textContent).not.toContain('match');
+      expect(statusText(page.element)).toBe('500,000 users');
+    });
+
+    it('has no axe violations with a filter and its result', async () => {
+      const page = await renderPage();
+      await choose(page, 'users-role', 'Admin');
+      page.grid.loaded.emit(25_000);
       await page.settle();
 
       vi.useRealTimers();

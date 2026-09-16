@@ -2,7 +2,7 @@ import { IGetRowsParams, SortModelItem } from 'ag-grid-community';
 import { ApiError } from '../core/api/api-error';
 import { seedUser } from '../core/api/in-memory/user-seed';
 import { PageRequest, UserPage } from '../core/api/user.model';
-import { UsersDatasourceEvents, createUsersDatasource } from './users-datasource';
+import { ListQuery, UsersDatasourceEvents, createUsersDatasource } from './users-datasource';
 
 function rowsParams(startRow: number, endRow: number, sortModel: SortModelItem[] = []) {
   return {
@@ -68,16 +68,34 @@ describe('createUsersDatasource', () => {
 
   it('sends the current search, trimmed, and leaves out a blank one', async () => {
     const loadPage = vi.fn((_request: PageRequest) => Promise.resolve({ items: [], total: 0 }));
-    let query = ' lamport ';
+    let query: ListQuery = { q: ' lamport ' };
     const datasource = createUsersDatasource(loadPage, trackEvents().events, () => query);
 
     await datasource.getRows(rowsParams(0, 25));
-    query = '  ';
+    query = { q: '  ' };
     await datasource.getRows(rowsParams(0, 25));
 
     expect(loadPage.mock.calls.map(([request]) => request)).toEqual([
       { skip: 0, limit: 25, q: 'lamport' },
       { skip: 0, limit: 25 },
+    ]);
+  });
+
+  it('sends each filter on its own and both together with the search', async () => {
+    const loadPage = vi.fn((_request: PageRequest) => Promise.resolve({ items: [], total: 0 }));
+    let query: ListQuery = { q: '', role: 'Admin' };
+    const datasource = createUsersDatasource(loadPage, trackEvents().events, () => query);
+
+    await datasource.getRows(rowsParams(0, 25));
+    query = { q: '', status: 'suspended' };
+    await datasource.getRows(rowsParams(0, 25));
+    query = { q: 'lamport', role: 'Viewer', status: 'active' };
+    await datasource.getRows(rowsParams(0, 25));
+
+    expect(loadPage.mock.calls.map(([request]) => request)).toEqual([
+      { skip: 0, limit: 25, role: 'Admin' },
+      { skip: 0, limit: 25, status: 'suspended' },
+      { skip: 0, limit: 25, q: 'lamport', role: 'Viewer', status: 'active' },
     ]);
   });
 
@@ -96,7 +114,7 @@ describe('createUsersDatasource', () => {
   it('reloads the same request quietly after quietNextLoad', async () => {
     const loadPage = vi.fn(() => Promise.resolve({ items: [], total: 42 }));
     const { calls, events } = trackEvents();
-    const datasource = createUsersDatasource(loadPage, events, () => 'lamport');
+    const datasource = createUsersDatasource(loadPage, events, () => ({ q: 'lamport' }));
     const sortModel: SortModelItem[] = [{ colId: 'email', sort: 'asc' }];
     await datasource.getRows(rowsParams(25, 50, sortModel));
     calls.length = 0;
@@ -132,7 +150,7 @@ describe('createUsersDatasource', () => {
   it('reports loading when the request after quietNextLoad asks for something else', async () => {
     const loadPage = vi.fn(() => Promise.resolve({ items: [], total: 42 }));
     const { calls, events } = trackEvents();
-    let query = '';
+    let query: ListQuery = { q: '' };
     const datasource = createUsersDatasource(loadPage, events, () => query);
     await datasource.getRows(rowsParams(0, 25));
     calls.length = 0;
@@ -142,7 +160,7 @@ describe('createUsersDatasource', () => {
     await datasource.getRows(rowsParams(25, 50));
     // A search merged into the debounced reload.
     datasource.quietNextLoad();
-    query = 'lamport';
+    query = { q: 'lamport' };
     await datasource.getRows(rowsParams(25, 50));
 
     expect(calls).toEqual([

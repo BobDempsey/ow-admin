@@ -51,6 +51,17 @@ export async function searchList(page: Page, text: string): Promise<void> {
 export const showSearchResults = (page: Page) => searchList(page, 'lamport');
 export const showNoSearchResults = (page: Page) => searchList(page, 'no-such-user-xyz');
 
+/** The user list's Role and Status dropdowns, which sit between search and Table settings. */
+export const roleFilter = (page: Page) => page.getByLabel('Role', { exact: true });
+export const statusFilter = (page: Page) => page.getByLabel('Status', { exact: true });
+
+/** Opens the list and filters it by status, waiting for the result to be announced. */
+export async function showFilteredList(page: Page): Promise<void> {
+  await openList(page);
+  await statusFilter(page).selectOption('suspended');
+  await expect(listStatus(page)).toContainText(/match/);
+}
+
 /**
  * Records every page request the list makes from now on, by wrapping `UsersService.loadPage` on
  * the live grid through `ng.getComponent`. Dev server only. Returns a reader for the requests.
