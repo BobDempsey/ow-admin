@@ -600,6 +600,84 @@ describe('UsersPage', () => {
     });
   });
 
+  describe('empty result', () => {
+    beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }));
+    afterEach(() => vi.useRealTimers());
+
+    const emptyState = (element: HTMLElement) => element.querySelector('app-empty-users-overlay');
+    const clearFilters = (element: HTMLElement) =>
+      Array.from(element.querySelectorAll('button')).find(
+        (button) => button.textContent?.trim() === 'Clear filters',
+      );
+
+    async function loadEmptySearch(page: Awaited<ReturnType<typeof renderPage>>) {
+      await type(page, 'no-such-user');
+      const status = page.element.querySelector<HTMLSelectElement>('#users-status')!;
+      status.value = 'suspended';
+      status.dispatchEvent(new Event('change'));
+      await page.settle();
+      page.grid.loadingChange.emit(true);
+      page.grid.loadingChange.emit(false);
+      page.grid.loaded.emit(0);
+      await page.settle();
+    }
+
+    it('shows No users match with Clear filters after a search and filter match nothing', async () => {
+      const page = await renderPage();
+      await loadEmptySearch(page);
+
+      expect(emptyState(page.element)?.querySelector('h2')?.textContent?.trim()).toBe(
+        'No users match',
+      );
+      expect(clearFilters(page.element)).toBeDefined();
+      expect(page.element.textContent).toContain('0 users match');
+    });
+
+    it('clears every filter from Clear filters and focuses Search users', async () => {
+      const page = await renderPage();
+      await loadEmptySearch(page);
+      const before = page.grid.queries.length;
+
+      clearFilters(page.element)?.click();
+      await page.settle();
+
+      expect(page.grid.queries.slice(before)).toEqual([{ q: '' }]);
+      const field = page.element.querySelector<HTMLInputElement>('#users-search')!;
+      expect(field.value).toBe('');
+      expect(page.element.querySelector<HTMLSelectElement>('#users-status')?.value).toBe('');
+      expect(document.activeElement).toBe(field);
+    });
+
+    it('hides the empty state while the next page loads', async () => {
+      const page = await renderPage();
+      await loadEmptySearch(page);
+
+      page.grid.loadingChange.emit(true);
+      await page.settle();
+
+      expect(emptyState(page.element)).toBeNull();
+    });
+
+    it('says No users yet, with no button, when nothing is filtered and there are no users', async () => {
+      const page = await renderPage();
+      page.grid.loaded.emit(0);
+      await page.settle();
+
+      expect(emptyState(page.element)?.querySelector('h2')?.textContent?.trim()).toBe(
+        'No users yet',
+      );
+      expect(clearFilters(page.element)).toBeUndefined();
+    });
+
+    it('shows no empty state while users are listed', async () => {
+      const page = await renderPage();
+      page.grid.loaded.emit(500_000);
+      await page.settle();
+
+      expect(emptyState(page.element)).toBeNull();
+    });
+  });
+
   describe('table settings', () => {
     const settingsButton = (element: HTMLElement) =>
       Array.from(element.querySelectorAll('button')).find(

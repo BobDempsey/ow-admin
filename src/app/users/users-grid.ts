@@ -19,6 +19,7 @@ import {
   GridReadyEvent,
   InfiniteRowModelModule,
   ModuleRegistry,
+  OverlayType,
   PaginationChangedEvent,
   PaginationModule,
   RowClickedEvent,
@@ -119,7 +120,7 @@ const usersGridTheme = themeQuartz
       [domLayout]="initialDomLayout"
       [ensureDomOrder]="true"
       [suppressMultiSort]="true"
-      [overlayNoRowsTemplate]="noRowsTemplate"
+      [suppressOverlays]="suppressedOverlays"
       [suppressMovableColumns]="!settings.movableColumns()"
       [suppressDragLeaveHidesColumns]="true"
       [tabToNextCell]="leaveGridOnTab"
@@ -247,7 +248,11 @@ export class UsersGrid {
     cellRendererSelector: (params) => (params.data ? undefined : { component: SkeletonCell }),
   }));
   protected readonly initialDefaultColDef = untracked(this.defaultColDef);
-  protected readonly noRowsTemplate = '<span>No users match your search or filters.</span>';
+  /**
+   * AG Grid's overlay turns pointer events off for everything inside it, so its no-rows overlay
+   * could not hold a working Clear filters button. `UsersPage` shows the empty state instead.
+   */
+  protected readonly suppressedOverlays: OverlayType[] = ['noRows'];
 
   /**
    * AG Grid moves focus to some of its controls, such as Page Size, without scrolling them into

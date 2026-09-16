@@ -14,6 +14,7 @@ import {
   resetPasswordDialog,
   showChipsList,
   showFixedHeader,
+  showNoSearchResults,
 } from './support/app';
 import { obscuredFocusStops } from './support/layout';
 
@@ -206,6 +207,21 @@ test.describe('keyboard flows', () => {
     await expect(page.getByLabel('Search users')).toHaveValue('');
     await expect(page.getByLabel('Status', { exact: true })).toHaveValue('');
     await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
+  });
+
+  test('list: Tab from the search field reaches Clear filters, and Enter clears', async ({
+    page,
+  }) => {
+    await showNoSearchResults(page);
+
+    await page.getByLabel('Search users').focus();
+    await pressUntilFocused(page, 'Clear filters');
+    await page.keyboard.press('Enter');
+
+    await expect(focused(page)).toHaveAccessibleName('Search users');
+    await expect(page.getByLabel('Search users')).toHaveValue('');
+    await expect(page.getByRole('button', { name: 'Clear filters' })).toBeHidden();
+    await page.locator('.ag-row a').first().waitFor();
   });
 
   test('list: a fixed header never hides the focused cell while arrowing a 100-row page', async ({

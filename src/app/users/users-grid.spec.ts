@@ -98,6 +98,13 @@ describe('UsersGrid', () => {
     expect(grid.context.loading()).toBe(false);
   });
 
+  it('turns off its own no-rows overlay, since the page shows the empty state', async () => {
+    const { fixture } = await renderGrid({ q: '' });
+    const grid = fixture.componentInstance as unknown as { suppressedOverlays: string[] };
+
+    expect(grid.suppressedOverlays).toEqual(['noRows']);
+  });
+
   it('renders the name with its initials circle, with room for both', async () => {
     const { fixture } = await renderGrid({ q: '' });
     const name = columnDefs(fixture).find((column) => column.field === 'name');

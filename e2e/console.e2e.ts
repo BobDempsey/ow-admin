@@ -5,6 +5,7 @@ import {
   listStatus,
   openList,
   showChipsList,
+  showNoSearchResults,
   statusFilter,
 } from './support/app';
 
@@ -51,6 +52,16 @@ test.describe('operating the list logs nothing', () => {
 
     await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
     await expect(listStatus(page)).toHaveText('500,000 users');
+    await page.waitForTimeout(SETTLE_MS);
+  });
+
+  test('Clear filters in the empty state', async ({ page }) => {
+    await showNoSearchResults(page);
+
+    await page.getByRole('button', { name: 'Clear filters' }).click();
+
+    await expect(listStatus(page)).toHaveText('500,000 users');
+    await page.locator('.ag-row a').first().waitFor();
     await page.waitForTimeout(SETTLE_MS);
   });
 });

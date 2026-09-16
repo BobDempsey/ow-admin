@@ -116,7 +116,11 @@ test.describe('user list filters', () => {
 
     await expect(total(page)).toHaveText('0 users match');
     await expect(listStatus(page)).toHaveText('No users match');
-    await expect(page.getByText('No users match your search or filters.')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'No users match' })).toBeVisible();
+    await expect(
+      page.getByText('Try a different search or filter, or clear them to see every user.'),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Clear filters' })).toBeVisible();
   });
 
   test('announces the match count without taking focus off the dropdown', async ({ page }) => {
@@ -206,5 +210,29 @@ test.describe('user list filter chips', () => {
     await expect(clearAllButton(page)).toBeHidden();
     await expect(page.getByRole('list', { name: 'Active filters' })).toBeHidden();
     await expect(email).toHaveAttribute('aria-sort', 'descending');
+  });
+});
+
+test.describe('user list empty state', () => {
+  test('Clear filters shows every user from the first page and focuses the search field', async ({
+    page,
+  }) => {
+    await openList(page);
+    await statusFilter(page).selectOption('suspended');
+    await searchField(page).fill('no-such-user-xyz');
+    await expect(total(page)).toHaveText('0 users match');
+    const requests = await recordListRequests(page);
+
+    await page.getByRole('button', { name: 'Clear filters' }).click();
+
+    await expect(total(page)).toHaveText('500,000 users');
+    expect(await requests()).toEqual([{ skip: 0, limit: 25 }]);
+    await expect(searchField(page)).toHaveValue('');
+    await expect(searchField(page)).toBeFocused();
+    await expect(statusFilter(page)).toHaveValue('');
+    await expect(statusFilter(page).locator('option:checked')).toHaveText('Any status');
+    await expect(page.getByRole('heading', { name: 'No users match' })).toBeHidden();
+    await expect(page.getByRole('spinbutton', { name: /Page number/ })).toHaveValue('1');
+    await page.locator('.ag-row a').first().waitFor();
   });
 });

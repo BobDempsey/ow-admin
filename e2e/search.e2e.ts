@@ -54,7 +54,11 @@ test.describe('user list search', () => {
 
     await expect(listStatus(page)).toHaveText('No users match');
     await expect(total(page)).toHaveText('0 users match');
-    await expect(page.getByText('No users match your search or filters.')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'No users match' })).toBeVisible();
+    await expect(
+      page.getByText('Try a different search or filter, or clear them to see every user.'),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Clear filters' })).toBeVisible();
   });
 
   test('keeps the current sort', async ({ page }) => {

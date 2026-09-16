@@ -13,6 +13,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
 import { USER_ROLES, USER_STATUSES, UserRole, UserStatus } from '../core/api/user.model';
+import { EmptyUsersOverlay } from './empty-users-overlay';
 import { FilterChip, FilterChipRemoval, FilterChips } from './filter-chips';
 import { TableSettingsDialog } from './table-settings-dialog';
 import { EMPTY_LIST_QUERY, ListQuery } from './users-datasource';
@@ -41,7 +42,7 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
  */
 @Component({
   selector: 'app-users-page',
-  imports: [FilterChips, RouterLink, TableSettingsDialog, UsersGrid],
+  imports: [EmptyUsersOverlay, FilterChips, RouterLink, TableSettingsDialog, UsersGrid],
   template: `
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <h1 #heading tabindex="-1" class="text-2xl font-semibold text-ink focus:outline-none">
@@ -158,6 +159,13 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
         (failed)="error.set($event)"
         (openUser)="openUser($event)"
       />
+      @if (empty()) {
+        <app-empty-users-overlay
+          class="block border-t border-line-subtle"
+          [filtered]="emptyFiltered()"
+          (clearFilters)="clearAll()"
+        />
+      }
     </div>
     <app-table-settings-dialog #tableSettings />
   `,
@@ -226,6 +234,9 @@ export default class UsersPage {
     const total = this.total();
     return total === undefined ? '' : countLabel(total, isNarrowed(this.loadedQuery()));
   });
+  /** A settled load with no users, which shows the empty state below the grid. */
+  protected readonly empty = computed(() => !this.loading() && !this.error() && this.total() === 0);
+  protected readonly emptyFiltered = computed(() => isNarrowed(this.loadedQuery()));
   protected readonly announcementText = computed(() => {
     const result = this.announcement();
     if (!result) {
@@ -290,7 +301,7 @@ export default class UsersPage {
    * Removes every filter in one step, so the grid sends a single request. Clear all leaves the DOM
    * with the chips, so focus goes to the search field, where starting over begins.
    */
-  clearAll(): void {
+  protected clearAll(): void {
     this.announceNextLoad = true;
     this.searchText.set('');
     this.search.set('');
