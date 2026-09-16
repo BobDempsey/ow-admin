@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b` (earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
+Last updated: 2026-09-15, the table settings dialog built and committed in `86c2e2e` (earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -209,7 +209,7 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`65c0800` (the search count wording and the quiet density reload); `061c53b` holds the five drafted OpenSpec changes. Commit `handoff.md` and `tasks.md` edits after
+`86c2e2e` (the table settings dialog). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Nine capability specs are archived in `openspec/specs/`: `admin-navigation`,
@@ -244,7 +244,7 @@ added a searching scenario to "Total count displayed".
 Five OpenSpec changes are active, drafted on 2026-09-15 and all valid under `openspec validate --strict`. Build them in this order, because the first four each edit `users-page.ts` or the header:
 
 1. `fix-search-match-count` (9 of 9 tasks done, committed in `65c0800`, not archived). Singular count wording through `countLabel`, the status line's result text inside an `sr-only` span with "Loading users…" still visible, and a density reload that does not announce loading.
-2. `polish-settings-dialog` (17 tasks). The Settings nav entry goes back to a disabled placeholder and the dialog moves to a "Table settings" button across from the list's search field, losing its Theme group. Density defaults to Compact, the dialog's radios and checkboxes are drawn with tokens so an unchecked control reads as unselected in dark, and two settings arrive: Resizable columns (a second 2.5.7 gap) and Fixed header.
+2. `polish-settings-dialog` (16 of 17 tasks done, committed in `86c2e2e`, not archived; task 7.3 rewrites the capability's Purpose after archive). The Settings nav entry is a disabled placeholder again and `TableSettingsDialog` (`src/app/users/table-settings-dialog.ts`) opens from a "Table settings" button across from the list's search field, with no Theme group. Density defaults to Compact, the radios and checkboxes are drawn with `appearance-none` and tokens, and Resizable columns (a second 2.5.7 gap) and Fixed header are in. Checks on 2026-09-15: `ng test` 241 passed, `ng build` passed, `npm run test:a11y` 209 passed, Prettier clean.
 3. `add-list-role-status-filters` (13 tasks). `role` and `status` on `GET /users`, and Role and Status dropdowns beside search.
 4. `add-theme-menu` (8 tasks). The header's three theme radios become a "Theme" menu button following the ARIA menu button pattern with `menuitemradio` items, built in-house.
 5. `add-mobile-nav-drawer` (8 tasks). Below 768 px the nav entries move into a modal `<dialog>` drawer behind a Menu button; the wordmark and theme control stay in the bar.
@@ -674,6 +674,36 @@ All pre-implementation decisions are made.
   - AG Grid's `api.resetRowHeights()` logs error #200 on the Infinite Row Model because it needs the Enterprise `ServerSideRowModelApiModule`. `setGridOption('rowHeight', …)` then `refreshInfiniteCache()` re-lays the page and keeps the page number.
   - The closed Settings dialog stays in the DOM, so a test locator such as `page.locator('label', { hasText: 'Dark' })` matches its labels too. Scope header queries to `header`, or use role queries, which skip the closed dialog.
   - Slate-50 stripes on white were close to invisible in screenshots; the light stripe is slate-100.
+- Facts found while building `polish-settings-dialog` on 2026-09-15:
+  - In the dark theme a native radio renders unchecked as a filled grey
+    disc and a native checkbox as a filled grey square, which was the
+    reported bug. The controls are now drawn with `appearance-none`, tokens
+    and a `--check-mark` background image in `styles.css`. A CSS mask does
+    not work: it applies to the whole input and erases the fill and border.
+    `forced-colors:appearance-auto` hands drawing back to the browser under
+    forced colors.
+  - Measured against the dialog surface: unselected outline 4.8:1 light and
+    6.8:1 dark; selected fill 5.9:1 light and 3.0:1 dark. The dark fill is
+    3.04:1, so lowering `--color-primary` in dark would break 1.4.11.
+  - With Fixed header on, the grid host takes
+    `max(20rem, calc(100dvh - 19rem))` (`GRID_HEIGHT_OFFSET`) and
+    `domLayout` becomes `normal`. `domLayout` and `defaultColDef` are not
+    reactive through the template, so one effect pushes both with
+    `setGridOption`.
+  - `.ag-body-viewport` does not exist in AG Grid 36. Tell the layouts apart
+    with `.ag-root.ag-layout-normal` versus `.ag-root.ag-layout-auto-height`,
+    and scroll rows by hovering a `.ag-row` and using `page.mouse.wheel`.
+  - AG Grid's Page Size control is a `role="combobox"` div, not a `<select>`,
+    so `selectOption` throws. Use `choosePageSize()` in `e2e/support/app.ts`.
+  - Alt with Left Arrow shrinks a column 4 px per press and stops at its
+    `minWidth`; dragging stops earlier because flex columns redistribute.
+  - In an e2e `page.evaluate`, `document.querySelector('input[type="radio"]')`
+    finds the header Theme radios first, so scope control queries to
+    `dialog`.
+  - Playwright wipes `test-results/` when a run starts, so a test writing
+    files there has to create its directory first.
+  - `e2e/support/app.ts` still calls its opener `openSettingsDialog`, though
+    everything else now says Table settings.
 - Facts found while building `fix-search-match-count` on 2026-09-15:
   - `refreshInfiniteCache()` and a pending page change combine into one
     datasource `getRows` call under `blockLoadDebounceMillis`, so a
@@ -711,16 +741,16 @@ All pre-implementation decisions are made.
   Draggable columns label that says it reorders rather than resizes (built
   in `4e09f2c`); column resizing as a setting (not built); and a darker
   light-mode stripe (built, slate-50 to slate-100 during the build, with the
-  light header following in `3fe5b7f`). Compact default and resizing are
-  specced in `polish-settings-dialog`, which rewrites the two
+  light header following in `3fe5b7f`). Compact default and resizing were
+  built in `polish-settings-dialog` (`86c2e2e`), which rewrote the two
   `settings-dialog` lines they contradicted.
 - The optional password reset UI action is not built, and the
   `password-reset` spec still needs softening to match the optional status.
 - The user added three optional tasks to `tasks.md` on 2026-09-13: a light,
   dark and system theme switcher (built 2026-09-15, see State); striped
   table rows as a setting (built 2026-09-15 in `add-settings-dialog`); and
-  a fixed table header, specced in `polish-settings-dialog` but not built.
-  It switches `domLayout` away from `autoHeight` while on (see the AG Grid
+  a fixed table header, built 2026-09-15 in `polish-settings-dialog`. It
+  switches `domLayout` away from `autoHeight` while on (see the AG Grid
   gotchas).
 - The user added an optional mobile nav menu and drawer task to `tasks.md`
   on 2026-09-15, specced in `add-mobile-nav-drawer` but not built. At 320 px

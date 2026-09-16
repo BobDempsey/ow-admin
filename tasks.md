@@ -1,10 +1,7 @@
-- [!] Make unchecked radios look unselected in dark mode
-- [!] set table density to compact by default
-- [!] Hide or explain table settings on screens without a table
 - [ ] (Optional) Build password reset action
-- [!] add table cols resizing to settings dialog
 - [!] (Optional) Add filter to the user list
-- [!] (Optional) Add fixed table header
 - [!] Update the theme switcher UI in the navbar
 - [!] (Optional) Add mobile nav menu and drawer
 - [ ] improve ui styling to a modern look
+- [ ] dropdown carets in user detail page need padding right
+- [ ] run/go through app to surface and fix any console errors or console warnings
