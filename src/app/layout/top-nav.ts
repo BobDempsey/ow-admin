@@ -36,7 +36,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
                 [routerLink]="entry.path"
                 routerLinkActive
                 ariaCurrentWhenActive="page"
-                class="inline-flex min-h-11 items-center border-b-[3px] border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
+                class="inline-flex min-h-11 items-center border-b-3 border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
               >
                 {{ entry.label }}
               </a>
@@ -44,7 +44,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
               <button
                 type="button"
                 aria-disabled="true"
-                class="inline-flex min-h-11 cursor-not-allowed items-center border-b-[3px] border-transparent px-3 text-sm text-header-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
+                class="inline-flex min-h-11 cursor-not-allowed items-center border-b-3 border-transparent px-3 text-sm text-header-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus"
               >
                 {{ entry.label }}<span class="sr-only"> (not available yet)</span>
               </button>

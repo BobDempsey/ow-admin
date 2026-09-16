@@ -13,7 +13,7 @@ import { Component, ElementRef, input, output, viewChild } from '@angular/core';
       aria-labelledby="reset-password-dialog-heading"
       aria-describedby="reset-password-dialog-description"
       (cancel)="onCancel($event)"
-      class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
+      class="m-auto w-dialog max-w-lg rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
       <h2 id="reset-password-dialog-heading" class="text-xl font-semibold">Reset password?</h2>
       <p id="reset-password-dialog-description" class="mt-3 break-words text-ink-muted">

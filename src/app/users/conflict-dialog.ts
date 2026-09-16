@@ -19,7 +19,7 @@ export type ConflictChoice = 'keep' | 'reload' | 'overwrite';
       aria-labelledby="conflict-dialog-heading"
       aria-describedby="conflict-dialog-description"
       (cancel)="onCancel($event)"
-      class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
+      class="m-auto w-dialog max-w-lg rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
       <h2 id="conflict-dialog-heading" class="text-xl font-semibold">This user changed</h2>
       <p id="conflict-dialog-description" class="mt-3 text-ink-muted">

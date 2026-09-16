@@ -63,7 +63,7 @@ const CHECKBOX_CLASSES = `${CONTROL_CLASSES} rounded-sm checked:border-primary c
       #dialog
       aria-labelledby="settings-dialog-heading"
       (cancel)="onCancel($event)"
-      class="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
+      class="m-auto max-h-[calc(100dvh-2rem)] w-dialog max-w-lg overflow-y-auto rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
       <h2
         #heading

@@ -8,9 +8,11 @@
 /*
  * Named colors. Light values are the Tailwind palette colors the templates used before theming;
  * dark values override them below. Components use these (`bg-surface`, `text-ink`), never palette
- * classes, so each color has exactly one light and one dark definition.
+ * classes, so each color has exactly one light and one dark definition. `static` keeps a token's
+ * light value in the build even before a template uses it, so the dark block never overrides a
+ * variable that does not exist in light.
  */
-@theme {
+@theme static {
   --color-surface: var(--color-white);
   --color-surface-muted: var(--color-slate-100);
   --color-ink: var(--color-slate-900);
@@ -42,6 +44,35 @@
   --color-header-line: transparent;
   --color-backdrop: var(--color-slate-900);
   --color-row-stripe: var(--color-slate-100);
+  --color-line-subtle: var(--color-slate-200);
+  --color-shadow: rgb(15 23 42 / 0.08);
+  --color-skeleton: var(--color-slate-200);
+  --color-nav-current: var(--color-sky-700);
+  --color-status-active-surface: var(--color-green-50);
+  --color-status-active-ink: var(--color-green-800);
+  --color-status-active-line: var(--color-green-200);
+  --color-status-invited-surface: var(--color-amber-50);
+  --color-status-invited-ink: var(--color-amber-800);
+  --color-status-invited-line: var(--color-amber-200);
+  --color-status-suspended-surface: var(--color-red-50);
+  --color-status-suspended-ink: var(--color-red-800);
+  --color-status-suspended-line: var(--color-red-200);
+  --color-avatar-1-surface: var(--color-sky-100);
+  --color-avatar-1-ink: var(--color-sky-800);
+  --color-avatar-2-surface: var(--color-violet-100);
+  --color-avatar-2-ink: var(--color-violet-800);
+  --color-avatar-3-surface: var(--color-emerald-100);
+  --color-avatar-3-ink: var(--color-emerald-800);
+  --color-avatar-4-surface: var(--color-amber-100);
+  --color-avatar-4-ink: var(--color-amber-800);
+  --color-avatar-5-surface: var(--color-rose-100);
+  --color-avatar-5-ink: var(--color-rose-800);
+  --color-avatar-6-surface: var(--color-slate-200);
+  --color-avatar-6-ink: var(--color-slate-800);
+
+  /* Cards: `rounded-card` and `shadow-card`. The shadow reads its color, so dark only swaps that. */
+  --radius-card: var(--radius-xl);
+  --shadow-card: 0 1px 2px 0 var(--color-shadow), 0 1px 3px 0 var(--color-shadow);
 }
 
 :root {
@@ -93,6 +124,31 @@
   --color-header-line: var(--color-slate-700);
   --color-backdrop: var(--color-black);
   --color-row-stripe: var(--color-slate-800);
+  --color-line-subtle: var(--color-slate-700);
+  --color-shadow: rgb(0 0 0 / 0.5);
+  --color-skeleton: var(--color-slate-700);
+  --color-nav-current: var(--color-sky-400);
+  --color-status-active-surface: var(--color-green-950);
+  --color-status-active-ink: var(--color-green-200);
+  --color-status-active-line: var(--color-green-800);
+  --color-status-invited-surface: var(--color-amber-950);
+  --color-status-invited-ink: var(--color-amber-200);
+  --color-status-invited-line: var(--color-amber-800);
+  --color-status-suspended-surface: var(--color-red-950);
+  --color-status-suspended-ink: var(--color-red-200);
+  --color-status-suspended-line: var(--color-red-800);
+  --color-avatar-1-surface: var(--color-sky-900);
+  --color-avatar-1-ink: var(--color-sky-200);
+  --color-avatar-2-surface: var(--color-violet-900);
+  --color-avatar-2-ink: var(--color-violet-200);
+  --color-avatar-3-surface: var(--color-emerald-900);
+  --color-avatar-3-ink: var(--color-emerald-200);
+  --color-avatar-4-surface: var(--color-amber-900);
+  --color-avatar-4-ink: var(--color-amber-200);
+  --color-avatar-5-surface: var(--color-rose-900);
+  --color-avatar-5-ink: var(--color-rose-200);
+  --color-avatar-6-surface: var(--color-slate-700);
+  --color-avatar-6-ink: var(--color-slate-200);
   --select-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23f1f5f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4 6 8 10 12 6'/%3E%3C/svg%3E");
 }
 
@@ -113,6 +169,11 @@
     appearance: auto;
     background-image: none;
   }
+}
+
+/* A dialog's width on any screen: the full width less a 1rem margin on each side. */
+@utility w-dialog {
+  width: calc(100% - 2rem);
 }
 
 /*
