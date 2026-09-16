@@ -11,13 +11,13 @@ built.
 
 The system SHALL provide an About screen at `/about`, reachable from an
 About entry in the top navigation bar placed after the placeholder
-entries. Its document title SHALL be `About | Orbweaver Admin` and it SHALL
+entries. Its document title SHALL be `About | OW Admin` and it SHALL
 have one level 1 heading.
 
 #### Scenario: Open About from the nav
 - **WHEN** an admin activates the About nav entry
 - **THEN** the URL becomes `/about`, the document title is
-  `About | Orbweaver Admin`, and focus moves to the screen's level 1
+  `About | OW Admin`, and focus moves to the screen's level 1
   heading
 
 #### Scenario: Open About by URL

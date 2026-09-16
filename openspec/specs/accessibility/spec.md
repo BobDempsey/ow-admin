@@ -93,11 +93,11 @@ loaded.
 
 #### Scenario: Detail screen title
 - **WHEN** an admin opens the detail screen for a user named Radia Lamport
-- **THEN** the document title becomes `Radia Lamport | Orbweaver Admin`
+- **THEN** the document title becomes `Radia Lamport | OW Admin`
 
 #### Scenario: Missing user title
 - **WHEN** an admin opens the detail screen for an id that does not exist
-- **THEN** the document title becomes `User not found | Orbweaver Admin`
+- **THEN** the document title becomes `User not found | OW Admin`
 
 ### Requirement: Reflow and target size
 

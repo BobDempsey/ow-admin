@@ -53,11 +53,11 @@ moves keyboard focus past the navigation to the main content.
 ### Requirement: Document title per screen
 
 Each admin screen SHALL set the document title to the screen's name
-followed by `| Orbweaver Admin`.
+followed by `| OW Admin`.
 
 #### Scenario: Title on the user management screen
 - **WHEN** the user management screen loads
-- **THEN** the document title is `Users | Orbweaver Admin`
+- **THEN** the document title is `Users | OW Admin`
 
 ### Requirement: Default route
 

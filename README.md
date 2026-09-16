@@ -1,6 +1,6 @@
 # Orbweaver Admin
 
-Orbweaver Admin is an admin UI for managing users. It has a top navigation bar, a paged list of 500,000 users, screens to create, view and edit a user, and an About page. The app runs entirely in the browser: a client-side API layer answers HTTP requests from an in-memory store, so there is no backend to start.
+Orbweaver Admin is an admin UI for managing users. It has a top navigation bar, a paged list of 500,000 users, screens to create, view and edit a user, and an About page. The app runs entirely in the browser: a client-side API layer answers HTTP requests from an in-memory store, so there is no backend to start. The app shows its name as "OW Admin" in the header and the browser tab.
 
 It uses Angular 22 (standalone components, signals, Signal Forms, zoneless), Tailwind CSS 4, and AG Grid Community for the list.
 
