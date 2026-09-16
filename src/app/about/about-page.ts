@@ -15,20 +15,49 @@ import { RouterLink } from '@angular/router';
       <section aria-labelledby="about-what">
         <h2 id="about-what" class="text-xl font-semibold text-ink">What it does</h2>
         <p class="mt-2 text-ink-muted">
-          Page through 500,000 users, create new ones, and view or edit any user. The AI assistant
-          button in the header opens a demo chat that links to a live example.
+          Search, sort and filter 500,000 users, create new ones, edit any user or send a password
+          reset, and set table options and a light or dark theme. The AI assistant button in the
+          header opens a demo chat that links to a live example.
         </p>
         <div class="mt-4 flex flex-wrap gap-3">
           <a
             routerLink="/users"
-            class="inline-flex min-h-11 items-center rounded bg-primary px-4 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >Go to users</a
+            class="inline-flex min-h-11 items-center gap-2 rounded bg-primary pr-4 pl-3 font-medium text-on-primary hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
+            <svg
+              aria-hidden="true"
+              class="size-5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="4" />
+              <path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3" />
+            </svg>
+            Go to users
+          </a>
           <a
             routerLink="/users/new"
-            class="inline-flex min-h-11 items-center rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >Create a user</a
+            class="inline-flex min-h-11 items-center gap-2 rounded border border-line pr-4 pl-3 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
+            <svg
+              aria-hidden="true"
+              class="size-5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="4" />
+              <path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6" />
+            </svg>
+            Create a user
+          </a>
         </div>
       </section>
 
