@@ -201,12 +201,24 @@ test.describe('skeleton rows', () => {
   });
 
   test('show a full page of placeholder rows on the first load', async ({ page }) => {
+    // The first page answers within 250 ms, so the largest count is recorded as rows appear.
+    await page.addInitScript(() => {
+      const record = window as unknown as { mostSkeletonRows: number };
+      record.mostSkeletonRows = 0;
+      new MutationObserver(() => {
+        const rows = document.querySelectorAll('.ag-row:has(app-skeleton-cell span)').length;
+        record.mostSkeletonRows = Math.max(record.mostSkeletonRows, rows);
+      }).observe(document, { childList: true, subtree: true });
+    });
     await page.goto('/users');
-    await expect(page.locator('.ag-row:has(app-skeleton-cell span)').first()).toBeVisible();
-    expect(await page.locator('.ag-row:has(app-skeleton-cell span)').count()).toBe(25);
 
     await page.locator('.ag-row a').first().waitFor();
-    await expect(page.getByText('1 to 25 of 500,000')).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { mostSkeletonRows: number }).mostSkeletonRows,
+      ),
+    ).toBe(25);
+    await expect(page.locator('.ag-paging-row-summary-panel')).toHaveText(/1 to 25 of 500,000/);
     await expect(page.getByRole('spinbutton', { name: /Page number/ })).toHaveAccessibleName(
       /Page number, 1 of 20,000/,
     );
