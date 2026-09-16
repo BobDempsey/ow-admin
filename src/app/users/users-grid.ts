@@ -28,6 +28,7 @@ import { ApiError } from '../core/api/api-error';
 import { User } from '../core/api/user.model';
 import { ROW_HEIGHTS, TableSettingsService } from '../core/table-settings.service';
 import { UserNameCell } from './user-name-cell';
+import { UserPillCell, UserPillCellParams } from './user-pill-cell';
 import {
   EMPTY_LIST_QUERY,
   ListQuery,
@@ -208,8 +209,23 @@ export class UsersGrid {
   protected readonly columnDefs: ColDef<User>[] = [
     { field: 'name', headerName: 'Name', cellRenderer: UserNameCell, flex: 1, minWidth: 180 },
     { field: 'email', headerName: 'Email', flex: 1.5, minWidth: 240 },
-    { field: 'role', headerName: 'Role', width: 120, minWidth: 120 },
-    { field: 'status', headerName: 'Status', width: 130, minWidth: 130 },
+    {
+      field: 'role',
+      headerName: 'Role',
+      cellRenderer: UserPillCell,
+      cellRendererParams: { kind: 'role' } satisfies UserPillCellParams,
+      width: 120,
+      minWidth: 120,
+    },
+    // 140 px keeps "suspended" on one line inside its pill under WCAG text spacing.
+    {
+      field: 'status',
+      headerName: 'Status',
+      cellRenderer: UserPillCell,
+      cellRendererParams: { kind: 'status' } satisfies UserPillCellParams,
+      width: 140,
+      minWidth: 140,
+    },
   ];
   /**
    * Every column sorts through the API, one at a time, cycling ascending, descending and unsorted;

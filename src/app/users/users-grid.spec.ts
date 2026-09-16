@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { GridApi, GridReadyEvent, IGetRowsParams } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, IGetRowsParams } from 'ag-grid-community';
 import { API_LATENCY_MS } from '../core/api/api-config';
 import { provideUsersApi } from '../core/api/provide-users-api';
 import { User, UserPage } from '../core/api/user.model';
 import { ListQuery, UsersDatasource } from './users-datasource';
+import { UserPillCell } from './user-pill-cell';
 import { UsersGrid } from './users-grid';
 import { UsersService } from './users.service';
 
@@ -46,7 +47,27 @@ async function renderGrid(query: ListQuery) {
   return { api, fixture, setQuery };
 }
 
+const columnDefs = (fixture: Awaited<ReturnType<typeof renderGrid>>['fixture']) =>
+  (fixture.componentInstance as unknown as { columnDefs: ColDef<User>[] }).columnDefs;
+
 describe('UsersGrid', () => {
+  it('shows role and status as pills, with room for "suspended"', async () => {
+    const { fixture } = await renderGrid({ q: '' });
+    const byField = new Map(columnDefs(fixture).map((column) => [column.field, column]));
+
+    expect(byField.get('role')).toMatchObject({
+      cellRenderer: UserPillCell,
+      cellRendererParams: { kind: 'role' },
+      minWidth: 120,
+    });
+    expect(byField.get('status')).toMatchObject({
+      cellRenderer: UserPillCell,
+      cellRendererParams: { kind: 'status' },
+      width: 140,
+      minWidth: 140,
+    });
+  });
+
   it('leaves the cache and the page alone for an equal new query object', async () => {
     const { api, setQuery } = await renderGrid({ q: 'hopper', role: 'Admin' });
 

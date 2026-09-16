@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { expect, test } from './support/test';
-import { COLOR_SCHEMES, openAbout } from './support/app';
+import { COLOR_SCHEMES, openAbout, openList, storeTableSettings } from './support/app';
 import { contrast, tokenContrast } from './support/contrast';
 
 /** A foreground and background token pair and the ratio it must reach (WCAG 1.4.3, 1.4.11). */
@@ -128,6 +128,53 @@ for (const colorScheme of COLOR_SCHEMES) {
       expect(ratios.focusRing).toBeGreaterThanOrEqual(NON_TEXT);
       expect(ratios.underline).toBeGreaterThanOrEqual(NON_TEXT);
       expect(ratios.underlineOnHover).toBeGreaterThanOrEqual(NON_TEXT);
+    });
+  });
+}
+
+/** The text and fill of the first pill in a grid cell matching `selector`, with its word. */
+function pillColors(page: Page, selector: string) {
+  return page
+    .locator(selector)
+    .first()
+    .locator('span')
+    .first()
+    .evaluate((pill) => {
+      const style = getComputedStyle(pill);
+      return { word: pill.textContent?.trim(), text: style.color, fill: style.backgroundColor };
+    });
+}
+
+const statusCell = (status: string) =>
+  `.ag-row:has(a) [col-id="status"]:has(span:text-is("${status}"))`;
+
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`pill contrast, ${colorScheme} theme`, () => {
+    test.use({ colorScheme, viewport: { width: 1280, height: 900 } });
+
+    test('each status pill reaches 4.5:1 against its own fill', async ({ page }) => {
+      await openList(page);
+      const fills = new Set<string>();
+      for (const status of ['active', 'invited', 'suspended']) {
+        const pill = await pillColors(page, statusCell(status));
+        const ratio = await contrast(page, pill.text, pill.fill);
+        console.log(`${colorScheme}: ${status} pill ${ratio.toFixed(2)}:1`);
+        expect(pill.word).toBe(status);
+        expect(ratio).toBeGreaterThanOrEqual(TEXT);
+        fills.add(pill.fill);
+      }
+      expect(fills.size).toBe(3);
+    });
+
+    test('role pills reach 4.5:1 on plain and striped rows', async ({ page }) => {
+      await storeTableSettings(page, { striped: true });
+      await openList(page);
+      for (const row of ['ag-row-even', 'ag-row-odd']) {
+        const pill = await pillColors(page, `.ag-row.${row}:has(a) [col-id="role"]`);
+        const ratio = await contrast(page, pill.text, pill.fill);
+        console.log(`${colorScheme}: role pill on ${row} ${ratio.toFixed(2)}:1`);
+        expect(ratio).toBeGreaterThanOrEqual(TEXT);
+      }
     });
   });
 }
