@@ -6,6 +6,6 @@
 - [ ] Check Tab order in the Table settings dialog now that Close sits first, after the heading
 - [ ] Check the header at 320px and at md with the AI assistant, Theme and Menu buttons: Tab order through them, the theme menu opening on screen, and Menu sitting outside the nav landmark
 - [ ] Record the icon buttons, detail avatar, header order, dark header and AI assistant demo in docs/accessibility.md, README and the About page
-- [ ] Decide whether the Theme button name should include the current theme
+- [ ] Name the Theme button with the current theme ("Theme: Dark") and update the tests that expect "Theme"
 - [ ] Record these UI changes as an OpenSpec change
 - [ ] Update handoff.md for these UI changes, including the dark header
