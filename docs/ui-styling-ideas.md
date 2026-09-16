@@ -49,6 +49,8 @@ These are candidate changes for the "improve ui styling to a modern look" task, 
 - **Command palette.** A Cmd+K search across users and actions.
 - **Bulk selection.** Row checkboxes with an action bar. This needs new API endpoints.
 
+Deferred on 2026-09-16: none of the larger options goes into the styling spec. The PDF asks for a top navigation bar, and bulk actions need API endpoints the contract does not have.
+
 ## Tailwind v4 practices
 
 - Define colors in `oklch` and layer the tokens: raw values, then roles such as `surface` and `primary`, then component tokens.
@@ -57,6 +59,8 @@ These are candidate changes for the "improve ui styling to a modern look" task, 
 - Use container queries where a component should respond to its own width, such as the filter row.
 - Keep the `motion-reduce` and `forced-colors` handling, and add `prefers-contrast: more`.
 - Keep class names complete in the source so Tailwind can detect them.
+
+Decided on 2026-09-16: the styling spec adds `prettier-plugin-tailwindcss` and cleans up repeated bracket values into tokens. It keeps the current palette values rather than moving to `oklch`, because a color format change would mean measuring every contrast pair again.
 
 ## Checks every change needs
 
