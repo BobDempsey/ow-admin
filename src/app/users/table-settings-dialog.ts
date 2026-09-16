@@ -65,14 +65,35 @@ const CHECKBOX_CLASSES = `${CONTROL_CLASSES} rounded-sm checked:border-primary c
       (cancel)="onCancel($event)"
       class="m-auto max-h-[calc(100dvh-2rem)] w-dialog max-w-lg overflow-y-auto rounded-lg bg-surface p-6 text-ink shadow-xl backdrop:bg-backdrop/60"
     >
-      <h2
-        #heading
-        id="settings-dialog-heading"
-        tabindex="-1"
-        class="text-xl font-semibold focus:outline-none"
-      >
-        Table settings
-      </h2>
+      <div class="-mt-2 -mr-2 flex items-start justify-between gap-4">
+        <h2
+          #heading
+          id="settings-dialog-heading"
+          tabindex="-1"
+          class="pt-2 text-xl font-semibold focus:outline-none"
+        >
+          Table settings
+        </h2>
+        <button
+          type="button"
+          title="Close"
+          (click)="close()"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus motion-safe:transition-colors"
+        >
+          <svg
+            aria-hidden="true"
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+          <span class="sr-only">Close</span>
+        </button>
+      </div>
 
       <label class="mt-4 flex min-h-11 cursor-pointer items-center gap-2">
         <input
@@ -161,15 +182,6 @@ const CHECKBOX_CLASSES = `${CONTROL_CLASSES} rounded-sm checked:border-primary c
         Keep the column header in view while scrolling through a page of users.
       </p>
 
-      <div class="mt-6 flex justify-end">
-        <button
-          type="button"
-          (click)="close()"
-          class="min-h-11 rounded border border-line px-4 font-medium hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >
-          Close
-        </button>
-      </div>
     </dialog>
   `,
 })

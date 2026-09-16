@@ -55,10 +55,22 @@ export interface NavEntry {
           </h2>
           <button
             type="button"
+            title="Close"
             (click)="close()"
-            class="min-h-11 rounded border border-line px-3 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+            class="-mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus motion-safe:transition-colors"
           >
-            Close
+            <svg
+              aria-hidden="true"
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+            <span class="sr-only">Close</span>
           </button>
         </div>
         <ul class="mt-4 flex flex-col">
