@@ -24,12 +24,12 @@ describe('PageTitleStrategy', () => {
   it('appends the app name to the route title', async () => {
     await RouterTestingHarness.create('/titled');
 
-    expect(TestBed.inject(Title).getTitle()).toBe('Reports | Orbweaver Admin');
+    expect(TestBed.inject(Title).getTitle()).toBe('Reports | OW Admin');
   });
 
   it('falls back to the app name when the route has no title', async () => {
     await RouterTestingHarness.create('/untitled');
 
-    expect(TestBed.inject(Title).getTitle()).toBe('Orbweaver Admin');
+    expect(TestBed.inject(Title).getTitle()).toBe('OW Admin');
   });
 });

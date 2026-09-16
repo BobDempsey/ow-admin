@@ -32,7 +32,7 @@ describe('routes', () => {
   it('titles the users screen', async () => {
     await RouterTestingHarness.create('/users');
 
-    expect(TestBed.inject(Title).getTitle()).toBe('Users | Orbweaver Admin');
+    expect(TestBed.inject(Title).getTitle()).toBe('Users | OW Admin');
   });
 
   it('shows and titles a user detail screen', async () => {
@@ -40,7 +40,7 @@ describe('routes', () => {
 
     expect(TestBed.inject(Router).url).toBe('/users/u-000001');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('User');
-    expect(TestBed.inject(Title).getTitle()).toBe('User | Orbweaver Admin');
+    expect(TestBed.inject(Title).getTitle()).toBe('User | OW Admin');
   });
 
   it('shows and titles the About screen', async () => {
@@ -50,7 +50,7 @@ describe('routes', () => {
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
       'About this app',
     );
-    expect(TestBed.inject(Title).getTitle()).toBe('About | Orbweaver Admin');
+    expect(TestBed.inject(Title).getTitle()).toBe('About | OW Admin');
   });
 
   it('shows and titles the new user screen', async () => {
@@ -58,6 +58,6 @@ describe('routes', () => {
 
     expect(TestBed.inject(Router).url).toBe('/users/new');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('New user');
-    expect(TestBed.inject(Title).getTitle()).toBe('New user | Orbweaver Admin');
+    expect(TestBed.inject(Title).getTitle()).toBe('New user | OW Admin');
   });
 });

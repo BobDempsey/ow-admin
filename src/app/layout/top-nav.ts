@@ -28,7 +28,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
         routerLink="/users"
         class="inline-flex min-h-11 items-center font-bold text-header-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus md:text-lg"
       >
-        Orbweaver Admin
+        OW Admin
       </a>
       <ul class="hidden flex-wrap items-center gap-1 md:flex">
         @for (entry of entries; track entry.label) {

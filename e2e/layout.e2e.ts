@@ -356,7 +356,7 @@ test('the header holds the wordmark, AI assistant, Theme and Menu on one row at 
 }) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await openList(page);
-  const wordmark = (await page.getByRole('link', { name: 'Orbweaver Admin' }).boundingBox())!;
+  const wordmark = (await page.getByRole('link', { name: 'OW Admin' }).boundingBox())!;
   const ai = (await aiButton(page).boundingBox())!;
   const theme = (await themeButton(page).boundingBox())!;
   const menu = (await menuButton(page).boundingBox())!;
@@ -396,7 +396,7 @@ test('widening past 768px closes the drawer and moves focus to the wordmark', as
   await page.setViewportSize({ width: 1024, height: 800 });
 
   await expect(navDrawer(page)).toBeHidden();
-  await expect(page.locator(':focus')).toHaveAccessibleName('Orbweaver Admin');
+  await expect(page.locator(':focus')).toHaveAccessibleName('OW Admin');
   await expect(page.getByRole('link', { name: 'About' })).toBeVisible();
   await tableSettingsButton(page).click();
   await expect(page.getByRole('dialog', { name: 'Table settings' })).toBeVisible();

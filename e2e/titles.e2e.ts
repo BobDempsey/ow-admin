@@ -13,32 +13,32 @@ test.describe('page titles (2.4.2)', () => {
   test('user list', async ({ page }) => {
     await openList(page);
 
-    await expect(page).toHaveTitle('Users | Orbweaver Admin');
+    await expect(page).toHaveTitle('Users | OW Admin');
   });
 
   test('new user', async ({ page }) => {
     await openNewUser(page);
 
-    await expect(page).toHaveTitle('New user | Orbweaver Admin');
+    await expect(page).toHaveTitle('New user | OW Admin');
   });
 
   test('user detail names the user', async ({ page }) => {
     await openDetail(page);
     const name = await page.getByRole('heading', { level: 1 }).innerText();
 
-    await expect(page).toHaveTitle(`${name} | Orbweaver Admin`);
+    await expect(page).toHaveTitle(`${name} | OW Admin`);
   });
 
   test('about', async ({ page }) => {
     await openAbout(page);
 
-    await expect(page).toHaveTitle('About | Orbweaver Admin');
+    await expect(page).toHaveTitle('About | OW Admin');
   });
 
   test('user not found', async ({ page }) => {
     await openMissingUser(page);
 
-    await expect(page).toHaveTitle('User not found | Orbweaver Admin');
+    await expect(page).toHaveTitle('User not found | OW Admin');
   });
 
   test.describe('reached from the nav drawer at 320px', () => {
@@ -49,7 +49,7 @@ test.describe('page titles (2.4.2)', () => {
       await openNavDrawer(page);
       await navDrawer(page).getByRole('link', { name: 'About' }).click();
 
-      await expect(page).toHaveTitle('About | Orbweaver Admin');
+      await expect(page).toHaveTitle('About | OW Admin');
     });
   });
 });

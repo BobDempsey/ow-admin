@@ -48,7 +48,7 @@ async function openDrawer(url = '/users') {
   opener.textContent = 'Menu';
   const fallback = document.createElement('a');
   fallback.href = '/users';
-  fallback.textContent = 'Orbweaver Admin';
+  fallback.textContent = 'OW Admin';
   document.body.append(opener, fallback);
   TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
   const router = TestBed.inject(Router);

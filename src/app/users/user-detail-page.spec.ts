@@ -235,13 +235,13 @@ describe('UserDetailPage', () => {
     it('titles the document with the loaded user name', async () => {
       await renderPage();
 
-      expect(TestBed.inject(Title).getTitle()).toBe(`${seeded.name} | Orbweaver Admin`);
+      expect(TestBed.inject(Title).getTitle()).toBe(`${seeded.name} | OW Admin`);
     });
 
     it('titles the document User not found for a missing user', async () => {
       await renderPage({ id: 'u-999999' });
 
-      expect(TestBed.inject(Title).getTitle()).toBe('User not found | Orbweaver Admin');
+      expect(TestBed.inject(Title).getTitle()).toBe('User not found | OW Admin');
     });
 
     it('announces a user that was just created', async () => {

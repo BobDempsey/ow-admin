@@ -572,7 +572,7 @@ test.describe('header Tab order at 1280px', () => {
 
     expect(await tabStops(page, 9)).toEqual([
       'Skip to main content',
-      'Orbweaver Admin',
+      'OW Admin',
       'Dashboard (not available yet)',
       'Users',
       'Reports (not available yet)',
@@ -593,7 +593,7 @@ test.describe('header Tab order at 320px', () => {
 
     expect(await tabStops(page, 5)).toEqual([
       'Skip to main content',
-      'Orbweaver Admin',
+      'OW Admin',
       'AI assistant',
       'Theme: System',
       'Menu',
