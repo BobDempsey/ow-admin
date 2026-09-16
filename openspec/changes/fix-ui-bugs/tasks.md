@@ -18,11 +18,16 @@
 - [ ] 4.1 Add `user-detail-page.spec.ts` cases that expect `Location.replaceState` to be called with a state keeping `navigationId` and dropping `notice`, and an empty status for a `404` rendered with `notice: 'created'`, and an e2e case that creates a user and then reloads, and another that creates a user, activates Back to users and goes back, each expecting the status never to read "User created."; verify they fail against the current code
 - [ ] 4.2 Remove `notice` from the history entry in `afterNextRender` after reading it, and return the notice from `status` only while a user is loaded; verify the tests from 4.1 and the existing "announces a user that was just created" case pass
 
-## 5. Docs and final checks
+## 5. Field messages without a period
 
-- [ ] 5.1 Update the 2.4.3 row in `docs/accessibility.md` to say Cancel on the detail screen moves focus to the user list's heading, choosing the current screen in the drawer returns focus to Menu, and a drawer closed by widening moves focus to the wordmark; verify the row names the tests that cover each
-- [ ] 5.2 Run `ng test --watch=false` and verify every unit test passes
-- [ ] 5.3 Run `ng build` and verify it succeeds with no new warnings
-- [ ] 5.4 With port 4600 free, run `npm run test:a11y` and verify every browser test passes
-- [ ] 5.5 Run `npx prettier --check src e2e` and verify it reports no files
-- [ ] 5.6 Run `openspec validate fix-ui-bugs --strict` and verify the change is valid
+- [ ] 5.1 Add a unit case that submits the empty create form and expects no field message to end with ".", and update the message strings asserted in the form and `user-validation.spec.ts` specs; verify the new case fails against the current code
+- [ ] 5.2 Drop the final period from the three messages in `user-draft-schema.ts` and the name, email, role and status messages in `validateDraft`, update any e2e assertion that quotes them, and verify the tests from 5.1 pass
+
+## 6. Docs and final checks
+
+- [ ] 6.1 Update the 2.4.3 row in `docs/accessibility.md` to say Cancel on the detail screen moves focus to the user list's heading, choosing the current screen in the drawer returns focus to Menu, and a drawer closed by widening moves focus to the wordmark, and the 3.3.2 row's quoted message to drop its period; verify the rows name the tests that cover each
+- [ ] 6.2 Run `ng test --watch=false` and verify every unit test passes
+- [ ] 6.3 Run `ng build` and verify it succeeds with no new warnings
+- [ ] 6.4 With port 4600 free, run `npm run test:a11y` and verify every browser test passes
+- [ ] 6.5 Run `npx prettier --check src e2e` and verify it reports no files
+- [ ] 6.6 Run `openspec validate fix-ui-bugs --strict` and verify the change is valid

@@ -31,6 +31,12 @@ Each bug below was reproduced with a Playwright script against `ng serve` on 202
 - Reproduce: create a user, then reload the page. The in-memory store resets, so the screen says "User not found", and the status line under it still says "User created.". Creating a user, choosing Back to users, and pressing the browser Back button also shows "User created." again.
 - Expected: "User created." shows once, on the navigation that follows a successful create, and never beside "User not found" or "The user could not be loaded".
 
+### 5. Field error messages end with a period
+
+- Where: the field messages on `/users/new` and `/users/:id`, from `src/app/users/user-draft-schema.ts` ("Enter a name.", "Enter an email address.", "Enter an email address like name@example.com.") and from the API's `400` field errors in `src/app/core/api/in-memory/user-validation.ts` ("Name is required.", "Email must be a valid email address.", and the role and status messages).
+- Reproduce: submit the empty create form. The user added this item to `tasks.md` on 2026-09-16.
+- Expected: field messages are short phrases with no period at the end.
+
 ### Checked and working
 
 The wordmark, the Users and About entries, the three placeholders, the Theme menu (pointer, Enter, Space, arrows, Home, End, Escape, Tab and outside clicks), the skip link, New user, search (typing, Escape, clearing, no results), the Role and Status filters, sorting by pointer and Enter, paging by pointer and keyboard, page size, row click and Enter, Table settings with each setting and Close and Escape, every create screen control, Save, Back to users, Simulate, all three conflict choices, Reset password with Cancel, Escape and confirm, the not-found screen, and both About links all behave as their specs say.
@@ -43,7 +49,7 @@ None.
 
 ### Modified Capabilities
 
-- `user-management`: "Edit user details" says Cancel returns to the user list, and a new "Created notice shown once" requirement limits "User created." to the navigation that follows a create.
+- `user-management`: "Edit user details" says Cancel returns to the user list, and a new "Created notice shown once" requirement limits "User created." to the navigation that follows a create, and a new "Field error wording" requirement drops the period from field messages.
 - `admin-navigation`: "Navigation drawer on narrow screens" says what happens when the admin chooses the current screen's entry and when the viewport widens while the drawer is open.
 
 ## Impact
@@ -52,4 +58,6 @@ None.
 - `src/app/layout/nav-drawer.ts` and `nav-drawer.spec.ts`: closing on a skipped same-URL navigation and on a breakpoint change.
 - `e2e/keyboard.e2e.ts` or a new `e2e/ui-bugs.e2e.ts`: browser checks for all four bugs.
 - `docs/accessibility.md` may need its 2.4.3 row updated if it describes Cancel or the drawer's focus.
-- No API, store or dependency change.
+- `src/app/users/user-draft-schema.ts` and `src/app/core/api/in-memory/user-validation.ts`, with their specs: field messages without a trailing period.
+- `docs/accessibility.md` 3.3.2 row, which quotes "Enter an email address like name@example.com.".
+- No API shape, store or dependency change. The API's query parameter messages (`skip`, `limit`, `sort`, `q`, `role`, `status`) never show under a field and keep their wording.

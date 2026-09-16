@@ -60,10 +60,18 @@ The detail screen (`src/app/users/user-detail-page.ts`) is always an editable fo
 
 **Test.** In `user-detail-page.spec.ts`, render with `state: { notice: 'created', navigationId: 2 }`, check that `Location.replaceState` was called with a state that has `navigationId` and no `notice`, and render a `404` with the same state and check the status is empty. In `e2e/`, create a user, reload, and check the status never reads "User created."; then create a user, choose Back to users, go back, and check the same.
 
+### 5. Field messages without a period
+
+**Cause.** The messages were written as sentences.
+
+**Decision.** Drop the final period from the three messages in `user-draft-schema.ts` and from the four field messages `validateDraft` returns in `user-validation.ts` (name, email, role and status), so a message from either source reads the same way under a field. The `body` message and the query parameter messages stay as they are, because no field shows them. Keep the wording otherwise: "Enter a name", "Enter an email address", "Enter an email address like name@example.com".
+
+**Test.** Update the existing assertions in `user-draft-schema` or form specs and `user-validation.spec.ts` to the new strings, add a check that no field message ends with "." after an empty submit on `/users/new`, and update any e2e assertion that quotes a message.
+
 ## Risks / Trade-offs
 
 - [Cancel leaves the screen while a save is still running] → The save still reaches the store and the list shows the result on its next load. Save already shows "Saving…", so this matches what Back to users does today.
-- [The spec change for Cancel is a behavior change the user did not ask for in those words] → The decision is flagged in the change summary. If the user prefers the on-screen reset, only task 1 changes: keep the button, restore the values, and announce "Changes discarded.".
+- [Cancel leaving the screen changes the spec's earlier on-screen reset] → The user confirmed on 2026-09-16 that Cancel discards edits and returns to the user list, matching Cancel on the create screen.
 - [`replaceState` in `afterNextRender` could run before the router writes the URL under a different `urlUpdateStrategy`] → The app uses the default `deferred` strategy, which writes the entry before activation. The reload and Back e2e checks catch a regression.
 - [`matchMedia` listeners in unit tests] → jsdom has no `matchMedia`, so the spec defines a stub per test, as `theme.service.spec.ts` does.
 - [`docs/accessibility.md` 2.4.3 row lists the drawer's focus rules and says nothing about Cancel] → Task 5 updates that row.

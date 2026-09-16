@@ -27,6 +27,26 @@ user was not found or could not be loaded.
 - **WHEN** the detail screen says the user was not found
 - **THEN** the status message does not read "User created."
 
+### Requirement: Field error wording
+
+Every message shown under a field on the create and detail screens SHALL
+be a short phrase with no period at the end, whether the form's own rules
+or an API `400` field error produced it.
+
+#### Scenario: Empty create form
+- **WHEN** an admin submits the create form with Name and Email empty
+- **THEN** the Name and Email fields each show a message that does not end
+  with a period
+
+#### Scenario: Invalid email
+- **WHEN** an admin enters "not-an-email" in Email and leaves the field
+- **THEN** the Email field shows a message that says what to enter and does
+  not end with a period
+
+#### Scenario: Field error from the API
+- **WHEN** a create or save answers `400` with field errors
+- **THEN** each message shown under a field does not end with a period
+
 ## MODIFIED Requirements
 
 ### Requirement: Edit user details
