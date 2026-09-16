@@ -81,6 +81,28 @@ export async function recordListRequests(page: Page): Promise<() => Promise<unkn
   return () => page.evaluate(() => (window as unknown as { listRequests: unknown[] }).listRequests);
 }
 
+/** The header's Menu button, which stands in for the nav entries below 768 px. */
+export const menuButton = (page: Page) => page.getByRole('button', { name: 'Menu' });
+
+/** The open navigation drawer. */
+export const navDrawer = (page: Page) => page.getByRole('dialog', { name: 'Menu' });
+
+/** Opens the header's nav drawer on whatever screen is showing. Narrow viewports only. */
+export async function openNavDrawer(page: Page): Promise<void> {
+  await menuButton(page).click();
+  await expect(navDrawer(page)).toBeVisible();
+  // The drawer slides in, so wait for that transition before measuring or shooting it.
+  await navDrawer(page).evaluate((drawer) =>
+    Promise.all(drawer.getAnimations().map((animation) => animation.finished)),
+  );
+}
+
+/** Opens the user list with the nav drawer open. Narrow viewports only. */
+export async function showNavDrawer(page: Page): Promise<void> {
+  await openList(page);
+  await openNavDrawer(page);
+}
+
 /** The header's Theme button, which opens the menu of Light, Dark and System. */
 export const themeButton = (page: Page) => page.getByRole('button', { name: 'Theme' });
 

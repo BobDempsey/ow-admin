@@ -16,6 +16,7 @@ import {
   showFilteredList,
   showNoSearchResults,
   showFixedHeader,
+  showNavDrawer,
   showSearchResults,
   showSettingsWcagNote,
   showThemeMenu,
@@ -58,4 +59,18 @@ for (const colorScheme of COLOR_SCHEMES) {
       }
     });
   }
+}
+
+// The Menu button and its drawer exist only below 768px, so that state is checked at 320px alone.
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`axe WCAG A and AA, ${colorScheme} theme at 320px, nav drawer`, () => {
+    test.use({ colorScheme, viewport: { width: 320, height: 800 } });
+
+    test('user list with the nav drawer open', async ({ page }) => {
+      await showNavDrawer(page);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme);
+
+      await expectNoAxeViolations(page);
+    });
+  });
 }

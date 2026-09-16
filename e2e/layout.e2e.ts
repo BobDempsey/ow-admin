@@ -9,8 +9,11 @@ import {
   openList,
   openMissingUser,
   openNewUser,
+  menuButton,
+  navDrawer,
   showFixedHeader,
   showFilteredList,
+  showNavDrawer,
   showNewUserErrors,
   showNoSearchResults,
   showSearchResults,
@@ -23,6 +26,7 @@ import {
 import {
   applyTextSpacing,
   clippedText,
+  obscuredFocusStops,
   scrollsHorizontally,
   smallTargets,
   waitForLoaded,
@@ -142,6 +146,62 @@ for (const viewport of VIEWPORTS) {
     expect(await scrollsHorizontally(page)).toBe(false);
   });
 }
+
+// The drawer replaces the entries only below 768px, so it is checked at 320px alone.
+for (const colorScheme of COLOR_SCHEMES) {
+  test.describe(`nav drawer, ${colorScheme} theme at 320px`, () => {
+    test.use({ colorScheme, viewport: { width: 320, height: 800 } });
+
+    test('fits the viewport, keeps its targets and never hides focus', async ({ page }) => {
+      await showNavDrawer(page);
+      await shot(page, `nav-drawer-320px-${colorScheme}`);
+      const drawer = (await navDrawer(page).boundingBox())!;
+
+      expect(drawer.x).toBeGreaterThanOrEqual(0);
+      expect(drawer.x + drawer.width).toBeLessThanOrEqual(320);
+      expect(await scrollsHorizontally(page)).toBe(false);
+      expect(await smallTargets(page)).toEqual([]);
+      expect(await obscuredFocusStops(page)).toEqual([]);
+    });
+
+    test('keeps its text under WCAG text spacing', async ({ page }) => {
+      await showNavDrawer(page);
+      await applyTextSpacing(page);
+      await waitForLoaded(page);
+      await shot(page, `nav-drawer-text-spacing-${colorScheme}`);
+
+      expect(await clippedText(page)).toEqual([]);
+      expect(await scrollsHorizontally(page)).toBe(false);
+    });
+  });
+}
+
+test('the header holds the wordmark, Menu and Theme on one row at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await openList(page);
+  const wordmark = (await page.getByRole('link', { name: 'Orbweaver Admin' }).boundingBox())!;
+  const menu = (await menuButton(page).boundingBox())!;
+  const theme = (await themeButton(page).boundingBox())!;
+
+  // One row: every box overlaps the wordmark's vertically, and each starts after the one before.
+  for (const box of [menu, theme]) {
+    expect(box.y).toBeLessThan(wordmark.y + wordmark.height);
+    expect(wordmark.y).toBeLessThan(box.y + box.height);
+  }
+  expect(menu.x).toBeGreaterThanOrEqual(wordmark.x + wordmark.width);
+  expect(theme.x).toBeGreaterThanOrEqual(menu.x + menu.width);
+  await expect(page.getByRole('link', { name: 'About' })).toBeHidden();
+  expect(await scrollsHorizontally(page)).toBe(false);
+});
+
+test('the entries stay in the bar with no Menu button at 1280px', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openList(page);
+
+  await expect(menuButton(page)).toBeHidden();
+  await expect(page.getByRole('link', { name: 'About' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reports (not available yet)' })).toBeVisible();
+});
 
 test('the fixed header list reflows at 320 by 256 px (400 percent zoom)', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 256 });

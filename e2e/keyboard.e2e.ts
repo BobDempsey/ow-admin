@@ -6,6 +6,8 @@ import {
   openList,
   openMissingUser,
   openNewUser,
+  menuButton,
+  navDrawer,
   showFixedHeader,
 } from './support/app';
 import { obscuredFocusStops } from './support/layout';
@@ -283,6 +285,62 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('Enter');
     await expect(page.getByRole('status')).toHaveText('User saved.');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/ overwritten\s*$/);
+  });
+});
+
+test.describe('the nav drawer at 320px', () => {
+  test.use({ viewport: { width: 320, height: 800 } });
+
+  test('opens from the keyboard, traps focus, and Escape returns to the Menu button', async ({
+    page,
+  }) => {
+    await openList(page);
+
+    await pressUntilFocused(page, 'Menu');
+    await page.keyboard.press('Enter');
+    await expect(navDrawer(page)).toBeVisible();
+    await expect(focused(page)).toHaveText('Menu');
+    await expect(focused(page)).toHaveRole('heading');
+
+    const stops: string[] = [];
+    for (let press = 0; press < 8; press++) {
+      await page.keyboard.press('Tab');
+      stops.push(
+        await page.evaluate(() =>
+          document.activeElement?.closest('dialog')
+            ? (document.activeElement.textContent?.trim() ?? '')
+            : document.activeElement === document.body
+              ? '(browser)'
+              : `outside: ${document.activeElement?.textContent?.trim()}`,
+        ),
+      );
+    }
+    expect(stops.filter((stop) => stop.startsWith('outside'))).toEqual([]);
+
+    await page.keyboard.press('Escape');
+    await expect(navDrawer(page)).toBeHidden();
+    await expect(focused(page)).toHaveAccessibleName('Menu');
+    expect(new URL(page.url()).pathname).toBe('/users');
+  });
+
+  test('marks the current screen, and an entry navigates and closes the drawer', async ({
+    page,
+  }) => {
+    await openList(page);
+    await menuButton(page).click();
+    await expect(navDrawer(page)).toBeVisible();
+
+    const current = navDrawer(page).locator('[aria-current]');
+    await expect(current).toHaveCount(1);
+    await expect(current).toHaveText('Users');
+
+    await pressUntilFocused(page, 'About');
+    await page.keyboard.press('Enter');
+
+    await expect(page).toHaveURL(/\/about$/);
+    await expect(navDrawer(page)).toBeHidden();
+    await expect(focused(page)).toHaveRole('heading');
+    await expect(focused(page)).toHaveText('About this app');
   });
 });
 

@@ -1,0 +1,128 @@
+import { Component, ElementRef, inject, input, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter } from 'rxjs';
+
+export interface NavEntry {
+  label: string;
+  /** A route the entry links to. */
+  path?: string;
+}
+
+/**
+ * The navigation drawer shown behind the header's Menu button below the `md` breakpoint. Like
+ * `ConflictDialog` and `TableSettingsDialog` it is a native `<dialog>` opened with `showModal()`,
+ * which makes the page behind it inert, keeps focus inside and turns Escape into a `cancel` event.
+ * Escape, Close and a click on the backdrop share one path that returns focus to the opener, while
+ * navigating closes the drawer and leaves focus to the new screen.
+ */
+@Component({
+  selector: 'app-nav-drawer',
+  imports: [RouterLink, RouterLinkActive],
+  template: `
+    <dialog
+      #dialog
+      aria-labelledby="nav-drawer-heading"
+      (cancel)="onCancel($event)"
+      (click)="onClick($event)"
+      class="fixed top-0 left-0 m-0 h-dvh max-h-none w-[min(20rem,85vw)] max-w-none bg-header p-0 text-header-ink shadow-xl backdrop:bg-backdrop/60"
+    >
+      <!-- Everything sits in this wrapper, so only a backdrop click has the dialog as its target. -->
+      <div class="flex h-full flex-col overflow-y-auto p-4">
+        <div class="flex items-center justify-between gap-3">
+          <h2
+            #heading
+            id="nav-drawer-heading"
+            tabindex="-1"
+            class="text-lg font-semibold focus:outline-none"
+          >
+            Menu
+          </h2>
+          <button
+            type="button"
+            (click)="close()"
+            class="min-h-11 rounded border border-header-muted px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-header-focus"
+          >
+            Close
+          </button>
+        </div>
+        <ul class="mt-4 flex flex-col">
+          @for (entry of entries(); track entry.label) {
+            <li>
+              @if (entry.path) {
+                <a
+                  [routerLink]="entry.path"
+                  routerLinkActive
+                  ariaCurrentWhenActive="page"
+                  class="flex min-h-11 items-center border-l-4 border-transparent px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-header-focus aria-[current=page]:border-header-accent aria-[current=page]:font-semibold"
+                >
+                  {{ entry.label }}
+                </a>
+              } @else {
+                <button
+                  type="button"
+                  aria-disabled="true"
+                  class="flex min-h-11 w-full cursor-not-allowed items-center border-l-4 border-transparent px-3 text-left text-sm text-header-muted focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-header-focus"
+                >
+                  {{ entry.label }}<span class="sr-only"> (not available yet)</span>
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    </dialog>
+  `,
+})
+export class NavDrawer {
+  readonly entries = input.required<readonly NavEntry[]>();
+
+  private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
+  private readonly heading = viewChild.required<ElementRef<HTMLElement>>('heading');
+  private opener: HTMLElement | undefined;
+
+  constructor() {
+    // A chosen entry navigates, and `App` moves focus to the new screen's heading, so the drawer
+    // closes without taking focus back to the Menu button.
+    inject(Router)
+      .events.pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.closeOnNavigation());
+  }
+
+  /** Opens the drawer as a modal with focus on its heading; closing returns focus to `opener`. */
+  show(opener?: HTMLElement): void {
+    this.opener = opener;
+    const dialog = this.dialog().nativeElement;
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+    this.heading().nativeElement.focus();
+  }
+
+  close(): void {
+    this.dialog().nativeElement.close();
+    this.opener?.focus();
+  }
+
+  protected onCancel(event: Event): void {
+    event.preventDefault();
+    this.close();
+  }
+
+  private closeOnNavigation(): void {
+    const dialog = this.dialog().nativeElement;
+    if (dialog.open) {
+      dialog.close();
+    }
+  }
+
+  /** A click on the backdrop reaches the dialog element itself; a click inside never does. */
+  protected onClick(event: MouseEvent): void {
+    if (event.target === this.dialog().nativeElement) {
+      this.close();
+    }
+  }
+}

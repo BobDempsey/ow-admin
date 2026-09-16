@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { openAbout, openDetail, openList, openMissingUser, openNewUser } from './support/app';
+import {
+  navDrawer,
+  openAbout,
+  openDetail,
+  openList,
+  openMissingUser,
+  openNavDrawer,
+  openNewUser,
+} from './support/app';
 
 test.describe('page titles (2.4.2)', () => {
   test('user list', async ({ page }) => {
@@ -31,5 +39,17 @@ test.describe('page titles (2.4.2)', () => {
     await openMissingUser(page);
 
     await expect(page).toHaveTitle('User not found | Orbweaver Admin');
+  });
+
+  test.describe('reached from the nav drawer at 320px', () => {
+    test.use({ viewport: { width: 320, height: 800 } });
+
+    test('about', async ({ page }) => {
+      await openList(page);
+      await openNavDrawer(page);
+      await navDrawer(page).getByRole('link', { name: 'About' }).click();
+
+      await expect(page).toHaveTitle('About | Orbweaver Admin');
+    });
   });
 });

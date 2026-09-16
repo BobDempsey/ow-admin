@@ -90,6 +90,27 @@
   --color-row-stripe: var(--color-slate-800);
 }
 
+/*
+ * The nav drawer slides in from the left. A modal `<dialog>` goes from `display: none` to open in
+ * one step, so `@starting-style` supplies the frame the slide starts from. Reduced motion skips it.
+ */
+app-nav-drawer dialog {
+  translate: 0;
+  transition: translate 200ms ease-out;
+}
+
+@starting-style {
+  app-nav-drawer dialog[open] {
+    translate: -100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-nav-drawer dialog {
+    transition: none;
+  }
+}
+
 /* Striped rows setting: TableSettingsService puts the `striped` class on the grid host. */
 app-users-grid.striped .ag-row-odd {
   background-color: var(--color-row-stripe);

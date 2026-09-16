@@ -19,7 +19,7 @@ import { TopNav } from './layout/top-nav';
     </a>
     <header class="bg-header shadow-[inset_0_-1px_0_var(--color-header-line)]">
       <div
-        class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-1"
+        class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-1 md:gap-x-6"
       >
         <app-top-nav />
         <!-- Kept at the right end of its row, so its right-aligned menu opens on screen at any width. -->

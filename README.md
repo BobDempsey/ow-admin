@@ -24,6 +24,8 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
 
 Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
 
+On a window narrower than 768 pixels the navigation entries move into a drawer behind a Menu button, and the wordmark and the Theme button stay in the header. Choosing an entry navigates and closes the drawer; Escape, Close and a click outside close it and put focus back on the Menu button.
+
 The Theme button in the header opens a menu of Light, Dark and System, with a check mark on the current choice. A choice applies as soon as you pick it, and the menu closes. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
 
 Table settings, beside Search users on the list, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on.
