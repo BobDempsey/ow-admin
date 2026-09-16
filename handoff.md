@@ -1,6 +1,6 @@
 # Orbweaver Admin — Handoff
 
-Last updated: 2026-09-16, the console warning fix and guard built in `7225214` and archived, and the small and medium UI styling changes decided (earlier 2026-09-16, UI bug fixes built in `5a2c8f0` and archived; earlier 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived; earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
+Last updated: 2026-09-16, the UI styling update built in 14 group commits plus fixes and archived (earlier 2026-09-16, the console warning fix and guard built in `7225214` and archived, and the small and medium UI styling changes decided; earlier 2026-09-16, UI bug fixes built in `5a2c8f0` and archived; earlier 2026-09-16, the password reset action and drawn select carets built in `53aeaa3` and archived; earlier 2026-09-16, the five 2026-09-15 changes archived with their deltas merged; earlier 2026-09-15, the mobile nav drawer built and committed in `0c1a0c5`; earlier 2026-09-15, the header theme menu built and committed in `07329a5`; earlier 2026-09-15, role and status filters built and committed in `72a894c`; earlier 2026-09-15, the table settings dialog built and committed in `86c2e2e`; earlier 2026-09-15, search count wording and the quiet density reload built and committed in `65c0800`, with five OpenSpec changes drafted and committed in `061c53b`; earlier 2026-09-15, last code commit, port note and follow-ups corrected after sync; earlier 2026-09-15, `tasks.md` flattened and ordered by effort, archive recorded in `56ff8e7` (earlier 2026-09-15, `add-list-sort-and-search` archived with its deltas synced; earlier 2026-09-15, list sort and search committed in `5279cab`; earlier 2026-09-15, list sort and search built through `add-list-sort-and-search` (all 13 tasks); earlier 2026-09-15, draggable columns hint and light table header committed; earlier 2026-09-15, `add-theme-switcher` and `add-settings-dialog` archived with their deltas synced; earlier 2026-09-15, settings dialog committed in `05d0a93`; earlier 2026-09-15, settings dialog built through `add-settings-dialog` (all 15 tasks); earlier 2026-09-15, theme switcher committed in `916c1cc`; earlier 2026-09-15, theme switcher built through `add-theme-switcher` (all 14 tasks); earlier 2026-09-15, README rewritten to describe the app; earlier 2026-09-15, routes, ports and `tasks.md` corrected after sync; earlier 2026-09-15, `add-about-page` archived with its deltas synced; earlier 2026-09-15, About page committed in `ae56a1f`; earlier 2026-09-15, About page built through `add-about-page` (all 8 tasks); earlier 2026-09-15, app checked against every PDF requirement; earlier 2026-09-15, `verify-wcag-accessibility` archived with its delta synced; earlier 2026-09-15, accessibility work committed in `9b2563f`; earlier 2026-09-15, `verify-wcag-accessibility` all 14 tasks done with the smoke test, README line and final checks; earlier 2026-09-15, NVDA pass stopped after step 2 and recorded at 12 of 14 tasks; earlier 2026-09-15, `verify-wcag-accessibility` at 10 of 14 tasks and waiting on the user's NVDA pass; earlier 2026-09-14, `build-user-management` archived with its deltas synced; earlier 2026-09-14, user management screens committed in `4ab6e59`; earlier 2026-09-14, user management screens built through `build-user-management`; earlier 2026-09-14, dev server ports corrected after sync; earlier 2026-09-14, optional tasks and stray dev servers recorded; earlier 2026-09-13, `build-user-list` archived; earlier 2026-09-13, user list committed in `3901bcf`; earlier 2026-09-13, user list built through `build-user-list`; earlier 2026-09-13, API client and top nav changes archived; earlier 2026-09-13, commit reference corrected after sync; earlier 2026-09-13, top nav built; previously 2026-09-10))
 
 ## What this is
 
@@ -209,12 +209,12 @@ rule was re-added at the top.
 
 Git tracks the Angular workspace, `CLAUDE.md`, `.mcp.json`, the OpenSpec
 workspace, the `.claude/` commands, `handoff.md` and `tasks.md`. The last code commit is
-`7225214` (the console warning fix and guard). Commit `handoff.md` and `tasks.md` edits after
+`8fd6617` (the last UI styling fix). Commit `handoff.md` and `tasks.md` edits after
 each task.
 
 Ten capability specs are archived in `openspec/specs/`: `admin-navigation`, `runtime-quality`,
 `user-list`, `user-management`, `password-reset`, `user-api-client`,
-`accessibility`, `about-page`, `theme-switcher` and `settings-dialog` (79
+`accessibility`, `about-page`, `theme-switcher` and `settings-dialog` (84
 requirements total). The change that created them is at
 `openspec/changes/archive/2026-09-10-establish-user-management-specs/`; the
 two 2026-09-13 archives added five requirements to `user-api-client` and
@@ -253,7 +253,12 @@ and put the reset back into the keyboard scenario in `accessibility`. The
 wording" to `user-management`, rewrote "Edit user details" so Cancel
 returns to the list, and added two drawer scenarios in `admin-navigation`.
 The `fix-console-errors-and-warnings` archive created `runtime-quality`
-with two requirements.
+with two requirements. The `modernize-ui-styling` archive added four
+requirements to `user-list` (result and loading announcements, filter
+chips, empty state, row actions menu), removed "Search result announced"
+there, added a list entry point to `password-reset` and "Detail layout and
+save bar" to `user-management`, and widened requirements in `user-list`,
+`settings-dialog`, `accessibility` and `runtime-quality`.
 `openspec validate --specs --strict` passes all ten.
 
 No OpenSpec change is active. Five changes were drafted and built on 2026-09-15, in this order because the first four each edit `users-page.ts` or the header, and archived on 2026-09-16 under `openspec/changes/archive/2026-09-16-*`:
@@ -269,6 +274,10 @@ A sixth change, `add-password-reset-action` (all 12 tasks done, committed in `53
 A seventh change, `fix-ui-bugs` (all 16 tasks done, committed in `5a2c8f0`, archived 2026-09-16), came from a pass over every control. Cancel on the detail screen is now a link back to `/users` (the user confirmed this over restoring values in place). `NavDrawer` closes on `NavigationSkipped` when the admin picks the current screen, and on the `md` media query when the window widens, moving focus to the wordmark. "User created." is removed from history state with `Location.replaceState` in `afterNextRender` after it is read, and shows only while a user is loaded. Field messages from `user-draft-schema.ts` and `validateDraft` no longer end with a period. Checks on 2026-09-16: `ng test` 323 passed, `ng build` passed, `npm run test:a11y` 304 passed on the second full run, Prettier clean.
 
 An eighth change, `fix-console-errors-and-warnings` (all 6 tasks done, committed in `7225214`, archived 2026-09-16), fixed the only console message a full walk found, `NG0953: Unexpected emit for destroyed OutputRef`, which `UsersGrid` logged when an admin left `/users` mid-load. `UsersGrid` now wraps its datasource callbacks in `emitWhileActive`, which checks `DestroyRef.destroyed`. Every e2e file imports `test` and `expect` from `e2e/support/test.ts`, an auto fixture that fails a test on any console error, console warning or `pageerror`; its `allowConsole` option is empty and no test uses it. Keep it that way. `e2e/console.e2e.ts` checks leaving the list mid-load. Checks on 2026-09-16: `ng test` 324 passed, `ng build` passed with no warnings, `npm run test:a11y` 306 passed, Prettier clean.
+
+A ninth change, `modernize-ui-styling` (all tasks done, archived 2026-09-16), restyled the app from `docs/ui-styling-ideas.md`. The user asked for one commit per UI change so each can be reverted alone. In order: `233e936` Tailwind class sorting, `9a430b1` tokens, `06b4135` Inter, `c5c1075` light header, `68e7054` screen descriptions, `56f549a` cards, `3aca0d5` role and status pills, `d76a61b` initials avatars, `a12842c` filter chips and Clear all, `92a89da` skeleton rows, `3d0212c` empty state, `950b0b5` row Actions menu, `11ec641` two-column detail screen with a save bar, `2989777` docs. The final full run found problems that were fixed in separate commits naming their group: `e39b331` and `c134792` (row menu), `bd748f1` (avatars), `56a7225` (save bar), `8fd6617` (Inter and the paging panel), and test fixes `b6d5336` and `4757723`. The design's Rollback section (in the archived change) lists which groups depend on which: group 2's tokens feed most later groups, group 6's cards feed the toolbar and the detail layout, and groups 7, 8, 10 and 12 all edit the grid's column definitions. The user chose to skip per-group browser tests from group 5 on and test once at the end.
+
+What changed in behavior: "Loading users…" is now visually hidden behind skeleton rows; search counts as a filter chip and Clear all empties it; the empty state sits in the card below the grid (`EmptyUsersOverlay`), after the paging controls in Tab order, because AG Grid's overlay ignores pointer events; Enter on the Actions cell opens the row menu instead of the user; a reset from a row announces "Password reset email sent to {name}."; the dark header and its `header-*` tokens are gone. Checks on 2026-09-16: `ng test` 432 passed in 34 files, `ng build` passed with no warnings, `npm run test:a11y` 450 passed, Prettier clean. Every new color pair passed in both themes and is in the Theme colors table.
 
 No OpenSpec change is active.
 
@@ -845,6 +854,35 @@ All pre-implementation decisions are made.
     `http://localhost:4600/@vite/client:524`, because the Vite dev client
     wraps `console`; the message text is what matters. The dev server also
     repeats page warnings as `[WebServer] … [console.warn]` lines.
+- Facts found while building `modernize-ui-styling` on 2026-09-16:
+  - Tailwind 4 drops any `@theme` variable no template uses, and it scans
+    the whole repo for class names, including the openspec markdown.
+    `src/styles.css` uses `@theme static` so new tokens exist before a
+    template uses them.
+  - AG Grid logs error #200 a short time after an API call whose module is
+    not registered, in jsdom too. RowApi and ScrollApi are not registered;
+    `setFocusedCell` and the pagination calls are safe. A unit spec that
+    stubs `GridApi` will not catch this, so `users-grid.spec.ts` also
+    drives a real grid.
+  - AG Grid's no-rows overlay has `pointer-events: none`, so it cannot hold
+    a button.
+  - AG Grid virtualises columns, so off-screen cells do not exist at 320 px;
+    the grid now sets `suppressColumnVirtualisation`.
+  - A click that scrolls its button into view fires a scroll event after
+    the click handler; the row menu ignores scrolls that leave its button
+    where it was.
+  - A link that is a flex item computes as `display: block`, so the
+    `smallTargets` layout check no longer treats it as inline text.
+  - Calling `recordListRequests` twice in one test records every request
+    twice.
+  - `getByText` does not match AG Grid's paging summary; use
+    `.ag-paging-row-summary-panel`. The detail screen has two status regions
+    now, so e2e files read it through `detailStatus()`.
+  - Inter made the 320 px header wrap; the gaps below `md` are `gap-x-2`
+    and Menu uses `px-2`. The save bar wraps to about 101 px at 320 px, so
+    its scroll padding is 8rem.
+  - Stopping a Playwright run marks every remaining test failed at 0 ms;
+    ignore those.
 - `openspec archive` (1.10.0) failed on 2026-09-16 with `EPERM` renaming
   each change folder inside `openspec/changes/`, and after that failure it
   rolled back the spec updates it had just printed as applied. Check
@@ -894,11 +932,11 @@ All pre-implementation decisions are made.
   count while the visible total is right. Reproduced only from a script,
   about 5 ms apart. Fixing it means tagging each `loaded` emission with the
   request it belongs to.
-- "improve ui styling to a modern look" has no spec yet. On 2026-09-16 the
-  user decided every small and medium item in `docs/ui-styling-ideas.md`
-  (see its "Decided" sections), and chose to spec both sets together. The
-  larger options (sidebar layout, command palette, bulk selection) are not
-  discussed yet.
+- The larger styling options in `docs/ui-styling-ideas.md` (sidebar
+  layout, command palette, bulk selection) were deferred on 2026-09-16.
+- The user added "add a mock ai chatbot that links back to my ai
+  storefront" to `tasks.md` on 2026-09-16 and asked to hold it; it has no
+  spec.
 - `e2e/filter.e2e.ts` "choosing a status filters from the first page and
   shows only those rows" failed once on 2026-09-16 because an extra
   `skip: 25` request was recorded before the filter, then passed on every

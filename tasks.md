@@ -1,1 +1,2 @@
-- [!] improve ui styling to a modern look
+- [ ] add a mock ai chatbot that links back to my ai storefront "visit x to see how an ai assistant could be added to your app"
+- avatar should also go on user detail page
