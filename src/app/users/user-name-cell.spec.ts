@@ -33,7 +33,7 @@ describe('UserNameCell', () => {
     expect(circle?.classList).toContain('bg-avatar-1-surface');
     expect(circle?.classList).toContain('text-avatar-1-ink');
     expect(circle?.classList).toContain('rounded-full');
-    expect(circle?.nextElementSibling?.tagName).toBe('A');
+    expect(circle?.nextElementSibling?.querySelector('a')).not.toBeNull();
   });
 
   it('keeps the link name to the user name alone', async () => {

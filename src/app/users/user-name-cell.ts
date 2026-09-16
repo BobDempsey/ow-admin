@@ -21,11 +21,14 @@ import { AVATAR_COLOR_CLASSES, avatarColorIndex, initialsOf } from './user-avata
           [class]="avatarClasses()"
           >{{ initials() }}</span
         >
-        <a
-          [routerLink]="['/users', user.id]"
-          class="min-w-0 font-medium break-words text-link underline underline-offset-2 hover:text-link-hover"
-          >{{ user.name }}</a
-        >
+        <!-- The wrapper keeps the link inline text, as it was before the circle, not a flex item. -->
+        <span class="min-w-0 break-words">
+          <a
+            [routerLink]="['/users', user.id]"
+            class="font-medium text-link underline underline-offset-2 hover:text-link-hover"
+            >{{ user.name }}</a
+          >
+        </span>
       </span>
     }
   `,
