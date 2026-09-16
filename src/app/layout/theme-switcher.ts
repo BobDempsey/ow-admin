@@ -4,6 +4,7 @@ import {
   Injector,
   afterNextRender,
   inject,
+  input,
   signal,
   viewChild,
   viewChildren,
@@ -17,9 +18,51 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
 ];
 
 /**
+ * The picture for a theme choice: a sun for Light, a moon for Dark and a monitor for System. It is
+ * decorative, so the label beside it (or the button's hidden text) carries the name. The host sets
+ * the size and color; the strokes follow `currentColor`.
+ */
+@Component({
+  selector: 'app-theme-icon',
+  host: { class: 'inline-block shrink-0', 'aria-hidden': 'true' },
+  template: `
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="size-full"
+    >
+      @switch (preference()) {
+        @case ('light') {
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+          />
+        }
+        @case ('dark') {
+          <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472A7 7 0 0 0 20.985 12.486z" />
+        }
+        @default {
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        }
+      }
+    </svg>
+  `,
+})
+export class ThemeIcon {
+  readonly preference = input.required<ThemePreference>();
+}
+
+/**
  * The header's Light, Dark and System choice, built as a menu button following the WAI-ARIA menu
  * button pattern: a "Theme" button opens a `menu` of `menuitemradio` items, the chosen one marked
- * with a check mark. A closed menu is not rendered, so it is out of the accessibility tree. Focus
+ * with a check mark. The button shows the chosen item's icon, and its name stays "Theme" through
+ * hidden text; the menu's checked item tells assistive technology the choice. A closed menu is not rendered, so it is out of the accessibility tree. Focus
  * moves through the items with a roving `tabindex`, and choosing applies the theme, closes the
  * menu and returns focus to the button.
  */
@@ -30,6 +73,7 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
     '(document:pointerdown)': 'onDocumentPointerDown($event)',
     '(focusout)': 'onFocusOut($event)',
   },
+  imports: [ThemeIcon],
   template: `
     <button
       #button
@@ -39,16 +83,17 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
       [attr.aria-controls]="open() ? menuId : null"
       (click)="toggle()"
       (keydown)="onButtonKeydown($event)"
-      class="inline-flex min-h-11 items-center px-3 text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      class="inline-flex size-11 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-expanded:bg-surface-muted aria-expanded:text-ink motion-safe:transition-colors"
     >
-      Theme
+      <app-theme-icon [preference]="theme.preference()" class="size-5" />
+      <span class="sr-only">Theme</span>
     </button>
     @if (open()) {
       <div
         [id]="menuId"
         role="menu"
         aria-label="Theme"
-        class="absolute top-full right-0 z-20 mt-1 min-w-40 rounded border border-line bg-surface py-1 text-ink shadow-lg"
+        class="absolute top-full right-0 z-20 mt-2 min-w-44 rounded-xl border border-line bg-surface p-1 text-ink shadow-lg"
       >
         @for (option of options; track option.value; let index = $index) {
           <button
@@ -59,10 +104,12 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
             [tabindex]="index === focusedIndex() ? 0 : -1"
             (click)="select(option.value)"
             (keydown)="onMenuKeydown($event, option.value)"
-            class="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+            class="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus aria-checked:bg-surface-muted aria-checked:font-semibold motion-safe:transition-colors"
           >
-            <!-- The mark keeps its space when unchecked so the labels stay in one column. -->
-            <span class="inline-flex size-4 shrink-0 items-center justify-center">
+            <app-theme-icon [preference]="option.value" class="size-4 text-ink-muted" />
+            <span class="grow">{{ option.label }}</span>
+            <!-- The mark keeps its space when unchecked so the rows keep one width. -->
+            <span class="inline-flex size-4 shrink-0 items-center justify-center text-link">
               @if (theme.preference() === option.value) {
                 <svg
                   viewBox="0 0 16 16"
@@ -78,7 +125,6 @@ const OPTIONS: readonly { value: ThemePreference; label: string }[] = [
                 </svg>
               }
             </span>
-            {{ option.label }}
           </button>
         }
       </div>
