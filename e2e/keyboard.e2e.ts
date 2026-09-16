@@ -1,5 +1,13 @@
 import { Page, expect, test } from '@playwright/test';
-import { VIEWPORTS, openDetail, openList, openMissingUser, openNewUser } from './support/app';
+import {
+  VIEWPORTS,
+  choosePageSize,
+  openDetail,
+  openList,
+  openMissingUser,
+  openNewUser,
+  showFixedHeader,
+} from './support/app';
 import { obscuredFocusStops } from './support/layout';
 
 /** Presses `key` until the focused element's text is `name`, failing after `max` presses. */
@@ -15,6 +23,32 @@ async function pressUntilFocused(page: Page, name: string, key = 'Tab', max = 40
 }
 
 const focused = (page: Page) => page.locator(':focus');
+
+/** True when the focused element is entirely outside the viewport or covered at every corner. */
+function focusHidden(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const element = document.activeElement;
+    if (!element || element === document.body) {
+      return false;
+    }
+    const rect = element.getBoundingClientRect();
+    const inset = 1;
+    const points = [
+      [rect.left + rect.width / 2, rect.top + rect.height / 2],
+      [rect.left + inset, rect.top + inset],
+      [rect.right - inset, rect.top + inset],
+      [rect.left + inset, rect.bottom - inset],
+      [rect.right - inset, rect.bottom - inset],
+    ];
+    return !points.some(([x, y]) => {
+      if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) {
+        return false;
+      }
+      const hit = document.elementFromPoint(x, y);
+      return !!hit && (hit === element || element.contains(hit) || hit.contains(element));
+    });
+  });
+}
 
 test.describe('keyboard flows', () => {
   test('skip link moves focus to main without changing the URL', async ({ page }) => {
@@ -41,7 +75,7 @@ test.describe('keyboard flows', () => {
   test('nav: About follows Settings and opens the About screen', async ({ page }) => {
     await openList(page);
 
-    await pressUntilFocused(page, 'Settings');
+    await pressUntilFocused(page, 'Settings (not available yet)');
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAttribute('href', '/about');
     await page.keyboard.press('Enter');
@@ -59,6 +93,8 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAccessibleName('Search users');
     await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Table settings');
+    await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAttribute('role', 'columnheader');
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
@@ -71,6 +107,7 @@ test.describe('keyboard flows', () => {
     await openList(page);
 
     await pressUntilFocused(page, 'New user');
+    await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAttribute('role', 'columnheader');
@@ -92,11 +129,32 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
 
     const inPaging = await page.evaluate(
       () => !!document.activeElement?.closest('.ag-paging-panel'),
     );
     expect(inPaging).toBe(true);
+  });
+
+  test('list: a fixed header never hides the focused cell while arrowing a 100-row page', async ({
+    page,
+  }) => {
+    await showFixedHeader(page);
+    await choosePageSize(page, 100);
+    await page.getByRole('columnheader', { name: 'Name' }).focus();
+    const hidden: string[] = [];
+
+    for (const key of ['ArrowDown', 'ArrowUp']) {
+      for (let press = 0; press < 100; press++) {
+        await page.keyboard.press(key);
+        if (await focusHidden(page)) {
+          hidden.push(`${key} ${press}`);
+        }
+      }
+    }
+
+    expect(hidden).toEqual([]);
   });
 
   test('create: errors take focus, then a valid user opens with a notice', async ({ page }) => {

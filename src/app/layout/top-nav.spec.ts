@@ -40,41 +40,27 @@ describe('TopNav', () => {
     const current = element.querySelectorAll('[aria-current]');
 
     expect(entries.at(-1)).toBe('About');
-    expect(entries.at(-2)).toBe('Settings');
+    expect(entries.at(-2)).toBe('Settings (not available yet)');
     expect(aboutLink?.textContent?.trim()).toBe('About');
     expect(current).toHaveLength(1);
     expect(current[0]).toBe(aboutLink);
   });
 
-  it('renders Dashboard and Reports as unavailable placeholders', async () => {
+  it('renders Dashboard, Reports and Settings as unavailable placeholders', async () => {
     const { element } = await renderOn('/users');
     const placeholders = Array.from(element.querySelectorAll('ul button[aria-disabled]'));
 
     expect(placeholders.map((button) => button.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
       'Dashboard (not available yet)',
       'Reports (not available yet)',
+      'Settings (not available yet)',
     ]);
     for (const button of placeholders) {
       expect(button.getAttribute('aria-disabled')).toBe('true');
       expect(button.hasAttribute('disabled')).toBe(false);
       expect(button.getAttribute('type')).toBe('button');
+      expect(button.hasAttribute('aria-haspopup')).toBe(false);
     }
-  });
-
-  it('renders Settings as a button that opens a dialog and emits itself', async () => {
-    const { element, fixture } = await renderOn('/users');
-    const settings = Array.from(element.querySelectorAll<HTMLButtonElement>('ul button')).find(
-      (button) => button.textContent?.trim() === 'Settings',
-    )!;
-    const opened: HTMLElement[] = [];
-    fixture.componentInstance.openSettings.subscribe((button) => opened.push(button));
-
-    settings.click();
-
-    expect(settings.hasAttribute('aria-disabled')).toBe(false);
-    expect(settings.getAttribute('aria-haspopup')).toBe('dialog');
-    expect(settings.textContent).not.toContain('not available');
-    expect(opened).toEqual([settings]);
   });
 
   it('stays on the current screen when a placeholder is activated', async () => {

@@ -18,12 +18,18 @@ export interface TableSettings {
   density: TableDensity;
   /** Lets columns be reordered by dragging a header. Fails WCAG 2.5.7, so it is off by default. */
   movableColumns: boolean;
+  /** Lets column widths be changed by dragging a header edge. Also fails WCAG 2.5.7. */
+  resizableColumns: boolean;
+  /** Keeps the column header in view by scrolling the rows inside a grid of bounded height. */
+  fixedHeader: boolean;
 }
 
 export const DEFAULT_TABLE_SETTINGS: TableSettings = {
   striped: false,
-  density: 'comfortable',
+  density: 'compact',
   movableColumns: false,
+  resizableColumns: false,
+  fixedHeader: false,
 };
 
 /**
@@ -38,6 +44,8 @@ export class TableSettingsService {
   readonly striped = computed(() => this.settings().striped);
   readonly density = computed(() => this.settings().density);
   readonly movableColumns = computed(() => this.settings().movableColumns);
+  readonly resizableColumns = computed(() => this.settings().resizableColumns);
+  readonly fixedHeader = computed(() => this.settings().fixedHeader);
 
   update(changes: Partial<TableSettings>): void {
     this.settings.update((settings) => ({ ...settings, ...changes }));
@@ -60,11 +68,20 @@ function readSettings(storage: Storage | undefined): TableSettings {
   if (typeof stored !== 'object' || stored === null) {
     return DEFAULT_TABLE_SETTINGS;
   }
-  const { striped, density, movableColumns } = stored as Record<string, unknown>;
+  const { striped, density, movableColumns, resizableColumns, fixedHeader } = stored as Record<
+    string,
+    unknown
+  >;
   return {
     striped: typeof striped === 'boolean' ? striped : DEFAULT_TABLE_SETTINGS.striped,
     density: TABLE_DENSITIES.find((value) => value === density) ?? DEFAULT_TABLE_SETTINGS.density,
     movableColumns:
       typeof movableColumns === 'boolean' ? movableColumns : DEFAULT_TABLE_SETTINGS.movableColumns,
+    resizableColumns:
+      typeof resizableColumns === 'boolean'
+        ? resizableColumns
+        : DEFAULT_TABLE_SETTINGS.resizableColumns,
+    fixedHeader:
+      typeof fixedHeader === 'boolean' ? fixedHeader : DEFAULT_TABLE_SETTINGS.fixedHeader,
   };
 }

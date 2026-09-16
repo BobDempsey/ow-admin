@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../core/api/api-error';
+import { TableSettingsDialog } from './table-settings-dialog';
 import { UsersGrid } from './users-grid';
 
 /** How long typing must pause before the search is sent. */
@@ -24,10 +25,10 @@ export function countLabel(total: number, query: string): string {
   return query ? `${count} users match` : `${count} users`;
 }
 
-/** The user list screen: the total, search, load status, and the paged user grid. */
+/** The user list screen: the total, search, table settings, load status, and the paged user grid. */
 @Component({
   selector: 'app-users-page',
-  imports: [RouterLink, UsersGrid],
+  imports: [RouterLink, TableSettingsDialog, UsersGrid],
   template: `
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <h1 #heading tabindex="-1" class="text-2xl font-semibold text-ink focus:outline-none">
@@ -42,19 +43,31 @@ export function countLabel(total: number, query: string): string {
         >New user</a
       >
     </div>
-    <div class="mt-4 grid max-w-md gap-1">
-      <label for="users-search" class="font-medium text-ink">Search users</label>
-      <input
-        id="users-search"
-        type="search"
-        placeholder="Name or email"
-        autocomplete="off"
-        maxlength="100"
-        [value]="searchText()"
-        (input)="onSearchInput($event)"
-        class="min-h-11 w-full rounded border border-line-input bg-surface px-3 text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-      />
+    <div class="mt-4 flex flex-wrap items-end justify-between gap-4">
+      <div class="grid max-w-md grow basis-64 gap-1">
+        <label for="users-search" class="font-medium text-ink">Search users</label>
+        <input
+          id="users-search"
+          type="search"
+          placeholder="Name or email"
+          autocomplete="off"
+          maxlength="100"
+          [value]="searchText()"
+          (input)="onSearchInput($event)"
+          class="min-h-11 w-full rounded border border-line-input bg-surface px-3 text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        />
+      </div>
+      <button
+        #tableSettingsButton
+        type="button"
+        aria-haspopup="dialog"
+        (click)="tableSettings.show(tableSettingsButton)"
+        class="min-h-11 shrink-0 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      >
+        Table settings
+      </button>
     </div>
+    <app-table-settings-dialog #tableSettings />
     <p role="status" class="mt-2 min-h-6 text-sm text-ink-subtle">
       @if (loading()) {
         Loading users…

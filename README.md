@@ -22,11 +22,11 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
 - `/users/:id` shows a user as an editable form with Save and Cancel.
 - `/about` explains the app and how to try it.
 
-Dashboard and Reports in the navigation are placeholders and do nothing.
+Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
 
 The Theme control in the header switches between Light, Dark and System. System follows your OS color scheme and is the default. The app remembers your choice in this browser.
 
-Settings in the navigation opens a dialog with the same theme choice and three settings for the user list: Striped rows, Density (Comfortable or Compact) and Draggable columns. Changes apply at once and are remembered in this browser. Draggable columns is off by default because dragging is then the only way to move a column, which fails WCAG 2.5.7; the dialog says so when you turn it on.
+Table settings, beside Search users on the list, opens a dialog with five settings for the user table: Striped rows, Density (Comfortable or Compact, Compact by default), Draggable columns, Resizable columns and Fixed header. Changes apply at once and are remembered in this browser. Draggable columns and Resizable columns are off by default because dragging is then the only way to move a column, and the only single-pointer way to change a width, which fails WCAG 2.5.7; the dialog says so when you turn either on.
 
 ## How the API layer works
 

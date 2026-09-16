@@ -46,6 +46,11 @@
 
 :root {
   color-scheme: light;
+  /*
+   * The check mark inside a selected checkbox in the table settings dialog, which draws its own
+   * states from the color tokens. Stroked in the on-primary color, which is white in both themes.
+   */
+  --check-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5 6.5 11.5 12.5 5'/%3E%3C/svg%3E");
 }
 
 /* Contrast for each text, border and focus pair is recorded in docs/accessibility.md. */

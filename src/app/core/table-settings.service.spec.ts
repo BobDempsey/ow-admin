@@ -7,33 +7,51 @@ const values = (service: TableSettingsService) => ({
   striped: service.striped(),
   density: service.density(),
   movableColumns: service.movableColumns(),
+  resizableColumns: service.resizableColumns(),
+  fixedHeader: service.fixedHeader(),
 });
 
 describe('TableSettingsService', () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => vi.restoreAllMocks());
 
-  it('starts with striping off, comfortable rows and fixed columns, and stores nothing', () => {
+  it('starts with striping off, compact rows and fixed columns, and stores nothing', () => {
     const service = TestBed.inject(TableSettingsService);
 
     expect(values(service)).toEqual({
       striped: false,
-      density: 'comfortable',
+      density: 'compact',
       movableColumns: false,
+      resizableColumns: false,
+      fixedHeader: false,
     });
     expect(localStorage.getItem(TABLE_SETTINGS_STORAGE_KEY)).toBeNull();
+  });
+
+  it('keeps a Comfortable density stored before Compact became the default', () => {
+    localStorage.setItem(TABLE_SETTINGS_STORAGE_KEY, JSON.stringify({ density: 'comfortable' }));
+
+    expect(TestBed.inject(TableSettingsService).density()).toBe('comfortable');
   });
 
   it('restores stored settings', () => {
     localStorage.setItem(
       TABLE_SETTINGS_STORAGE_KEY,
-      JSON.stringify({ striped: true, density: 'compact', movableColumns: true }),
+      JSON.stringify({
+        striped: true,
+        density: 'comfortable',
+        movableColumns: true,
+        resizableColumns: true,
+        fixedHeader: true,
+      }),
     );
 
     expect(values(TestBed.inject(TableSettingsService))).toEqual({
       striped: true,
-      density: 'compact',
+      density: 'comfortable',
       movableColumns: true,
+      resizableColumns: true,
+      fixedHeader: true,
     });
   });
 
@@ -45,25 +63,36 @@ describe('TableSettingsService', () => {
 
     expect(values(TestBed.inject(TableSettingsService))).toEqual({
       striped: true,
-      density: 'comfortable',
+      density: 'compact',
       movableColumns: false,
+      resizableColumns: false,
+      fixedHeader: false,
     });
   });
 
   it('falls back to defaults when the stored value is not JSON', () => {
     localStorage.setItem(TABLE_SETTINGS_STORAGE_KEY, '{not json');
 
-    expect(TestBed.inject(TableSettingsService).density()).toBe('comfortable');
+    expect(TestBed.inject(TableSettingsService).density()).toBe('compact');
   });
 
   it('applies and stores a change, keeping the other settings', () => {
     const service = TestBed.inject(TableSettingsService);
 
-    service.update({ density: 'compact' });
+    service.update({ density: 'comfortable' });
     service.update({ striped: true });
+    service.update({ resizableColumns: true });
+    service.update({ fixedHeader: true });
 
-    expect(values(service)).toEqual({ striped: true, density: 'compact', movableColumns: false });
-    expect(stored()).toEqual({ striped: true, density: 'compact', movableColumns: false });
+    const expected = {
+      striped: true,
+      density: 'comfortable',
+      movableColumns: false,
+      resizableColumns: true,
+      fixedHeader: true,
+    };
+    expect(values(service)).toEqual(expected);
+    expect(stored()).toEqual(expected);
   });
 
   it('still applies a change when storage throws', () => {

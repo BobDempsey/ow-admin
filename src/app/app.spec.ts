@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, TitleStrategy, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../testing/axe';
-import { stubDialogMethods } from '../testing/dialog';
 import { App } from './app';
 import { routes } from './app.routes';
 import { PageTitleStrategy } from './core/page-title-strategy';
@@ -50,28 +49,18 @@ describe('App', () => {
     expect(nav.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('opens Settings from the nav and returns focus to the Settings button on close', async () => {
-    stubDialogMethods();
+  it('leaves Settings a placeholder that opens no dialog', async () => {
     const { element, fixture, router } = await renderApp();
     const settings = Array.from(element.querySelectorAll<HTMLButtonElement>('nav button')).find(
-      (button) => button.textContent?.trim() === 'Settings',
+      (button) => button.textContent?.trim().startsWith('Settings'),
     )!;
-    const dialog = element.querySelector('app-settings-dialog dialog')!;
 
     settings.click();
     await fixture.whenStable();
 
-    expect(dialog.hasAttribute('open')).toBe(true);
-    expect(document.activeElement?.textContent?.trim()).toBe('Settings');
-    expect(document.activeElement?.tagName).toBe('H2');
+    expect(settings.getAttribute('aria-disabled')).toBe('true');
+    expect(element.querySelectorAll('dialog[open]')).toHaveLength(0);
     expect(router.url).toBe('/users');
-
-    Array.from(dialog.querySelectorAll('button'))
-      .find((button) => button.textContent?.trim() === 'Close')!
-      .click();
-
-    expect(dialog.hasAttribute('open')).toBe(false);
-    expect(document.activeElement).toBe(settings);
   });
 
   it('moves focus to main without changing the URL when the skip link is used', async () => {

@@ -2,15 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { expectNoAxeViolations } from '../../testing/axe';
 import { stubDialogMethods } from '../../testing/dialog';
 import { TableSettingsService } from '../core/table-settings.service';
-import { ThemeService } from '../core/theme.service';
-import { SettingsDialog } from './settings-dialog';
+import { TableSettingsDialog } from './table-settings-dialog';
 
 async function openDialog() {
   const dialogMethods = stubDialogMethods();
   const opener = document.createElement('button');
-  opener.textContent = 'Settings';
+  opener.textContent = 'Table settings';
   document.body.append(opener);
-  const fixture = TestBed.createComponent(SettingsDialog);
+  const fixture = TestBed.createComponent(TableSettingsDialog);
   await fixture.whenStable();
   fixture.componentInstance.show(opener);
   await fixture.whenStable();
@@ -20,31 +19,32 @@ async function openDialog() {
       (input) => input.closest('label')?.textContent?.trim() === label,
     )!;
   const note = () => element.querySelector('#settings-movable-columns-wcag');
+  const resizeNote = () => element.querySelector('#settings-resizable-columns-wcag');
   return {
     fixture,
     element,
     opener,
     control,
     note,
+    resizeNote,
     dialogMethods,
     dialog: element.querySelector('dialog')!,
-    theme: TestBed.inject(ThemeService),
     table: TestBed.inject(TableSettingsService),
   };
 }
 
-describe('SettingsDialog', () => {
+describe('TableSettingsDialog', () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => document.body.querySelectorAll('button').forEach((button) => button.remove()));
 
-  it('opens as a modal named Settings with focus on its heading', async () => {
+  it('opens as a modal named Table settings with focus on its heading', async () => {
     const { dialog, dialogMethods } = await openDialog();
     const heading = dialog.querySelector('h2')!;
 
     expect(dialogMethods.showModal).toHaveBeenCalledTimes(1);
     expect(dialog.hasAttribute('open')).toBe(true);
     expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)).toBe(heading);
-    expect(heading.textContent?.trim()).toBe('Settings');
+    expect(heading.textContent?.trim()).toBe('Table settings');
     expect(document.activeElement).toBe(heading);
   });
 
@@ -71,43 +71,61 @@ describe('SettingsDialog', () => {
     expect(document.activeElement).toBe(opener);
   });
 
-  it('shows the current theme and applies a new one', async () => {
-    const { fixture, control, theme } = await openDialog();
-    expect(control('System').checked).toBe(true);
-
-    control('Dark').click();
-    await fixture.whenStable();
-    expect(theme.preference()).toBe('dark');
-
-    theme.choose('light');
-    await fixture.whenStable();
-    expect(control('Light').checked).toBe(true);
-    expect(control('Light').name).toBe('settings-theme');
-  });
-
-  it('groups the theme and density choices under named fieldsets', async () => {
+  it('offers no theme choice, only the table settings under a Density fieldset', async () => {
     const { element } = await openDialog();
     const legends = Array.from(element.querySelectorAll('fieldset legend')).map((legend) =>
       legend.textContent?.trim(),
     );
 
-    expect(legends).toEqual(['Theme', 'Density']);
+    expect(legends).toEqual(['Density']);
+    expect(element.textContent).not.toContain('Theme');
+    expect(element.textContent).not.toContain('System');
   });
 
-  it('applies striped rows, density and draggable columns', async () => {
+  it('applies every setting and shows the defaults', async () => {
     const { fixture, control, table } = await openDialog();
     expect(control('Striped rows').checked).toBe(false);
-    expect(control('Comfortable').checked).toBe(true);
+    expect(control('Compact').checked).toBe(true);
     expect(control('Draggable columns').checked).toBe(false);
+    expect(control('Resizable columns').checked).toBe(false);
+    expect(control('Fixed header').checked).toBe(false);
 
     control('Striped rows').click();
-    control('Compact').click();
+    control('Comfortable').click();
     control('Draggable columns').click();
+    control('Resizable columns').click();
+    control('Fixed header').click();
     await fixture.whenStable();
 
     expect(table.striped()).toBe(true);
-    expect(table.density()).toBe('compact');
+    expect(table.density()).toBe('comfortable');
     expect(table.movableColumns()).toBe(true);
+    expect(table.resizableColumns()).toBe(true);
+    expect(table.fixedHeader()).toBe(true);
+  });
+
+  it('shows a WCAG 2.5.7 note described by the checkbox only while resizable columns is on', async () => {
+    const { fixture, control, resizeNote } = await openDialog();
+    const checkbox = control('Resizable columns');
+    expect(resizeNote()).toBeNull();
+    expect(checkbox.getAttribute('aria-describedby')).toBe('settings-resizable-columns-hint');
+    expect(document.getElementById('settings-resizable-columns-hint')?.textContent).toContain(
+      'Drag the edge of a column header',
+    );
+
+    checkbox.click();
+    await fixture.whenStable();
+
+    expect(resizeNote()?.textContent).toContain('Fails WCAG 2.5.7 Dragging Movements.');
+    expect(resizeNote()?.textContent).toContain('no single-pointer alternative');
+    expect(checkbox.getAttribute('aria-describedby')).toBe(
+      `settings-resizable-columns-hint ${resizeNote()?.id}`,
+    );
+
+    checkbox.click();
+    await fixture.whenStable();
+
+    expect(resizeNote()).toBeNull();
   });
 
   it('shows a WCAG 2.5.7 note described by the checkbox only while draggable columns is on', async () => {
@@ -138,12 +156,11 @@ describe('SettingsDialog', () => {
   it('shows no WCAG note for any conforming combination', async () => {
     const { fixture, control, element } = await openDialog();
 
-    for (const label of ['Light', 'Dark', 'System']) {
-      control(label).click();
-      for (const density of ['Comfortable', 'Compact']) {
-        control(density).click();
+    for (const density of ['Comfortable', 'Compact']) {
+      control(density).click();
+      for (const other of ['Striped rows', 'Fixed header']) {
         for (let flip = 0; flip < 2; flip++) {
-          control('Striped rows').click();
+          control(other).click();
           await fixture.whenStable();
           expect(element.textContent).not.toContain('Fails WCAG');
         }
@@ -156,6 +173,7 @@ describe('SettingsDialog', () => {
     await expectNoAxeViolations(element);
 
     control('Draggable columns').click();
+    control('Resizable columns').click();
     await fixture.whenStable();
 
     await expectNoAxeViolations(element);

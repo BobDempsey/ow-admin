@@ -14,6 +14,7 @@ import {
   openSettingsDialog,
   showNewUserErrors,
   showNoSearchResults,
+  showFixedHeader,
   showSearchResults,
   showSettingsWcagNote,
 } from './support/app';
@@ -23,6 +24,7 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user list', open: openList },
   { name: 'user list with search results', open: showSearchResults },
   { name: 'user list with no search results', open: showNoSearchResults },
+  { name: 'user list with a fixed header', open: showFixedHeader },
   { name: 'user list load failure (forced through ng.getComponent)', open: forceListFailure },
   { name: 'new user', open: openNewUser },
   { name: 'new user with errors', open: showNewUserErrors },
@@ -32,8 +34,8 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'user save failure (forced through ng.getComponent)', open: forceSaveFailure },
   { name: 'conflict dialog', open: openConflictDialog },
   { name: 'about', open: openAbout },
-  { name: 'settings dialog', open: openSettingsDialog },
-  { name: 'settings dialog with WCAG note', open: showSettingsWcagNote },
+  { name: 'table settings dialog', open: openSettingsDialog },
+  { name: 'table settings dialog with WCAG note', open: showSettingsWcagNote },
 ];
 
 // With no stored choice the app follows System, so the emulated OS scheme picks the theme.

@@ -70,14 +70,18 @@ export async function recordListRequests(page: Page): Promise<() => Promise<unkn
   return () => page.evaluate(() => (window as unknown as { listRequests: unknown[] }).listRequests);
 }
 
-/** Opens the Settings dialog from the nav on the user list. */
+/** Opens the Table settings dialog from the button beside the user list's search field. */
 export async function openSettingsDialog(page: Page): Promise<void> {
   await openList(page);
-  await page.getByRole('navigation').getByRole('button', { name: 'Settings' }).click();
-  await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible();
+  await tableSettingsButton(page).click();
+  await expect(page.getByRole('dialog', { name: 'Table settings' })).toBeVisible();
 }
 
-/** Opens Settings and turns on Draggable columns, which shows the WCAG 2.5.7 note. */
+/** The user list's Table settings button, which opens the dialog. */
+export const tableSettingsButton = (page: Page) =>
+  page.getByRole('button', { name: 'Table settings' });
+
+/** Opens Table settings and turns on Draggable columns, which shows the WCAG 2.5.7 note. */
 export async function showSettingsWcagNote(page: Page): Promise<void> {
   await openSettingsDialog(page);
   await page.getByRole('checkbox', { name: 'Draggable columns' }).check();
@@ -87,11 +91,30 @@ export async function showSettingsWcagNote(page: Page): Promise<void> {
 /** Stores table settings before the app loads, as if the admin had chosen them earlier. */
 export async function storeTableSettings(
   page: Page,
-  settings: { striped?: boolean; density?: 'comfortable' | 'compact'; movableColumns?: boolean },
+  settings: {
+    striped?: boolean;
+    density?: 'comfortable' | 'compact';
+    movableColumns?: boolean;
+    resizableColumns?: boolean;
+    fixedHeader?: boolean;
+  },
 ): Promise<void> {
   await page.addInitScript((value) => {
     localStorage.setItem('orbweaver-admin-table-settings', value);
   }, JSON.stringify(settings));
+}
+
+/** Opens the user list with Fixed header on, so the grid scrolls its rows under the header. */
+export async function showFixedHeader(page: Page): Promise<void> {
+  await storeTableSettings(page, { fixedHeader: true });
+  await openList(page);
+}
+
+/** Chooses a page size through AG Grid's own combobox, which is not a native select. */
+export async function choosePageSize(page: Page, size: number): Promise<void> {
+  await page.getByRole('combobox', { name: 'Page Size' }).click();
+  await page.getByRole('option', { name: String(size), exact: true }).click();
+  await page.locator('.ag-row a').first().waitFor();
 }
 
 /** Simulates another admin's edit and saves, which opens the conflict dialog. */

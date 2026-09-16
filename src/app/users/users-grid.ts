@@ -39,6 +39,9 @@ ModuleRegistry.registerModules([
 
 const DEFAULT_PAGE_SIZE = 25;
 
+/** The space the heading, search row, status line and page padding take above and below the grid. */
+const GRID_HEIGHT_OFFSET = '19rem';
+
 /**
  * Tailwind slate and sky values, so the grid matches the app's color tokens in styles.css. AG Grid
  * uses the dark set when `data-ag-theme-mode="dark"` is on `<html>`, which ThemeService sets.
@@ -74,23 +77,27 @@ const usersGridTheme = themeQuartz
 @Component({
   selector: 'app-users-grid',
   imports: [AgGridAngular],
-  host: { '(focusin)': 'revealFocus($event)', '[class.striped]': 'settings.striped()' },
+  host: {
+    '(focusin)': 'revealFocus($event)',
+    '[class.striped]': 'settings.striped()',
+    '[style.height]': 'hostHeight()',
+  },
   template: `
     <ag-grid-angular
-      class="block w-full"
+      class="block h-full w-full"
       [theme]="theme"
       [rowHeight]="initialRowHeight"
       rowModelType="infinite"
       [datasource]="datasource"
       [columnDefs]="columnDefs"
-      [defaultColDef]="defaultColDef"
+      [defaultColDef]="initialDefaultColDef"
       [pagination]="true"
       [paginationPageSize]="defaultPageSize"
       [paginationPageSizeSelector]="pageSizes"
       [cacheBlockSize]="defaultPageSize"
       [maxBlocksInCache]="1"
       [blockLoadDebounceMillis]="50"
-      domLayout="autoHeight"
+      [domLayout]="initialDomLayout"
       [ensureDomOrder]="true"
       [suppressMultiSort]="true"
       [overlayNoRowsTemplate]="noRowsTemplate"
@@ -117,6 +124,19 @@ export class UsersGrid {
   private readonly rowHeight = computed(() => ROW_HEIGHTS[this.settings.density()]);
   protected readonly initialRowHeight = untracked(this.rowHeight);
 
+  /**
+   * With Fixed header on the grid takes a bounded height and scrolls its rows under a header that
+   * never moves; the offset is the space above and below the grid at 1280 px, and the floor keeps a
+   * few rows visible at 400 percent zoom, where the page scrolls instead.
+   */
+  protected readonly hostHeight = computed(() =>
+    this.settings.fixedHeader() ? `max(20rem, calc(100dvh - ${GRID_HEIGHT_OFFSET}))` : null,
+  );
+  private readonly domLayout = computed<'autoHeight' | 'normal'>(() =>
+    this.settings.fixedHeader() ? 'normal' : 'autoHeight',
+  );
+  protected readonly initialDomLayout = untracked(this.domLayout);
+
   /** The committed search text. A change starts the list again from its first page. */
   readonly query = input('');
 
@@ -130,6 +150,18 @@ export class UsersGrid {
         api.paginationGoToFirstPage();
       }
       previousQuery = query;
+    });
+
+    // `defaultColDef` and `domLayout` are not reactive through the template, so a change to either
+    // setting is pushed onto the live grid.
+    effect(() => {
+      const defaultColDef = this.defaultColDef();
+      const domLayout = this.domLayout();
+      const api = this.api;
+      if (api) {
+        api.setGridOption('defaultColDef', defaultColDef);
+        api.setGridOption('domLayout', domLayout);
+      }
     });
 
     // A density change re-lays the current page. `resetRowHeights` needs an Enterprise module,
@@ -158,20 +190,22 @@ export class UsersGrid {
   protected readonly columnDefs: ColDef<User>[] = [
     { field: 'name', headerName: 'Name', cellRenderer: UserNameCell, flex: 1, minWidth: 180 },
     { field: 'email', headerName: 'Email', flex: 1.5, minWidth: 240 },
-    { field: 'role', headerName: 'Role', width: 120 },
-    { field: 'status', headerName: 'Status', width: 130 },
+    { field: 'role', headerName: 'Role', width: 120, minWidth: 120 },
+    { field: 'status', headerName: 'Status', width: 130, minWidth: 130 },
   ];
   /**
    * Every column sorts through the API, one at a time, cycling ascending, descending and unsorted;
-   * a header sorts on click or Enter. Columns cannot be resized: that needs dragging in AG Grid
-   * Community, and WCAG 2.5.7 asks for a way that does not. Columns flex to fill the width instead.
+   * a header sorts on click or Enter. Resizing is off unless the admin turns on Resizable columns,
+   * since AG Grid Community resizes by dragging a header edge or with Alt and an arrow key, and
+   * WCAG 2.5.7 asks for a single-pointer way. Columns flex to fill the width until one is resized.
    */
-  protected readonly defaultColDef: ColDef<User> = {
+  private readonly defaultColDef = computed<ColDef<User>>(() => ({
     sortable: true,
     sortingOrder: ['asc', 'desc', null],
     filter: false,
-    resizable: false,
-  };
+    resizable: this.settings.resizableColumns(),
+  }));
+  protected readonly initialDefaultColDef = untracked(this.defaultColDef);
   protected readonly noRowsTemplate = '<span>No users match your search.</span>';
 
   /**

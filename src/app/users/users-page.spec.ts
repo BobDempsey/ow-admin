@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { expectNoAxeViolations } from '../../testing/axe';
+import { stubDialogMethods } from '../../testing/dialog';
 import { ApiError } from '../core/api/api-error';
 import { UsersGrid } from './users-grid';
 import UsersPage, { SEARCH_DEBOUNCE_MS, countLabel } from './users-page';
@@ -280,6 +281,57 @@ describe('UsersPage', () => {
 
       vi.useRealTimers();
       await expectNoAxeViolations(page.element);
+    });
+  });
+
+  describe('table settings', () => {
+    const settingsButton = (element: HTMLElement) =>
+      Array.from(element.querySelectorAll('button')).find(
+        (button) => button.textContent?.trim() === 'Table settings',
+      )!;
+
+    it('offers the button beside the search field, marked as opening a dialog', async () => {
+      const { element } = await renderPage();
+      const button = settingsButton(element);
+      const search = element.querySelector('#users-search')!;
+
+      expect(button.getAttribute('aria-haspopup')).toBe('dialog');
+      expect(button.getAttribute('type')).toBe('button');
+      expect(button.closest('div')).toBe(search.closest('div')?.parentElement);
+    });
+
+    it('opens the dialog and returns focus to the button on Close', async () => {
+      stubDialogMethods();
+      const { element, settle } = await renderPage();
+      const button = settingsButton(element);
+      const dialog = element.querySelector('dialog')!;
+
+      button.click();
+      await settle();
+      expect(dialog.hasAttribute('open')).toBe(true);
+      expect(dialog.querySelector('h2')?.textContent?.trim()).toBe('Table settings');
+      expect(document.activeElement).toBe(dialog.querySelector('h2'));
+
+      Array.from(dialog.querySelectorAll('button'))
+        .find((candidate) => candidate.textContent?.trim() === 'Close')!
+        .click();
+
+      expect(dialog.hasAttribute('open')).toBe(false);
+      expect(document.activeElement).toBe(button);
+    });
+
+    it('closes on Escape and returns focus to the button', async () => {
+      stubDialogMethods();
+      const { element, settle } = await renderPage();
+      const button = settingsButton(element);
+      const dialog = element.querySelector('dialog')!;
+      button.click();
+      await settle();
+
+      dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+
+      expect(dialog.hasAttribute('open')).toBe(false);
+      expect(document.activeElement).toBe(button);
     });
   });
 
