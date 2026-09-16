@@ -1,4 +1,2 @@
 - [ ] improve ui styling to a modern look
 - [!] run/go through app to surface and fix any console errors or console warnings
-- [!] go through app to find any ui bugs that aren't functioning (cancel btn in user detail page doesn't work)
-- [!] new user form => empty form submission attempt => field auth messages => Name is required, Email is required, etc. => . is not needed at end of msg
