@@ -1,1 +1,1 @@
-- [ ] Run the full browser suite after the About screen changes
+- [ ] nav drawer should say OW Admin instead of Menu at top
