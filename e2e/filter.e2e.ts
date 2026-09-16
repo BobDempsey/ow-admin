@@ -34,6 +34,8 @@ test.describe('user list filters', () => {
     await openList(page);
     await page.getByRole('button', { name: 'Next Page' }).click();
     await expect(page.getByRole('spinbutton', { name: /Page number/ })).toHaveValue('2');
+    // Page 2 answers after a short debounce; record only what the filter sends.
+    await page.locator('.ag-row[row-index="25"] a').waitFor();
     const requests = await recordListRequests(page);
 
     await statusFilter(page).selectOption('suspended');
@@ -41,6 +43,8 @@ test.describe('user list filters', () => {
     await expect(listStatus(page)).toContainText(/users match/);
     expect(await requests()).toEqual([{ skip: 0, limit: 25, status: 'suspended' }]);
     await expect(page.getByRole('spinbutton', { name: /Page number/ })).toHaveValue('1');
+    // A row that loads gets its real cell renderers after the skeleton, so wait for a name link.
+    await page.locator('.ag-row a').first().waitFor();
     const rows = await rowTexts(page);
     expect(rows.length).toBeGreaterThan(0);
     for (const row of rows) {
@@ -78,6 +82,9 @@ test.describe('user list filters', () => {
     await email.click();
     await email.click();
     await expect(email).toHaveAttribute('aria-sort', 'descending');
+    // Let the sorted page answer first, so its load does not take the filter's announcement.
+    await expect(page.locator('.ag-row[row-index="0"] a')).toBeVisible();
+    await expect(listStatus(page)).not.toContainText('Loading');
     const requests = await recordListRequests(page);
 
     await roleFilter(page).selectOption('Viewer');
@@ -190,12 +197,19 @@ test.describe('user list filter chips', () => {
     await email.click();
     await email.click();
     await expect(email).toHaveAttribute('aria-sort', 'descending');
+    const filtering = await recordListRequests(page);
     await searchField(page).fill('hopper');
     await roleFilter(page).selectOption('Viewer');
     await statusFilter(page).selectOption('active');
     await expect(filterChip(page, 'Status: active')).toBeVisible();
+    // Every filter load ends in "match", so wait on the last request before the text.
+    await expect
+      .poll(async () => (await filtering()).at(-1))
+      .toMatchObject({ q: 'hopper', role: 'Viewer', status: 'active' });
     await expect(listStatus(page)).toContainText(/match/);
-    const requests = await recordListRequests(page);
+    // Wrapping loadPage a second time would record every request twice, so slice the one record.
+    const before = (await filtering()).length;
+    const requests = async () => (await filtering()).slice(before);
 
     await clearAllButton(page).click();
 

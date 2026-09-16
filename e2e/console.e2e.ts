@@ -6,6 +6,7 @@ import {
   listStatus,
   openList,
   openRowMenu,
+  recordListRequests,
   resetPasswordDialog,
   rowMenu,
   showChipsList,
@@ -50,9 +51,19 @@ test.describe('leaving the list mid-load logs nothing', () => {
 test.describe('operating the list logs nothing', () => {
   test('removing a filter chip, then Clear all', async ({ page }) => {
     await showChipsList(page);
+    const requests = await recordListRequests(page);
 
     await filterChip(page, 'Role: Admin').click();
     await expect(filterChip(page, 'Status: active')).toBeFocused();
+    // Both loads end in "match", so wait on the request before waiting on the text.
+    await expect
+      .poll(async () => (await requests()).at(-1))
+      .toEqual({
+        skip: 0,
+        limit: 25,
+        q: 'hopper',
+        status: 'active',
+      });
     await expect(listStatus(page)).toContainText(/match/);
     await clearAllButton(page).click();
 
