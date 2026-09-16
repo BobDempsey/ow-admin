@@ -145,6 +145,28 @@ export async function showNavDrawer(page: Page): Promise<void> {
   await openNavDrawer(page);
 }
 
+/** The header's AI assistant button, which opens the demo drawer. */
+export const aiButton = (page: Page) => page.getByRole('button', { name: 'AI assistant' });
+
+/** The open AI assistant demo drawer. */
+export const aiDrawer = (page: Page) => page.getByRole('dialog', { name: 'AI assistant' });
+
+/** Opens the header's AI assistant drawer on whatever screen is showing. */
+export async function openAiDrawer(page: Page): Promise<void> {
+  await aiButton(page).click();
+  await expect(aiDrawer(page)).toBeVisible();
+  // The drawer slides in, so wait for that transition before measuring or shooting it.
+  await aiDrawer(page).evaluate((drawer) =>
+    Promise.all(drawer.getAnimations().map((animation) => animation.finished)),
+  );
+}
+
+/** Opens the user list with the AI assistant drawer open. */
+export async function showAiDrawer(page: Page): Promise<void> {
+  await openList(page);
+  await openAiDrawer(page);
+}
+
 /**
  * The header's Theme button, which opens the menu of Light, Dark and System. Its name carries the
  * current choice, such as "Theme: Dark".

@@ -3,6 +3,8 @@ import { expect, test } from './support/test';
 import {
   USER_ID,
   VIEWPORTS,
+  aiButton,
+  aiDrawer,
   choosePageSize,
   filterChip,
   listStatus,
@@ -33,6 +35,20 @@ async function pressUntilFocused(page: Page, name: string, key = 'Tab', max = 40
 }
 
 const focused = (page: Page) => page.locator(':focus');
+
+/** Presses Tab `count` times from the top of the page and returns each focused element's text. */
+async function tabStops(page: Page, count: number): Promise<string[]> {
+  const stops: string[] = [];
+  for (let press = 0; press < count; press++) {
+    await page.keyboard.press('Tab');
+    stops.push(
+      await page.evaluate(
+        () => document.activeElement?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      ),
+    );
+  }
+  return stops;
+}
 
 /** True when the focused element is entirely outside the viewport or covered at every corner. */
 function focusHidden(page: Page): Promise<boolean> {
@@ -96,12 +112,14 @@ test.describe('keyboard flows', () => {
     await expect(page.getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page');
   });
 
-  test('header: the Theme button follows the nav, and Tab closes its open menu', async ({
+  test('header: AI assistant and Theme follow the nav, and Tab closes the open Theme menu', async ({
     page,
   }) => {
     await openList(page);
 
     await pressUntilFocused(page, 'About');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('AI assistant');
     await page.keyboard.press('Tab');
     await expect(focused(page)).toHaveAccessibleName('Theme: System');
 
@@ -111,6 +129,43 @@ test.describe('keyboard flows', () => {
 
     await expect(page.getByRole('menu', { name: 'Theme' })).toBeHidden();
     await expect(focused(page)).toHaveAccessibleName('New user');
+  });
+
+  test('AI assistant: opens on its heading, traps focus, and Escape and Close return focus', async ({
+    page,
+  }) => {
+    await openList(page);
+
+    await pressUntilFocused(page, 'AI assistant');
+    await page.keyboard.press('Enter');
+    await expect(aiDrawer(page)).toBeVisible();
+    await expect(focused(page)).toHaveRole('heading');
+    await expect(focused(page)).toHaveText('AI assistant');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('Close');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('View the live example (opens in a new tab)');
+
+    for (let press = 0; press < 6; press++) {
+      await page.keyboard.press('Tab');
+      const inside = await page.evaluate(
+        () =>
+          !!document.activeElement?.closest('dialog') || document.activeElement === document.body,
+      );
+      expect(inside).toBe(true);
+    }
+
+    await page.keyboard.press('Escape');
+    await expect(aiDrawer(page)).toBeHidden();
+    await expect(aiButton(page)).toBeFocused();
+
+    await page.keyboard.press('Enter');
+    await expect(aiDrawer(page)).toBeVisible();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(aiDrawer(page)).toBeHidden();
+    await expect(aiButton(page)).toBeFocused();
+    expect(new URL(page.url()).pathname).toBe('/users');
   });
 
   test('list: the grid is one tab stop and Enter on a row opens the user', async ({ page }) => {
@@ -506,6 +561,46 @@ test.describe('the nav drawer at 320px', () => {
     await expect(navDrawer(page)).toBeHidden();
     await expect(focused(page)).toHaveAccessibleName('Menu');
     expect(new URL(page.url()).pathname).toBe('/users');
+  });
+});
+
+test.describe('header Tab order at 1280px', () => {
+  test.use({ viewport: { width: 1280, height: 900 } });
+
+  test('skip link, wordmark, nav entries, AI assistant, then Theme', async ({ page }) => {
+    await openList(page);
+
+    expect(await tabStops(page, 9)).toEqual([
+      'Skip to main content',
+      'Orbweaver Admin',
+      'Dashboard (not available yet)',
+      'Users',
+      'Reports (not available yet)',
+      'Settings (not available yet)',
+      'About',
+      'AI assistant',
+      'Theme: System',
+    ]);
+    await expect(focused(page)).toHaveAccessibleName('Theme: System');
+  });
+});
+
+test.describe('header Tab order at 320px', () => {
+  test.use({ viewport: { width: 320, height: 800 } });
+
+  test('skip link, wordmark, AI assistant, Theme, then Menu', async ({ page }) => {
+    await openList(page);
+
+    expect(await tabStops(page, 5)).toEqual([
+      'Skip to main content',
+      'Orbweaver Admin',
+      'AI assistant',
+      'Theme: System',
+      'Menu',
+    ]);
+    await expect(focused(page)).toHaveAccessibleName('Menu');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveAccessibleName('New user');
   });
 });
 

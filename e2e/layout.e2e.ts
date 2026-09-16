@@ -3,6 +3,8 @@ import { expect, test } from './support/test';
 import {
   COLOR_SCHEMES,
   VIEWPORTS,
+  aiButton,
+  aiDrawer,
   choosePageSize,
   forceResetFailure,
   holdListLoad,
@@ -18,6 +20,7 @@ import {
   showChipsList,
   showFixedHeader,
   showFilteredList,
+  showAiDrawer,
   showListResetDialog,
   showNavDrawer,
   showNewUserErrors,
@@ -83,6 +86,7 @@ const SCREENS: Screen[] = [
   },
   { name: 'about', slug: 'about', open: openAbout },
   { name: 'user list with the Theme menu open', slug: 'theme-menu', open: showThemeMenu },
+  { name: 'user list with the AI assistant drawer open', slug: 'ai-drawer', open: showAiDrawer },
   { name: 'table settings dialog with WCAG note', slug: 'settings', open: showSettingsWcagNote },
 ];
 
@@ -272,6 +276,11 @@ for (const viewport of VIEWPORTS) {
     expect(menu.y).toBeGreaterThanOrEqual(button.y + button.height);
     expect(menu.x).toBeGreaterThanOrEqual(0);
     expect(menu.x + menu.width).toBeLessThanOrEqual(viewport.width);
+    expect(menu.y + menu.height).toBeLessThanOrEqual(viewport.height);
+    await expect(themeMenu(page).getByRole('menuitemradio')).toHaveCount(3);
+    for (const item of await themeMenu(page).getByRole('menuitemradio').all()) {
+      await expect(item).toBeInViewport({ ratio: 1 });
+    }
     expect(await scrollsHorizontally(page)).toBe(false);
   });
 }
@@ -305,22 +314,79 @@ for (const colorScheme of COLOR_SCHEMES) {
   });
 }
 
-test('the header holds the wordmark, Menu and Theme on one row at 320px', async ({ page }) => {
+// The AI assistant drawer shows at every width, so it is checked at both.
+for (const colorScheme of COLOR_SCHEMES) {
+  for (const viewport of VIEWPORTS) {
+    test.describe(`AI assistant drawer, ${colorScheme} theme at ${viewport.name}`, () => {
+      test.use({ colorScheme, viewport: { width: viewport.width, height: viewport.height } });
+
+      test('opens at the right edge, fits the viewport and never hides focus', async ({ page }) => {
+        await showAiDrawer(page);
+        const drawer = (await aiDrawer(page).boundingBox())!;
+
+        expect(drawer.x).toBeGreaterThanOrEqual(0);
+        expect(Math.round(drawer.x + drawer.width)).toBe(viewport.width);
+        expect(drawer.height).toBeLessThanOrEqual(viewport.height);
+        expect(await scrollsHorizontally(page)).toBe(false);
+        expect(await smallTargets(page)).toEqual([]);
+        expect(await obscuredFocusStops(page)).toEqual([]);
+        await expect(aiButton(page)).toHaveAttribute('aria-haspopup', 'dialog');
+      });
+    });
+  }
+}
+
+/** How many distinct rows the given boxes sit on, grouping boxes whose vertical spans overlap. */
+function rowCount(boxes: { y: number; height: number }[]): number {
+  const rows: { top: number; bottom: number }[] = [];
+  for (const box of boxes) {
+    const row = rows.find((r) => box.y < r.bottom && r.top < box.y + box.height);
+    if (row) {
+      row.top = Math.min(row.top, box.y);
+      row.bottom = Math.max(row.bottom, box.y + box.height);
+    } else {
+      rows.push({ top: box.y, bottom: box.y + box.height });
+    }
+  }
+  return rows.length;
+}
+
+test('the header holds the wordmark, AI assistant, Theme and Menu on one row at 320px', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await openList(page);
   const wordmark = (await page.getByRole('link', { name: 'Orbweaver Admin' }).boundingBox())!;
-  const menu = (await menuButton(page).boundingBox())!;
+  const ai = (await aiButton(page).boundingBox())!;
   const theme = (await themeButton(page).boundingBox())!;
+  const menu = (await menuButton(page).boundingBox())!;
+  const rows = rowCount([wordmark, ai, theme, menu]);
+  console.log(`header rows at 320px: ${rows}`);
 
   // One row: every box overlaps the wordmark's vertically, and each starts after the one before.
-  for (const box of [menu, theme]) {
-    expect(box.y).toBeLessThan(wordmark.y + wordmark.height);
-    expect(wordmark.y).toBeLessThan(box.y + box.height);
-  }
-  expect(menu.x).toBeGreaterThanOrEqual(wordmark.x + wordmark.width);
-  expect(theme.x).toBeGreaterThanOrEqual(menu.x + menu.width);
+  expect(rows).toBe(1);
+  expect(ai.x).toBeGreaterThanOrEqual(wordmark.x + wordmark.width);
+  expect(theme.x).toBeGreaterThanOrEqual(ai.x + ai.width);
+  expect(menu.x).toBeGreaterThanOrEqual(theme.x + theme.width);
+  expect(menu.x + menu.width).toBeLessThanOrEqual(320);
   await expect(page.getByRole('link', { name: 'About' })).toBeHidden();
   expect(await scrollsHorizontally(page)).toBe(false);
+  expect(
+    await page.locator('header').evaluate((header) => header.scrollWidth <= header.clientWidth),
+  ).toBe(true);
+});
+
+test('Menu sits outside the Primary nav landmark, in the header', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await openList(page);
+  const primary = page.getByRole('navigation', { name: 'Primary' });
+
+  await expect(menuButton(page)).toBeVisible();
+  await expect(primary).toHaveCount(1);
+  await expect(primary.getByRole('button', { name: 'Menu' })).toHaveCount(0);
+  await expect(primary.getByRole('button', { name: 'AI assistant' })).toHaveCount(0);
+  await expect(primary.getByRole('button', { name: /^Theme/ })).toHaveCount(0);
+  await expect(page.locator('header').getByRole('button', { name: 'Menu' })).toHaveCount(1);
 });
 
 test('widening past 768px closes the drawer and moves focus to the wordmark', async ({ page }) => {

@@ -100,6 +100,23 @@ test.describe('table settings dialog', () => {
     await expect(settingsButton(page)).toBeFocused();
   });
 
+  test('Tab goes from the heading to Close, then to Striped rows and Density', async ({ page }) => {
+    await openList(page);
+    await settingsButton(page).focus();
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator(':focus')).toHaveRole('heading');
+    await expect(page.locator(':focus')).toHaveText('Table settings');
+    await page.keyboard.press('Tab');
+    await expect(page.locator(':focus')).toHaveAccessibleName('Close');
+    await expect(page.locator(':focus')).toHaveRole('button');
+    await page.keyboard.press('Tab');
+    await expect(page.locator(':focus')).toHaveAccessibleName('Striped rows');
+    await expect(page.locator(':focus')).toHaveRole('checkbox');
+    await page.keyboard.press('Tab');
+    await expect(page.locator(':focus')).toHaveRole('radio');
+  });
+
   test('Close returns focus to the Table settings button', async ({ page }) => {
     await openSettingsDialog(page);
 
@@ -280,13 +297,14 @@ test.describe('table settings dialog', () => {
       }) => {
         await openSettingsDialog(page);
         await dialog(page).getByRole('checkbox', { name: 'Striped rows' }).check();
-        const colors = await page.evaluate(() => {
+        // The header's AI assistant drawer is also a `dialog`, so read from this one only.
+        const colors = await dialog(page).evaluate((settings) => {
           const read = (selector: string) => {
-            const style = getComputedStyle(document.querySelector(`dialog ${selector}`)!);
+            const style = getComputedStyle(settings.querySelector(selector)!);
             return { border: style.borderTopColor, background: style.backgroundColor };
           };
           return {
-            surface: getComputedStyle(document.querySelector('dialog')!).backgroundColor,
+            surface: getComputedStyle(settings).backgroundColor,
             unselected: read('input:not(:checked)'),
             selected: read('input:checked'),
           };

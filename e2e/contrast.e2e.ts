@@ -82,52 +82,124 @@ for (const colorScheme of COLOR_SCHEMES) {
   });
 }
 
+/**
+ * The color of the last shadow in a computed `box-shadow` list, such as
+ * `oklch(...) 0px -1px 0px 0px inset`. Tailwind puts empty ring shadows before the header's own.
+ */
+function lastShadowColor(shadows: string): string {
+  const last = shadows
+    .split(/,(?![^(]*\))/)
+    .at(-1)!
+    .trim();
+  return last.match(/^(.*\))\s/)?.[1] ?? last;
+}
+
 /** The colors the header draws, read from its rendered elements. */
 async function headerColors(page: Page) {
   const header = page.locator('header');
   const users = header.getByRole('link', { name: 'Users', exact: true });
   const placeholder = header.getByRole('button', { name: 'Reports (not available yet)' });
+  const iconButton = header.getByRole('button', { name: 'AI assistant' });
+  const theme = header.getByRole('button', { name: /^Theme/ });
   const style = (locator: typeof users, property: string) =>
     locator.evaluate((element, name) => getComputedStyle(element).getPropertyValue(name), property);
+  const rest = () => page.mouse.move(0, 400);
+  // Icon buttons fade their colors, so read them only once the fade has finished.
+  const settled = (locator: typeof users) =>
+    locator.evaluate((element) =>
+      Promise.all(element.getAnimations().map((animation) => animation.finished)),
+    );
   await expect(users).toHaveAttribute('aria-current', 'page');
 
   const surface = await style(header, 'background-color');
+  const bottomRule = lastShadowColor(await style(header, 'box-shadow'));
   const text = await style(users, 'color');
   const underline = await style(users, 'border-bottom-color');
   const placeholderText = await style(placeholder, 'color');
+  const icon = await style(iconButton, 'color');
+  const themeIcon = await style(theme, 'color');
   await users.hover();
   const hover = await style(users, 'background-color');
-  await page.mouse.move(0, 400);
+  await iconButton.hover();
+  await settled(iconButton);
+  const iconHoverFill = await style(iconButton, 'background-color');
+  const iconHover = await style(iconButton, 'color');
+  await rest();
   await users.focus();
   const focusRing = await style(users, 'outline-color');
-  return { surface, text, underline, placeholderText, hover, focusRing };
+  await rest();
+  await iconButton.focus();
+  await settled(iconButton);
+  const iconFocusRing = await style(iconButton, 'outline-color');
+  const iconFocusStyle = await style(iconButton, 'outline-style');
+  return {
+    surface,
+    bottomRule,
+    text,
+    underline,
+    placeholderText,
+    icon,
+    themeIcon,
+    hover,
+    iconHoverFill,
+    iconHover,
+    focusRing,
+    iconFocusRing,
+    iconFocusStyle,
+  };
 }
 
 for (const colorScheme of COLOR_SCHEMES) {
   test.describe(`header contrast, ${colorScheme} theme at 1280px`, () => {
     test.use({ colorScheme, viewport: { width: 1280, height: 900 } });
 
-    test('text, placeholders, focus ring and underline meet their minimums', async ({ page }) => {
+    test('text, icon buttons, focus ring and underline meet their minimums', async ({ page }) => {
       await page.goto('/users');
       await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme);
       const colors = await headerColors(page);
+      const ratio = async (foreground: string, background: string) =>
+        Number((await contrast(page, foreground, background)).toFixed(2));
       const ratios = {
-        text: await contrast(page, colors.text, colors.surface),
-        textOnHover: await contrast(page, colors.text, colors.hover),
-        placeholder: await contrast(page, colors.placeholderText, colors.surface),
-        focusRing: await contrast(page, colors.focusRing, colors.surface),
-        underline: await contrast(page, colors.underline, colors.surface),
-        underlineOnHover: await contrast(page, colors.underline, colors.hover),
+        text: await ratio(colors.text, colors.surface),
+        textOnHover: await ratio(colors.text, colors.hover),
+        placeholder: await ratio(colors.placeholderText, colors.surface),
+        mutedIcon: await ratio(colors.icon, colors.surface),
+        mutedOnHoverFill: await ratio(colors.icon, colors.iconHoverFill),
+        iconOnHover: await ratio(colors.iconHover, colors.iconHoverFill),
+        focusRing: await ratio(colors.focusRing, colors.surface),
+        focusRingOnHover: await ratio(colors.focusRing, colors.hover),
+        iconFocusRing: await ratio(colors.iconFocusRing, colors.surface),
+        underline: await ratio(colors.underline, colors.surface),
+        underlineOnHover: await ratio(colors.underline, colors.hover),
+        // Decorative, so it has no minimum; measured so docs/accessibility.md can record it. The
+        // light rule is transparent, which the canvas would draw as black, so it is not measured.
+        bottomRule:
+          colorScheme === 'dark' ? await ratio(colors.bottomRule, colors.surface) : undefined,
       };
-      console.log(`${colorScheme} header: ${JSON.stringify(ratios)}`);
+      console.log(`${colorScheme} header colors: ${JSON.stringify(colors)}`);
+      console.log(`${colorScheme} header ratios: ${JSON.stringify(ratios)}`);
 
       expect(colors.hover).not.toBe(colors.surface);
+      expect(colors.iconHoverFill).toBe(colors.hover);
+      expect(colors.themeIcon).toBe(colors.icon);
+      expect(colors.placeholderText).toBe(colors.icon);
+      expect(colors.iconFocusStyle).toBe('solid');
       expect(ratios.text).toBeGreaterThanOrEqual(TEXT);
       expect(ratios.textOnHover).toBeGreaterThanOrEqual(TEXT);
       expect(ratios.placeholder).toBeGreaterThanOrEqual(TEXT);
+      expect(ratios.mutedIcon).toBeGreaterThanOrEqual(TEXT);
+      expect(ratios.mutedOnHoverFill).toBeGreaterThanOrEqual(TEXT);
+      expect(ratios.iconOnHover).toBeGreaterThanOrEqual(TEXT);
       expect(ratios.focusRing).toBeGreaterThanOrEqual(NON_TEXT);
+      expect(ratios.focusRingOnHover).toBeGreaterThanOrEqual(NON_TEXT);
+      expect(ratios.iconFocusRing).toBeGreaterThanOrEqual(NON_TEXT);
       expect(ratios.underline).toBeGreaterThanOrEqual(NON_TEXT);
       expect(ratios.underlineOnHover).toBeGreaterThanOrEqual(NON_TEXT);
+      if (colorScheme === 'light') {
+        expect(colors.bottomRule).toMatch(/^(transparent|rgba\(0, 0, 0, 0\)|oklab\(0 0 0 \/ 0\))$/);
+      } else {
+        expect(colors.bottomRule).not.toBe(colors.surface);
+      }
     });
   });
 }

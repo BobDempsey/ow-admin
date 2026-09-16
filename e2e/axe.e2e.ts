@@ -23,6 +23,7 @@ import {
   showNoSearchResults,
   showFixedHeader,
   showNavDrawer,
+  showAiDrawer,
   showResetSent,
   showRowMenu,
   showSearchResults,
@@ -56,6 +57,7 @@ const STATES: { name: string; open: (page: Page) => Promise<void> }[] = [
   { name: 'password reset failure (forced through ng.getComponent)', open: forceResetFailure },
   { name: 'about', open: openAbout },
   { name: 'user list with the Theme menu open', open: showThemeMenu },
+  { name: 'user list with the AI assistant drawer open', open: showAiDrawer },
   { name: 'table settings dialog', open: openSettingsDialog },
   { name: 'table settings dialog with WCAG note', open: showSettingsWcagNote },
 ];
