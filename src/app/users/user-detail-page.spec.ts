@@ -143,6 +143,10 @@ describe('UserDetailPage', () => {
 
       expect(heading()?.textContent?.trim()).toBe(seeded.name);
       expect(element.textContent).toContain(`ID ${ID}`);
+      const idLine = Array.from(element.querySelectorAll('p')).find(
+        (paragraph) => paragraph.textContent?.trim() === `ID ${ID}`,
+      );
+      expect(idLine?.classList).toContain('tabular-nums');
       expect(control('Name')?.value).toBe(seeded.name);
       expect(control('Email')?.value).toBe(seeded.email);
       expect(control('Role')?.value).toBe(seeded.role);

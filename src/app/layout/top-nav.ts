@@ -20,7 +20,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
   selector: 'app-top-nav',
   imports: [RouterLink, RouterLinkActive, NavDrawer],
   template: `
-    <nav aria-label="Primary" class="flex flex-wrap items-center gap-x-3 gap-y-1 md:gap-x-6">
+    <nav aria-label="Primary" class="flex flex-wrap items-center gap-x-2 gap-y-1 md:gap-x-6">
       <a
         #wordmark
         routerLink="/users"
@@ -57,7 +57,7 @@ const NAV_ENTRIES: readonly NavEntry[] = [
         type="button"
         aria-haspopup="dialog"
         (click)="openDrawer()"
-        class="inline-flex min-h-11 items-center px-3 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus md:hidden"
+        class="inline-flex min-h-11 items-center px-2 text-sm text-header-ink hover:bg-header-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-focus md:hidden"
       >
         Menu
       </button>

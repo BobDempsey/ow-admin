@@ -308,3 +308,37 @@ test('the fixed header list reflows at 320 by 256 px (400 percent zoom)', async 
   await expect(page.getByRole('button', { name: 'Next Page' })).toBeVisible();
   expect(await clippedText(page)).toEqual([]);
 });
+
+test('text is set in Inter, loaded once from the app itself', async ({ page }) => {
+  const fontRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.resourceType() === 'font') {
+      fontRequests.push(new URL(request.url()).pathname);
+    }
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openList(page);
+  await page.evaluate(() => document.fonts.ready);
+
+  const font = await page.evaluate(() => ({
+    family: getComputedStyle(document.body).fontFamily,
+    loaded: document.fonts.check('1em "Inter Variable"'),
+  }));
+  expect(font.family).toMatch(/^"Inter Variable"/);
+  expect(font.loaded).toBe(true);
+  expect(fontRequests.filter((path) => path.endsWith('inter-latin-wght-normal.woff2'))).toEqual([
+    '/fonts/inter-latin-wght-normal.woff2',
+  ]);
+});
+
+test('the total and the paging panel use tabular numbers', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openList(page);
+  const numeric = (locator: ReturnType<Page['locator']>) =>
+    locator.evaluate((element) => getComputedStyle(element).fontVariantNumeric);
+
+  expect(await numeric(page.locator('app-users-page p', { hasText: /^\s*[\d,]+ users\s*$/ }))).toBe(
+    'tabular-nums',
+  );
+  expect(await numeric(page.locator('app-users-grid .ag-paging-panel'))).toBe('tabular-nums');
+});

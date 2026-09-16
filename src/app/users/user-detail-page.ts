@@ -66,7 +66,7 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
         </button>
       </div>
     } @else if (user.hasValue()) {
-      <p class="text-sm text-ink-subtle">ID {{ user.value().data.id }}</p>
+      <p class="text-sm text-ink-subtle tabular-nums">ID {{ user.value().data.id }}</p>
       <form novalidate (submit)="save($event)" class="mt-4 grid gap-6">
         <app-user-form-fields [fields]="fields" />
         @if (saveFailed()) {

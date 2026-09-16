@@ -45,7 +45,7 @@ function isNarrowed({ q, role, status }: ListQuery): boolean {
         Users
       </h1>
       @if (totalLabel(); as label) {
-        <p class="text-ink-subtle">{{ label }}</p>
+        <p class="text-ink-subtle tabular-nums">{{ label }}</p>
       }
       <a
         routerLink="/users/new"

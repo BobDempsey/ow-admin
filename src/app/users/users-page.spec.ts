@@ -79,6 +79,10 @@ describe('UsersPage', () => {
     await settle();
 
     expect(element.textContent).toContain('500,000 users');
+    const total = Array.from(element.querySelectorAll('p')).find(
+      (paragraph) => paragraph.textContent?.trim() === '500,000 users',
+    );
+    expect(total?.classList).toContain('tabular-nums');
   });
 
   it('announces loading only while a page is in flight', async () => {

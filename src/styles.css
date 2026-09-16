@@ -2,6 +2,44 @@
 
 @import 'tailwindcss';
 
+/*
+ * Inter, served from /fonts/ (angular.json copies the files from @fontsource-variable/inter). The
+ * faces are declared here rather than imported, because Angular would hash the imported file names
+ * and index.html preloads the latin file by its plain URL. Ranges match the package's own CSS.
+ */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Arial resized to Inter's metrics, so text keeps its line breaks while Inter loads. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 107.4%;
+  ascent-override: 90.2%;
+  descent-override: 22.5%;
+  line-gap-override: 0%;
+}
+
 /* `dark:` follows the resolved theme on <html>, which the inline script in index.html sets. */
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
@@ -69,6 +107,8 @@
   --color-avatar-5-ink: var(--color-rose-800);
   --color-avatar-6-surface: var(--color-slate-200);
   --color-avatar-6-ink: var(--color-slate-800);
+
+  --font-sans: 'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
 
   /* Cards: `rounded-card` and `shadow-card`. The shadow reads its color, so dark only swaps that. */
   --radius-card: var(--radius-xl);
@@ -202,8 +242,9 @@ app-users-grid.striped .ag-row-odd {
   background-color: var(--color-row-stripe);
 }
 
-/* AG Grid's pagination panel is one fixed-height row that clips at narrow widths; let it wrap. */
+/* AG Grid's pagination panel is one fixed-height row that clips at narrow widths; let it wrap. Its counts use tabular figures. */
 app-users-grid .ag-paging-panel {
+  font-variant-numeric: tabular-nums;
   height: auto;
   min-height: 48px;
   padding-block: 4px;

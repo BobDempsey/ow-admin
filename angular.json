@@ -23,6 +23,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "inter-latin{,-ext}-wght-normal.woff2",
+                "input": "node_modules/@fontsource-variable/inter/files",
+                "output": "fonts"
               }
             ],
             "styles": ["src/styles.css"]
