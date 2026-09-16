@@ -19,7 +19,7 @@ Open `http://localhost:4200/`. The app redirects to the user list at `/users`.
 
 - `/users` lists users 25, 50 or 100 at a time. Each page is one request to the API. Click a row, or press Enter on a focused row, to open that user. Click a column header, or press Enter on a focused one, to sort by it, and type in Search users to find people by name or email. The Role and Status dropdowns beside the search narrow the list to one role or status, and apply as soon as you choose.
 - `/users/new` creates a user. On success the app opens the new user's detail screen. New users take the next index, so they appear on the last page of the list.
-- `/users/:id` shows a user as an editable form with Save and Cancel.
+- `/users/:id` shows a user as an editable form with Save and Cancel. Its Reset password button sends the user a password reset email after you confirm, and leaves unsaved edits in the form.
 - `/about` explains the app and how to try it.
 
 Dashboard, Reports and Settings in the navigation are placeholders and do nothing.
@@ -43,7 +43,7 @@ The typed client is `UsersApi` in `src/app/core/api/`. It calls `HttpClient`, an
 | `GET /api/users/{id}`                 | 200 with an `ETag`, or 404.                                                                                                                                                                           |
 | `POST /api/users`                     | 201 with `ETag` and `Location`, or 400 with `fieldErrors`.                                                                                                                                            |
 | `PUT /api/users/{id}`                 | 200 with a new `ETag`. 428 without `If-Match`, 412 when the `If-Match` ETag is stale, 400 on invalid fields.                                                                                          |
-| `POST /api/users/{id}/password-reset` | 204. No UI calls it yet.                                                                                                                                                                              |
+| `POST /api/users/{id}/password-reset` | 204. The detail screen's Reset password button calls it.                                                                                                                                              |
 
 Other methods on a known path return 405 with an `Allow` header.
 

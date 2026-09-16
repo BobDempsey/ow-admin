@@ -38,6 +38,11 @@ export class UsersService {
     return firstValueFrom(this.api.update(id, draft, etag));
   }
 
+  /** Sends the user a password reset email. It needs no ETag and changes nothing callers hold. */
+  resetPassword(id: string): Promise<void> {
+    return firstValueFrom(this.api.resetPassword(id));
+  }
+
   /**
    * Changes the user the way a second admin would: reads it, then saves it with its status moved
    * to the next value. The new ETag is not returned, so ETags callers hold for this user go stale.

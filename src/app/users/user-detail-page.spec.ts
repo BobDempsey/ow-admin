@@ -66,6 +66,29 @@ async function renderPage(
   const alert = () => element.querySelector('[role="alert"]')?.textContent?.trim();
   const heading = () => element.querySelector('h1');
   const dialogOpen = () => element.querySelector('dialog')?.open ?? false;
+  // A closed dialog stays in the DOM, so reset dialog queries are scoped to its element.
+  const resetDialog = () =>
+    element.querySelector<HTMLDialogElement>('app-reset-password-dialog dialog')!;
+  const resetDialogButton = (name: string) =>
+    Array.from(resetDialog().querySelectorAll('button')).find(
+      (candidate) => candidate.textContent?.trim() === name,
+    );
+  const passwordSection = () =>
+    element.querySelector('section[aria-labelledby="password-heading"]');
+  const resetButton = () =>
+    Array.from(passwordSection()?.querySelectorAll('button') ?? []).find(
+      (candidate) => candidate.textContent?.trim() === 'Reset password',
+    );
+  const resetAlert = () => passwordSection()?.querySelector('[role="alert"]');
+  const openResetDialog = async () => {
+    resetButton()?.click();
+    await fixture.whenStable();
+  };
+  const confirmReset = async () => {
+    await openResetDialog();
+    resetDialogButton('Send reset email')?.click();
+    await settle();
+  };
 
   await settle();
   return {
@@ -82,6 +105,13 @@ async function renderPage(
     alert,
     heading,
     dialogOpen,
+    resetDialog,
+    resetDialogButton,
+    passwordSection,
+    resetButton,
+    resetAlert,
+    openResetDialog,
+    confirmReset,
     ...dialogStubs,
   };
 }
@@ -345,6 +375,209 @@ describe('UserDetailPage', () => {
     });
   });
 
+  describe('password reset', () => {
+    it('shows a Password section with Reset password between the form and Demo', async () => {
+      const page = await renderPage();
+
+      const section = page.passwordSection()!;
+      const heading = document.getElementById(section.getAttribute('aria-labelledby')!);
+      expect(heading?.tagName).toBe('H2');
+      expect(heading?.textContent?.trim()).toBe('Password');
+      expect(page.resetButton()?.type).toBe('button');
+      expect(page.resetButton()?.disabled).toBe(false);
+      expect(section.closest('form')).toBeNull();
+      const form = page.element.querySelector('form')!;
+      const demo = page.element.querySelector('section[aria-labelledby="demo-heading"]')!;
+      expect(form.compareDocumentPosition(section)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(section.compareDocumentPosition(demo)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it('shows no Reset password button for a missing user', async () => {
+      const page = await renderPage({ id: 'u-999999' });
+
+      expect(page.passwordSection()).toBeNull();
+      expect(page.button('Reset password')).toBeUndefined();
+    });
+
+    it('shows no Reset password button when loading fails', async () => {
+      const page = await renderPage({
+        beforeCreate: () =>
+          vi
+            .spyOn(TestBed.inject(UsersService), 'loadUser')
+            .mockRejectedValue(new ApiError(500, 'Server error')),
+      });
+
+      expect(page.passwordSection()).toBeNull();
+      expect(page.button('Reset password')).toBeUndefined();
+    });
+
+    it('opens the confirmation naming the user, with focus on Cancel and no request', async () => {
+      const page = await renderPage();
+      const resetPassword = vi.spyOn(page.users, 'resetPassword');
+
+      await page.openResetDialog();
+
+      expect(page.resetDialog().open).toBe(true);
+      expect(page.resetDialog().textContent).toContain(
+        `Send ${seeded.name} an email at ${seeded.email} with a link to choose a new password?`,
+      );
+      expect(document.activeElement).toBe(page.resetDialogButton('Cancel'));
+      expect(resetPassword).not.toHaveBeenCalled();
+    });
+
+    it('sends the reset on confirm, announces it, and returns focus to the button', async () => {
+      const page = await renderPage();
+      const resetPassword = vi.spyOn(page.users, 'resetPassword');
+
+      await page.confirmReset();
+
+      expect(resetPassword).toHaveBeenCalledExactlyOnceWith(ID);
+      expect(page.resetDialog().open).toBe(false);
+      expect(page.status()).toBe('Password reset email sent.');
+      expect(page.resetAlert()).toBeNull();
+      expect(document.activeElement).toBe(page.resetButton());
+    });
+
+    it('sends nothing on Cancel and returns focus to the button', async () => {
+      const page = await renderPage();
+      const resetPassword = vi.spyOn(page.users, 'resetPassword');
+      await page.openResetDialog();
+
+      page.resetDialogButton('Cancel')?.click();
+      await page.settle();
+
+      expect(page.resetDialog().open).toBe(false);
+      expect(resetPassword).not.toHaveBeenCalled();
+      expect(page.status()).toBe('');
+      expect(document.activeElement).toBe(page.resetButton());
+    });
+
+    it('sends nothing on Escape and returns focus to the button', async () => {
+      const page = await renderPage();
+      const resetPassword = vi.spyOn(page.users, 'resetPassword');
+      await page.openResetDialog();
+
+      page.resetDialog().dispatchEvent(new Event('cancel', { cancelable: true }));
+      await page.settle();
+
+      expect(page.resetDialog().open).toBe(false);
+      expect(resetPassword).not.toHaveBeenCalled();
+      expect(page.status()).toBe('');
+      expect(document.activeElement).toBe(page.resetButton());
+    });
+
+    it('announces a reset in flight and sends no second request while it runs', async () => {
+      const page = await renderPage();
+      const resetPassword = vi
+        .spyOn(page.users, 'resetPassword')
+        .mockReturnValue(new Promise(() => {}));
+
+      await page.confirmReset();
+      expect(page.status()).toBe('Sending password reset email…');
+
+      await page.openResetDialog();
+      page.resetDialogButton('Send reset email')?.click();
+      await page.fixture.whenStable();
+
+      expect(page.showModal).toHaveBeenCalledOnce();
+      expect(resetPassword).toHaveBeenCalledOnce();
+      expect(page.status()).toBe('Sending password reset email…');
+    });
+
+    it.each([
+      [500, 'Server error'],
+      [404, 'User not found'],
+    ])('shows an alert with Try again when the reset answers %i', async (code, message) => {
+      const page = await renderPage();
+      vi.spyOn(page.users, 'resetPassword').mockRejectedValue(new ApiError(code, message));
+
+      await page.confirmReset();
+
+      const alert = page.resetAlert();
+      expect(alert?.textContent).toContain('The password reset email could not be sent.');
+      expect(alert?.querySelector('button')?.textContent?.trim()).toBe('Try again');
+      expect(page.status()).toBe('');
+      expect(page.heading()?.textContent?.trim()).toBe(seeded.name);
+      expect(page.control('Name')?.value).toBe(seeded.name);
+    });
+
+    it('repeats the request on Try again without the dialog and moves focus to the button', async () => {
+      const page = await renderPage();
+      let answerRetry!: () => void;
+      const resetPassword = vi
+        .spyOn(page.users, 'resetPassword')
+        .mockRejectedValueOnce(new ApiError(500, 'Server error'))
+        .mockReturnValueOnce(new Promise<void>((resolve) => (answerRetry = resolve)));
+      await page.confirmReset();
+
+      page.resetAlert()?.querySelector('button')?.click();
+
+      expect(document.activeElement).toBe(page.resetButton());
+      await page.fixture.whenStable();
+      expect(page.status()).toBe('Sending password reset email…');
+      answerRetry();
+      await page.settle();
+      expect(resetPassword).toHaveBeenCalledTimes(2);
+      expect(page.showModal).toHaveBeenCalledOnce();
+      expect(page.resetAlert()).toBeNull();
+      expect(page.status()).toBe('Password reset email sent.');
+      expect(document.activeElement).toBe(page.resetButton());
+    });
+
+    it('clears the reset alert on Cancel and when a save starts', async () => {
+      const page = await renderPage();
+      vi.spyOn(page.users, 'resetPassword').mockRejectedValue(new ApiError(500, 'Server error'));
+      await page.confirmReset();
+      expect(page.resetAlert()).not.toBeNull();
+
+      await page.click('Cancel');
+      expect(page.resetAlert()).toBeNull();
+
+      await page.confirmReset();
+      expect(page.resetAlert()).not.toBeNull();
+      await page.saveForm();
+      expect(page.resetAlert()).toBeNull();
+      expect(page.status()).toBe('User saved.');
+    });
+
+    it('keeps unsaved edits and the held ETag through a reset', async () => {
+      const page = await renderPage();
+      const loadUser = vi.spyOn(page.users, 'loadUser');
+      const saveUser = vi.spyOn(page.users, 'saveUser');
+      await page.type('Name', 'Grace Hopper');
+      await page.type('Role', 'Viewer');
+
+      await page.confirmReset();
+
+      expect(page.status()).toBe('Password reset email sent.');
+      expect(page.control('Name')?.value).toBe('Grace Hopper');
+      expect(page.control('Role')?.value).toBe('Viewer');
+      expect(page.heading()?.textContent?.trim()).toBe(seeded.name);
+      expect(loadUser).not.toHaveBeenCalled();
+
+      await page.saveForm();
+
+      expect(saveUser).toHaveBeenCalledExactlyOnceWith(
+        ID,
+        { name: 'Grace Hopper', email: seeded.email, role: 'Viewer', status: seeded.status },
+        `"${ID}.1"`,
+      );
+      expect(page.status()).toBe('User saved.');
+    });
+
+    it('leaves the Demo section working after a reset', async () => {
+      const page = await renderPage();
+      await page.confirmReset();
+
+      await page.click('Simulate an edit by another admin');
+      expect(page.status()).toBe('Another admin changed this user. Save to see the conflict.');
+      await page.saveForm();
+
+      expect(page.dialogOpen()).toBe(true);
+      expect(page.resetDialog().open).toBe(false);
+    });
+  });
+
   describe('accessibility', () => {
     it('has no axe violations when loaded', async () => {
       const { element } = await renderPage();
@@ -367,6 +600,21 @@ describe('UserDetailPage', () => {
       });
 
       await expectNoAxeViolations(element);
+    });
+
+    it('has no axe violations when the reset dialog is open', async () => {
+      const page = await renderPage();
+      await page.openResetDialog();
+
+      await expectNoAxeViolations(page.element);
+    });
+
+    it('has no axe violations when the reset fails', async () => {
+      const page = await renderPage();
+      vi.spyOn(page.users, 'resetPassword').mockRejectedValue(new ApiError(500, 'Server error'));
+      await page.confirmReset();
+
+      await expectNoAxeViolations(page.element);
     });
 
     it('has no axe violations when saving fails', async () => {

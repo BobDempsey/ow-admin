@@ -1,5 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 import {
+  USER_ID,
   VIEWPORTS,
   choosePageSize,
   openDetail,
@@ -8,6 +9,7 @@ import {
   openNewUser,
   menuButton,
   navDrawer,
+  resetPasswordDialog,
   showFixedHeader,
 } from './support/app';
 import { obscuredFocusStops } from './support/layout';
@@ -285,6 +287,51 @@ test.describe('keyboard flows', () => {
     await page.keyboard.press('Enter');
     await expect(page.getByRole('status')).toHaveText('User saved.');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(/ overwritten\s*$/);
+  });
+
+  test('password reset: Escape sends nothing, and confirming sends one request', async ({
+    page,
+  }) => {
+    await openDetail(page);
+    // Count reset requests by wrapping the service method on the live page. Dev server only.
+    await page.evaluate(() => {
+      const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+      const detail = debug.getComponent(document.querySelector('app-user-detail-page')!);
+      const record = window as unknown as { resetRequests: string[] };
+      const original = detail.users.resetPassword.bind(detail.users);
+      record.resetRequests = [];
+      detail.users.resetPassword = (id: string) => {
+        record.resetRequests.push(id);
+        return original(id);
+      };
+    });
+    const resetRequests = () =>
+      page.evaluate(() => (window as unknown as { resetRequests: string[] }).resetRequests);
+    const dialog = resetPasswordDialog(page);
+
+    await page.getByLabel('Status').focus();
+    await pressUntilFocused(page, 'Reset password');
+    await page.keyboard.press('Enter');
+    await expect(dialog).toBeVisible();
+    await expect(focused(page)).toHaveText('Cancel');
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(focused(page)).toHaveText('Reset password');
+    expect(await resetRequests()).toEqual([]);
+    await expect(page.getByRole('status')).toHaveText('');
+
+    await page.keyboard.press('Enter');
+    await expect(dialog).toBeVisible();
+    await expect(focused(page)).toHaveText('Cancel');
+    await page.keyboard.press('Tab');
+    await expect(focused(page)).toHaveText('Send reset email');
+    await page.keyboard.press('Enter');
+
+    await expect(page.getByRole('status')).toHaveText('Password reset email sent.');
+    await expect(dialog).toBeHidden();
+    await expect(focused(page)).toHaveText('Reset password');
+    expect(await resetRequests()).toEqual([USER_ID]);
   });
 });
 

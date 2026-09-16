@@ -43,7 +43,7 @@ export function focusFirstError(fields: FieldTree<UserDraft>): void {
         <select
           [id]="id(field.key)"
           [formField]="fields()[field.key]"
-          class="min-h-11 w-full max-w-md rounded border border-line-input bg-surface px-3 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="min-h-11 w-full max-w-md rounded border border-line-input bg-surface pl-3 select-caret text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
           @for (option of field.options; track option) {
             <option [value]="option">{{ option }}</option>

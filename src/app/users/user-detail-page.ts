@@ -18,6 +18,7 @@ import { toApiError } from '../core/api/api-error';
 import { APP_NAME } from '../core/page-title-strategy';
 import { User, UserDraft, Versioned } from '../core/api/user.model';
 import { ConflictChoice, ConflictDialog } from './conflict-dialog';
+import { ResetPasswordDialog } from './reset-password-dialog';
 import { toFieldErrors, userDraftSchema } from './user-draft-schema';
 import { UserFormFields, focusFirstError } from './user-form-fields';
 import { UsersService } from './users.service';
@@ -30,7 +31,7 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
  */
 @Component({
   selector: 'app-user-detail-page',
-  imports: [ConflictDialog, RouterLink, UserFormFields],
+  imports: [ConflictDialog, ResetPasswordDialog, RouterLink, UserFormFields],
   template: `
     <a
       routerLink="/users"
@@ -93,6 +94,37 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
         </div>
       </form>
 
+      <section aria-labelledby="password-heading" class="mt-10 max-w-md">
+        <h2 id="password-heading" class="font-semibold text-ink">Password</h2>
+        <p class="mt-1 text-sm text-ink-muted">
+          Send this user an email with a link to choose a new password.
+        </p>
+        <!-- Never disabled: a disabled button would drop focus and leave the Tab order. -->
+        <button
+          #resetButton
+          type="button"
+          (click)="openResetDialog()"
+          class="mt-3 min-h-11 rounded border border-line px-4 font-medium text-ink hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        >
+          Reset password
+        </button>
+        @if (resetFailed()) {
+          <div
+            role="alert"
+            class="mt-3 flex flex-wrap items-center gap-3 rounded border border-danger-line bg-danger-surface px-4 py-3 text-danger-ink"
+          >
+            <span>The password reset email could not be sent.</span>
+            <button
+              type="button"
+              (click)="retryReset()"
+              class="min-h-11 rounded border border-danger-line-strong bg-surface px-4 font-medium text-danger-ink hover:bg-danger-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              Try again
+            </button>
+          </div>
+        }
+      </section>
+
       <section
         aria-labelledby="demo-heading"
         class="mt-10 max-w-md rounded border border-dashed border-line-strong p-4"
@@ -113,6 +145,11 @@ const EMPTY_DRAFT: UserDraft = { name: '', email: '', role: 'Member', status: 'i
     }
 
     <app-conflict-dialog (choice)="resolveConflict($event)" />
+    <app-reset-password-dialog
+      [name]="loaded()?.data?.name ?? ''"
+      [email]="loaded()?.data?.email ?? ''"
+      (confirmed)="resolveReset($event)"
+    />
   `,
 })
 export default class UserDetailPage {
@@ -122,12 +159,16 @@ export default class UserDetailPage {
   private readonly headingRef = viewChild.required<ElementRef<HTMLElement>>('headingElement');
   private readonly saveButton = viewChild<ElementRef<HTMLButtonElement>>('saveButton');
   private readonly conflictDialog = viewChild.required(ConflictDialog);
+  private readonly resetButton = viewChild<ElementRef<HTMLButtonElement>>('resetButton');
+  private readonly resetDialog = viewChild.required(ResetPasswordDialog);
 
   protected readonly user = resource({
     params: () => this.id(),
     loader: ({ params }) => this.users.loadUser(params),
   });
-  private readonly loaded = computed(() => (this.user.hasValue() ? this.user.value() : undefined));
+  protected readonly loaded = computed(() =>
+    this.user.hasValue() ? this.user.value() : undefined,
+  );
   private readonly loadError = computed(() => {
     const error = this.user.error();
     return error ? toApiError(error) : undefined;
@@ -138,6 +179,8 @@ export default class UserDetailPage {
   protected readonly fields = form(this.draft, userDraftSchema);
 
   protected readonly saveFailed = signal(false);
+  protected readonly resetFailed = signal(false);
+  private readonly resetting = signal(false);
   private readonly notice = signal(createdNotice(inject(Location).getState()));
   private readonly overwriting = signal(false);
 
@@ -155,6 +198,9 @@ export default class UserDetailPage {
     }
     if (this.fields().submitting() || this.overwriting()) {
       return 'Saving…';
+    }
+    if (this.resetting()) {
+      return 'Sending password reset email…';
     }
     return this.notice();
   });
@@ -186,6 +232,7 @@ export default class UserDetailPage {
 
   protected cancel(): void {
     this.saveFailed.set(false);
+    this.resetFailed.set(false);
     this.notice.set('');
     this.fields().reset(toDraft(this.loaded()));
   }
@@ -211,6 +258,27 @@ export default class UserDetailPage {
     }
   }
 
+  protected openResetDialog(): void {
+    // A reset already on its way is not sent twice.
+    if (!this.resetting()) {
+      this.resetDialog().show();
+    }
+  }
+
+  protected async resolveReset(confirmed: boolean): Promise<void> {
+    this.resetButton()?.nativeElement.focus();
+    if (confirmed) {
+      await this.sendReset();
+    }
+  }
+
+  protected async retryReset(): Promise<void> {
+    // Try again leaves the DOM with the alert, so hand focus to Reset password instead of losing it.
+    // The admin already confirmed this reset, so it goes out without the dialog.
+    this.resetButton()?.nativeElement.focus();
+    await this.sendReset();
+  }
+
   private busy(): boolean {
     return this.user.isLoading() || this.fields().submitting() || this.overwriting();
   }
@@ -228,6 +296,25 @@ export default class UserDetailPage {
     }
   }
 
+  /** Sends the reset email. It never touches the form, its unsaved edits or the held ETag. */
+  private async sendReset(): Promise<void> {
+    if (this.resetting()) {
+      return;
+    }
+    this.resetting.set(true);
+    this.resetFailed.set(false);
+    this.notice.set('');
+    try {
+      await this.users.resetPassword(this.id());
+      this.notice.set('Password reset email sent.');
+    } catch {
+      // Any error, a 404 included, gets the same alert; the app has no delete to cause a 404.
+      this.resetFailed.set(true);
+    } finally {
+      this.resetting.set(false);
+    }
+  }
+
   private async submitWith(etag: string): Promise<void> {
     const ok = await submit(this.fields, (fields) => this.send(fields, etag));
     if (!ok) {
@@ -240,6 +327,7 @@ export default class UserDetailPage {
     etag: string,
   ): Promise<ValidationError.WithOptionalFieldTree[]> {
     this.saveFailed.set(false);
+    this.resetFailed.set(false);
     this.notice.set('');
     try {
       const saved = await this.users.saveUser(this.id(), fields().value(), etag);

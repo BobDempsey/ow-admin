@@ -51,6 +51,11 @@
    * states from the color tokens. Stroked in the on-primary color, which is white in both themes.
    */
   --check-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5 6.5 11.5 12.5 5'/%3E%3C/svg%3E");
+  /*
+   * The dropdown caret drawn by `select-caret`. A data URI cannot read a color token, so the
+   * stroke repeats the ink color (slate-900 here, slate-100 in dark).
+   */
+  --select-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4 6 8 10 12 6'/%3E%3C/svg%3E");
 }
 
 /* Contrast for each text, border and focus pair is recorded in docs/accessibility.md. */
@@ -88,6 +93,26 @@
   --color-header-line: var(--color-slate-700);
   --color-backdrop: var(--color-black);
   --color-row-stripe: var(--color-slate-800);
+  --select-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23f1f5f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4 6 8 10 12 6'/%3E%3C/svg%3E");
+}
+
+/*
+ * A `<select>` with the app's caret instead of the browser's, which Chromium draws close to the
+ * right border whatever the padding. Under forced colors the browser draws its own caret again,
+ * in system colors.
+ */
+@utility select-caret {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: var(--select-caret);
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+
+  @media (forced-colors: active) {
+    appearance: auto;
+    background-image: none;
+  }
 }
 
 /*

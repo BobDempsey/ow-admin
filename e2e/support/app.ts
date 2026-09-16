@@ -184,6 +184,28 @@ export async function openConflictDialog(page: Page): Promise<void> {
   await expect(page.getByRole('dialog', { name: 'This user changed' })).toBeVisible();
 }
 
+/** The detail screen's Reset password button. */
+export const resetPasswordButton = (page: Page) =>
+  page.getByRole('button', { name: 'Reset password' });
+
+/** The open password reset confirmation. */
+export const resetPasswordDialog = (page: Page) =>
+  page.getByRole('dialog', { name: 'Reset password?' });
+
+/** Opens a user and activates Reset password, waiting for focus to reach Cancel. */
+export async function openResetDialog(page: Page): Promise<void> {
+  await openDetail(page);
+  await resetPasswordButton(page).click();
+  await expect(resetPasswordDialog(page).getByRole('button', { name: 'Cancel' })).toBeFocused();
+}
+
+/** Opens a user, sends a password reset and waits for it to be announced. */
+export async function showResetSent(page: Page): Promise<void> {
+  await openResetDialog(page);
+  await resetPasswordDialog(page).getByRole('button', { name: 'Send reset email' }).click();
+  await expect(page.getByRole('status')).toHaveText('Password reset email sent.');
+}
+
 // The in-memory API has no network to intercept, so failures are forced by replacing a service
 // method on a live component through Angular's dev-mode `ng` global. Dev server only.
 
@@ -221,6 +243,21 @@ export async function forceSaveFailure(page: Page): Promise<void> {
   });
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByRole('alert')).toContainText('The user could not be saved.');
+}
+
+/** Makes the detail screen's password reset fail, confirms one, and shows its alert. */
+export async function forceResetFailure(page: Page): Promise<void> {
+  await openDetail(page);
+  await page.evaluate(() => {
+    const debug = (window as unknown as { ng: { getComponent(element: Element): any } }).ng;
+    const detail = debug.getComponent(document.querySelector('app-user-detail-page')!);
+    detail.users.resetPassword = () => Promise.reject(new Error('Forced failure'));
+  });
+  await resetPasswordButton(page).click();
+  await resetPasswordDialog(page).getByRole('button', { name: 'Send reset email' }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    'The password reset email could not be sent.',
+  );
 }
 
 /** Submits the empty new user form so every field error shows. */

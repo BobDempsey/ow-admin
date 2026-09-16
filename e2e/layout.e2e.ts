@@ -3,12 +3,14 @@ import {
   COLOR_SCHEMES,
   VIEWPORTS,
   choosePageSize,
+  forceResetFailure,
   openAbout,
   openConflictDialog,
   openDetail,
   openList,
   openMissingUser,
   openNewUser,
+  openResetDialog,
   menuButton,
   navDrawer,
   showFixedHeader,
@@ -16,6 +18,7 @@ import {
   showNavDrawer,
   showNewUserErrors,
   showNoSearchResults,
+  showResetSent,
   showSearchResults,
   showSettingsWcagNote,
   showThemeMenu,
@@ -43,6 +46,13 @@ const SCREENS: { name: string; slug: string; open: (page: Page) => Promise<void>
   { name: 'user detail', slug: 'detail', open: openDetail },
   { name: 'user not found', slug: 'not-found', open: openMissingUser },
   { name: 'conflict dialog', slug: 'dialog', open: openConflictDialog },
+  { name: 'password reset dialog', slug: 'reset-dialog', open: openResetDialog },
+  { name: 'password reset sent', slug: 'reset-sent', open: showResetSent },
+  {
+    name: 'password reset failure (forced through ng.getComponent)',
+    slug: 'reset-failure',
+    open: forceResetFailure,
+  },
   { name: 'about', slug: 'about', open: openAbout },
   { name: 'user list with the Theme menu open', slug: 'theme-menu', open: showThemeMenu },
   { name: 'table settings dialog with WCAG note', slug: 'settings', open: showSettingsWcagNote },
@@ -101,6 +111,77 @@ for (const colorScheme of COLOR_SCHEMES) {
     }
   });
 }
+
+/**
+ * For each `<select>`, how far the widest option's text ends left of the drawn caret. The caret is
+ * the `select-caret` background: 1rem wide, 0.75rem inside the padding box's right edge, which
+ * Chromium reports as `calc(100% - 12px) 50%`.
+ */
+function selectCaretClearances(page: Page) {
+  return page.evaluate(() => {
+    const context = document.createElement('canvas').getContext('2d')!;
+    return Array.from(document.querySelectorAll('select')).map((select) => {
+      const style = getComputedStyle(select);
+      context.font = style.font;
+      const widest = Math.max(
+        ...Array.from(select.options).map((option) => context.measureText(option.text).width),
+      );
+      const box = select.getBoundingClientRect();
+      const textRight =
+        box.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft) + widest;
+      const caretLeft = box.right - parseFloat(style.borderRightWidth) - 12 - 16;
+      return {
+        label: select.labels?.[0]?.textContent?.trim(),
+        appearance: style.appearance,
+        caret: style.backgroundImage.startsWith('url('),
+        caretPosition: style.backgroundPosition,
+        caretSize: style.backgroundSize,
+        clearance: Math.floor(caretLeft - textRight),
+      };
+    });
+  });
+}
+
+const SELECT_SCREENS: [string, (page: Page) => Promise<void>, number][] = [
+  ['user detail', openDetail, 2],
+  ['new user', openNewUser, 2],
+  ['user list with a filter', showFilteredList, 2],
+];
+
+for (const viewport of VIEWPORTS) {
+  for (const [name, open, count] of SELECT_SCREENS) {
+    test(`${name} selects draw a caret clear of their longest option at ${viewport.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await open(page);
+      const selects = await selectCaretClearances(page);
+
+      expect(selects).toHaveLength(count);
+      for (const select of selects) {
+        expect(select, select.label).toMatchObject({
+          appearance: 'none',
+          caret: true,
+          caretPosition: 'calc(100% - 12px) 50%',
+          caretSize: '16px auto',
+        });
+        expect(select.clearance, select.label).toBeGreaterThanOrEqual(0);
+      }
+    });
+  }
+}
+
+test('selects hand the caret back to the browser under forced colors', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ forcedColors: 'active' });
+  await openDetail(page);
+  const selects = await selectCaretClearances(page);
+
+  expect(selects.map(({ appearance, caret }) => ({ appearance, caret }))).toEqual([
+    { appearance: 'auto', caret: false },
+    { appearance: 'auto', caret: false },
+  ]);
+});
 
 test('new user screen passes at 320px with no errors shown', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });

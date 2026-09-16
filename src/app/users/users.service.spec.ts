@@ -1,3 +1,4 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { API_LATENCY_MS } from '../core/api/api-config';
 import { ApiError } from '../core/api/api-error';
@@ -59,6 +60,28 @@ describe('UsersService', () => {
     const stale = service.saveUser('u-000042', draft, loaded.etag);
     await expect(stale).rejects.toBeInstanceOf(ApiError);
     await expect(stale).rejects.toMatchObject({ status: 412 });
+  });
+
+  it('resets a password with a POST that sends no If-Match', async () => {
+    const post = vi.spyOn(TestBed.inject(HttpClient), 'post');
+
+    await expect(service.resetPassword('u-000042')).resolves.toBeUndefined();
+
+    expect(post).toHaveBeenCalledOnce();
+    const [url, body, options] = post.mock.calls[0];
+    expect(url).toBe('/api/users/u-000042/password-reset');
+    expect(body).toBeNull();
+    const headers = options?.headers;
+    const ifMatch =
+      headers instanceof HttpHeaders ? headers.get('If-Match') : headers?.['If-Match'];
+    expect(ifMatch ?? null).toBeNull();
+  });
+
+  it('rejects a password reset for an unknown user with an ApiError 404', async () => {
+    const reset = service.resetPassword('u-999999');
+
+    await expect(reset).rejects.toBeInstanceOf(ApiError);
+    await expect(reset).rejects.toMatchObject({ status: 404 });
   });
 
   it('simulates a concurrent edit that moves the status on and stales held ETags', async () => {
